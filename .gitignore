@@ -1,0 +1,10 @@
+# Rust build output
+/target
+
+# Audient official binaries / extracted trees must never enter this repo.
+originals/
+extracted/
+*.dmg
+*.exe
+*.sys
+*.dll
