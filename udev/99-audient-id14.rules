@@ -1,4 +1,9 @@
-# udev rules for the Audient iD14 (mk1: 2708:0002, mk2: 2708:0008).
+# udev rules for the Audient iD14 MKII (mk2: 2708:0008, primary — the project
+# owner's unit) and the original iD14 (mk1: 2708:0002, also covered; its values
+# are static-analysis inferred only and hardware-unverified).
+#
+# The mk2 rules come first because mk2 is the primary target; both PIDs stay
+# covered.
 #
 # PROVISIONAL: the access mechanism (plugdev group vs. uaccess tag) is not yet
 # decided by the project owner, so both are granted here. Once decided, drop
@@ -7,10 +12,10 @@
 # Install: sudo cp udev/99-audient-id14.rules /etc/udev/rules.d/
 #          sudo udevadm control --reload-rules && sudo udevadm trigger
 
-# Audient iD14 mk1
-SUBSYSTEM=="usb", ATTRS{idVendor}=="2708", ATTRS{idProduct}=="0002", TAG+="uaccess"
-SUBSYSTEM=="usb", ATTRS{idVendor}=="2708", ATTRS{idProduct}=="0002", MODE="0660", GROUP="plugdev"
-
-# Audient iD14 mk2
+# Audient iD14 MKII (mk2) — primary target
 SUBSYSTEM=="usb", ATTRS{idVendor}=="2708", ATTRS{idProduct}=="0008", TAG+="uaccess"
 SUBSYSTEM=="usb", ATTRS{idVendor}=="2708", ATTRS{idProduct}=="0008", MODE="0660", GROUP="plugdev"
+
+# Audient iD14 (mk1) — supported, hardware-unverified
+SUBSYSTEM=="usb", ATTRS{idVendor}=="2708", ATTRS{idProduct}=="0002", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="2708", ATTRS{idProduct}=="0002", MODE="0660", GROUP="plugdev"

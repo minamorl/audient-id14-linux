@@ -1,7 +1,14 @@
 # audient-id14-linux
 
-Linux control tool for the **Audient iD14** (mk1, USB `2708:0002`) and
-**iD14 MKII** (mk2, USB `2708:0008`) audio interfaces.
+Linux control tool for the **Audient iD14 MKII** (mk2, USB `2708:0008`)
+audio interface.
+
+The **iD14 MKII (mk2)** is the primary target: it is the project owner's unit,
+and it is what the default target, CLI auto-detection priority, udev rule
+order, test fixtures, and any future hardware capture refer to. The original
+**iD14 (mk1, USB `2708:0002`)** is also supported in the product definition
+table, but every mk1 value in this project is **static-analysis inferred only
+and hardware-unverified** — no mk1 unit is available to the project.
 
 Audio streaming on Linux already works through the kernel's `snd-usb-audio`
 driver. What is missing is a way to drive the device's *control* features
@@ -14,7 +21,8 @@ driver. What is missing is a way to drive the device's *control* features
   bytes it would send without touching the USB bus).
 
 The tool is designed to coexist with `snd-usb-audio`; it does not replace the
-audio driver and does not require unloading it.
+audio driver and does not require unloading it. See
+[Linux audio coexistence](#linux-audio-coexistence) below.
 
 ## Disclaimer
 
@@ -29,6 +37,25 @@ accept no liability for any damage or data loss.**
 Early scaffolding. The protocol library and CLI are stubs; see the roadmap in
 the documentation below.
 
+Nothing in this project has been verified against real hardware yet — for
+either model. When a real USB capture is done it will be taken on the owner's
+mk2; mk1 stays inferred-only until someone with an mk1 unit contributes a
+capture.
+
+## Linux audio coexistence
+
+This tool does **control only** (mk2-based description; the same intent
+applies to mk1, unverified):
+
+- Audio streaming stays with the kernel's `snd-usb-audio` driver. The tool
+  **coexists** with it: it does **not** `rmmod` / unload `snd-usb-audio`, and it
+  does **not** claim the USB audio interface exclusively.
+- The ALSA UCM profile shipped in `alsa-ucm-conf` for this device,
+  `Audient-iD14-0008.conf`, targets the mk2 (PID `0x0008`). Interference-free
+  operation alongside that profile is the coexistence baseline this project
+  describes. No UCM profile exists for the mk1 (PID `0x0002`); how to handle
+  that is not decided.
+
 ## Building
 
 ```sh
@@ -41,7 +68,8 @@ lands (`sudo apt-get install libusb-1.0-0-dev pkg-config` on Debian/Ubuntu).
 
 ## udev rules
 
-`udev/99-audient-id14.rules` grants non-root access to both iD14 variants.
+`udev/99-audient-id14.rules` grants non-root access to both iD14 variants;
+the mk2 (`2708:0008`) rules come first, then mk1 (`2708:0002`).
 Copy it to `/etc/udev/rules.d/` and reload udev. The access mechanism
 (`plugdev` group vs. `uaccess` tag) is provisional; see the comments in the
 file.
@@ -74,9 +102,14 @@ conditions.
 
 ## 日本語
 
-Audient iD14 (初代 / MKII) を Linux から制御するための非公式ツールです。
-音声のストリーミングは既存の `snd-usb-audio` に任せ、本プロジェクトは
-モニター・ミキサーなどの制御機能のみを扱います。
+Audient iD14 MKII (mk2, USB `2708:0008`) を Linux から制御するための非公式
+ツールです。主対象は mk2 (プロジェクトオーナーの実機) で、初代 iD14 (mk1,
+USB `2708:0002`) も製品定義表に含めて対応しますが、mk1 の値はすべて静的解析
+からの推定のみで、実機未照合です。
+音声のストリーミングは既存の `snd-usb-audio` に任せ (アンロードしません・
+オーディオインターフェースを占有しません)、本プロジェクトは
+モニター・ミキサーなどの制御機能のみを扱います。alsa-ucm-conf の
+`Audient-iD14-0008.conf` は mk2 用です。
 
 Audient 社とは一切関係のない非公式プロジェクトであり、利用は自己責任で
 お願いします。
