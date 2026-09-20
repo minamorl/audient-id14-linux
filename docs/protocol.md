@@ -12,6 +12,15 @@
 > Evidence status for this whole document: `static_analysis_inferred_unverified`.
 > Nothing here is `hardware_confirmed`.
 
+> **Primary target: iD14 MKII (mk2, `2708:0008`).** The mk2 is the project
+> owner's unit. Once a real USB capture exists, the *hardware-confirmed* column
+> in every table below refers to the **mk2** — that is the only unit a capture
+> can be taken on. The original **iD14 (mk1, `2708:0002`)** stays in the product
+> table and is supported, but every mk1 value is **static-analysis inferred
+> only and hardware-unverified**; the hardware-confirmed column will not be
+> filled for mk1 by this project. Nothing — mk2 or mk1 — is hardware-confirmed
+> at the time of writing.
+
 See [`provenance.md`](provenance.md) for where each value came from (distribution
 URL, version, SHA-256, function name + address) and for the MixiD cross-check.
 
@@ -22,7 +31,7 @@ Each fact row has two evidence columns:
 | column | meaning |
 |---|---|
 | **inferred (static)** | Value read from constants / structure copies in the official app binary. Cited as `Class::method @ address` (macOS x86_64 virtual address, pre-ASLR). |
-| **hardware-confirmed** | Value observed in a USB capture of the official app talking to a real iD14, or confirmed by a successful request from this project. **Currently empty for every row.** |
+| **hardware-confirmed** | Value observed in a USB capture of the official app talking to a real iD14, or confirmed by a successful request from this project. The target unit for this column is the owner's **mk2** (`2708:0008`); mk1 rows remain inferred-only. **Currently empty for every row.** |
 
 A row whose hardware-confirmed cell reads `— (unverified)` MUST NOT be described
 anywhere as "confirmed", "known", or "verified". When a capture is done, fill the
@@ -45,6 +54,11 @@ the independent MixiD project uses the same IDs (see `provenance.md` §2).
 
 The project supports both variants; anything that differs between mk1 and mk2
 must live in the product-definition table, not be hard-coded elsewhere.
+
+Primary target is the **mk2** (owner's unit): default target, CLI auto-detect
+priority, udev rule order, and test fixtures all prefer mk2. The **mk1** rows
+above are static-analysis inferred only and hardware-unverified, and will stay
+that way until an mk1 capture is contributed.
 
 ---
 
