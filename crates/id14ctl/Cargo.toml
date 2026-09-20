@@ -6,3 +6,14 @@ license = "MIT OR Apache-2.0"
 description = "Linux command-line control tool for the Audient iD14 (mk1/mk2)"
 
 [dependencies]
+id14-protocol = { path = "../id14-protocol" }
+clap = { version = "4.6", features = ["derive"] }
+rusb = "0.9"
+
+[lib]
+name = "id14ctl"
+path = "src/lib.rs"
+
+[[bin]]
+name = "id14ctl"
+path = "src/main.rs"
