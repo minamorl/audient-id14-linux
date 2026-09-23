@@ -71,17 +71,51 @@ pub fn select_primary() -> Result<DetectedDevice, CliError> {
     enumerate()?.into_iter().next().ok_or(CliError::NoDevice)
 }
 
+/// Index of the configuration descriptor to read instead of the active one,
+/// or `None` to report the original error.
+///
+/// libusb on macOS answers `NotFound` for the active configuration while the
+/// process has not opened the device (Linux reads it from sysfs). When the
+/// device has exactly one configuration, that configuration is necessarily
+/// the active one, so descriptor index 0 is read instead. Any other error, or
+/// a device with several configurations, is not guessed around.
+pub fn fallback_config_index(active_error: rusb::Error, num_configurations: u8) -> Option<u8> {
+    (active_error == rusb::Error::NotFound && num_configurations == 1).then_some(0)
+}
+
 impl DetectedDevice {
     /// Interfaces of the active configuration, from libusb's cached
-    /// descriptor (no control request is sent).
+    /// descriptor (no control request is sent, nothing is claimed). Falls
+    /// back to the sole configuration descriptor per
+    /// [`fallback_config_index`].
     pub fn interfaces(&self) -> Result<Vec<InterfaceInfo>, CliError> {
-        let config = self
-            .device
-            .active_config_descriptor()
-            .map_err(|source| CliError::Usb {
-                context: "cannot read the active configuration descriptor",
-                source,
-            })?;
+        let config =
+            match self.device.active_config_descriptor() {
+                Ok(config) => config,
+                Err(active_error) => {
+                    let desc = self
+                        .device
+                        .device_descriptor()
+                        .map_err(|source| CliError::Usb {
+                            context: "cannot read the device descriptor",
+                            source,
+                        })?;
+                    match fallback_config_index(active_error, desc.num_configurations()) {
+                        Some(index) => self.device.config_descriptor(index).map_err(|source| {
+                            CliError::Usb {
+                                context: "cannot read the sole configuration descriptor",
+                                source,
+                            }
+                        })?,
+                        None => {
+                            return Err(CliError::Usb {
+                                context: "cannot read the active configuration descriptor",
+                                source: active_error,
+                            })
+                        }
+                    }
+                }
+            };
         let mut interfaces = Vec::new();
         for interface in config.interfaces() {
             for alt in interface.descriptors() {
@@ -187,5 +221,34 @@ impl ControlTransport for RusbTransport {
             )
             .map_err(|e| transport_error(setup, e))?;
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn not_found_with_one_configuration_falls_back_to_index_0() {
+        assert_eq!(fallback_config_index(rusb::Error::NotFound, 1), Some(0));
+    }
+
+    #[test]
+    fn other_errors_or_configuration_counts_are_not_guessed_around() {
+        assert_eq!(fallback_config_index(rusb::Error::NotFound, 0), None);
+        assert_eq!(fallback_config_index(rusb::Error::NotFound, 2), None);
+        for error in [
+            rusb::Error::Access,
+            rusb::Error::NoDevice,
+            rusb::Error::Io,
+            rusb::Error::NotSupported,
+        ] {
+            assert_eq!(fallback_config_index(error, 1), None);
+        }
+    }
+
+    #[test]
+    fn autodetect_prefers_mk2() {
+        assert!(autodetect_rank(Variant::Mk2) < autodetect_rank(Variant::Mk1));
     }
 }
