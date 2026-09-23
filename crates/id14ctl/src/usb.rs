@@ -12,7 +12,7 @@ use id14_protocol::descriptor::find_control_interface;
 use id14_protocol::{
     ControlError, ControlInterface, InterfaceInfo, ProductDefinition, SetupPacket, Variant, VID,
 };
-use rusb::{Device, DeviceHandle, GlobalContext};
+use rusb::{ConfigDescriptor, Device, DeviceHandle, GlobalContext};
 
 use crate::error::CliError;
 use crate::transport::{ControlTransport, TransportError};
@@ -71,65 +71,92 @@ pub fn select_primary() -> Result<DetectedDevice, CliError> {
     enumerate()?.into_iter().next().ok_or(CliError::NoDevice)
 }
 
-/// Index of the configuration descriptor to read instead of the active one,
-/// or `None` to report the original error.
+/// One configuration descriptor read by index, reduced to what the control
+/// path uses.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ConfigCandidate {
+    /// `bConfigurationValue`.
+    pub configuration_value: u8,
+    /// Every interface alternate setting, with its class-specific bytes.
+    pub interfaces: Vec<InterfaceInfo>,
+}
+
+/// Choose the configuration to use when the active one cannot be looked up.
 ///
 /// libusb on macOS answers `NotFound` for the active configuration while the
-/// process has not opened the device (Linux reads it from sysfs). When the
-/// device has exactly one configuration, that configuration is necessarily
-/// the active one, so descriptor index 0 is read instead. Any other error, or
-/// a device with several configurations, is not guessed around.
-pub fn fallback_config_index(active_error: rusb::Error, num_configurations: u8) -> Option<u8> {
-    (active_error == rusb::Error::NotFound && num_configurations == 1).then_some(0)
+/// process has not opened the device (Linux reads it from sysfs), and a
+/// standard GET_CONFIGURATION is not usable there. `candidates` are the
+/// configuration descriptors that could be read by index. If there is at
+/// least one and they all agree (same `bConfigurationValue` and identical
+/// interface list), the active configuration cannot be anything else, so it
+/// is returned. If none were read or any two differ, nothing is guessed.
+pub fn select_unambiguous_config(candidates: Vec<ConfigCandidate>) -> Option<ConfigCandidate> {
+    let mut iter = candidates.into_iter();
+    let first = iter.next()?;
+    iter.all(|c| c == first).then_some(first)
+}
+
+/// Whether an error from the active-configuration lookup allows reading the
+/// configuration descriptors by index. Only `NotFound` does; every other
+/// error is reported as is.
+pub fn allows_indexed_fallback(active_error: rusb::Error) -> bool {
+    active_error == rusb::Error::NotFound
+}
+
+fn interface_list(config: &ConfigDescriptor) -> Vec<InterfaceInfo> {
+    let mut interfaces = Vec::new();
+    for interface in config.interfaces() {
+        for alt in interface.descriptors() {
+            interfaces.push(InterfaceInfo {
+                number: alt.interface_number(),
+                alt_setting: alt.setting_number(),
+                class: alt.class_code(),
+                subclass: alt.sub_class_code(),
+                protocol: alt.protocol_code(),
+                extra: alt.extra().to_vec(),
+            });
+        }
+    }
+    interfaces
 }
 
 impl DetectedDevice {
     /// Interfaces of the active configuration, from libusb's cached
-    /// descriptor (no control request is sent, nothing is claimed). Falls
-    /// back to the sole configuration descriptor per
-    /// [`fallback_config_index`].
+    /// descriptors (no control request is sent, nothing is claimed). If
+    /// libusb reports the active configuration as `NotFound`, every
+    /// configuration descriptor is read by index and used only when they all
+    /// agree ([`select_unambiguous_config`]); otherwise the original error is
+    /// returned.
     pub fn interfaces(&self) -> Result<Vec<InterfaceInfo>, CliError> {
-        let config =
-            match self.device.active_config_descriptor() {
-                Ok(config) => config,
-                Err(active_error) => {
-                    let desc = self
-                        .device
-                        .device_descriptor()
-                        .map_err(|source| CliError::Usb {
-                            context: "cannot read the device descriptor",
-                            source,
-                        })?;
-                    match fallback_config_index(active_error, desc.num_configurations()) {
-                        Some(index) => self.device.config_descriptor(index).map_err(|source| {
-                            CliError::Usb {
-                                context: "cannot read the sole configuration descriptor",
-                                source,
-                            }
-                        })?,
-                        None => {
-                            return Err(CliError::Usb {
-                                context: "cannot read the active configuration descriptor",
-                                source: active_error,
-                            })
-                        }
-                    }
-                }
-            };
-        let mut interfaces = Vec::new();
-        for interface in config.interfaces() {
-            for alt in interface.descriptors() {
-                interfaces.push(InterfaceInfo {
-                    number: alt.interface_number(),
-                    alt_setting: alt.setting_number(),
-                    class: alt.class_code(),
-                    subclass: alt.sub_class_code(),
-                    protocol: alt.protocol_code(),
-                    extra: alt.extra().to_vec(),
-                });
-            }
+        let active_error = match self.device.active_config_descriptor() {
+            Ok(config) => return Ok(interface_list(&config)),
+            Err(error) => error,
+        };
+        let original = || CliError::Usb {
+            context: "cannot read the active configuration descriptor",
+            source: active_error,
+        };
+        if !allows_indexed_fallback(active_error) {
+            return Err(original());
         }
-        Ok(interfaces)
+        let count = self
+            .device
+            .device_descriptor()
+            .map_err(|source| CliError::Usb {
+                context: "cannot read the device descriptor",
+                source,
+            })?
+            .num_configurations();
+        let candidates = (0..count)
+            .filter_map(|index| self.device.config_descriptor(index).ok())
+            .map(|config| ConfigCandidate {
+                configuration_value: config.number(),
+                interfaces: interface_list(&config),
+            })
+            .collect();
+        select_unambiguous_config(candidates)
+            .map(|chosen| chosen.interfaces)
+            .ok_or_else(original)
     }
 
     /// Open the device and claim the control interface found in the
@@ -227,23 +254,67 @@ impl ControlTransport for RusbTransport {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use id14_protocol::fixtures::mk2_synthetic_interfaces;
 
-    #[test]
-    fn not_found_with_one_configuration_falls_back_to_index_0() {
-        assert_eq!(fallback_config_index(rusb::Error::NotFound, 1), Some(0));
+    fn candidate(configuration_value: u8) -> ConfigCandidate {
+        ConfigCandidate {
+            configuration_value,
+            interfaces: mk2_synthetic_interfaces(),
+        }
     }
 
     #[test]
-    fn other_errors_or_configuration_counts_are_not_guessed_around() {
-        assert_eq!(fallback_config_index(rusb::Error::NotFound, 0), None);
-        assert_eq!(fallback_config_index(rusb::Error::NotFound, 2), None);
+    fn identical_candidates_are_selected() {
+        // mk2 measured shape: bNumConfigurations 2, both indices read back
+        // bConfigurationValue 1 with identical content
+        let chosen = select_unambiguous_config(vec![candidate(1), candidate(1)]);
+        assert_eq!(chosen, Some(candidate(1)));
+        assert_eq!(
+            select_unambiguous_config(vec![candidate(1)]),
+            Some(candidate(1))
+        );
+    }
+
+    #[test]
+    fn no_readable_candidate_is_not_guessed_around() {
+        assert_eq!(select_unambiguous_config(Vec::new()), None);
+    }
+
+    #[test]
+    fn differing_configuration_values_are_refused() {
+        assert_eq!(
+            select_unambiguous_config(vec![candidate(1), candidate(2)]),
+            None
+        );
+    }
+
+    #[test]
+    fn differing_interface_content_is_refused() {
+        let mut other = candidate(1);
+        other.interfaces[0].extra.push(0);
+        assert_eq!(
+            select_unambiguous_config(vec![candidate(1), other.clone()]),
+            None
+        );
+        let mut fewer = candidate(1);
+        fewer.interfaces.pop();
+        assert_eq!(
+            select_unambiguous_config(vec![candidate(1), candidate(1), fewer]),
+            None
+        );
+    }
+
+    #[test]
+    fn only_not_found_allows_the_indexed_fallback() {
+        assert!(allows_indexed_fallback(rusb::Error::NotFound));
         for error in [
             rusb::Error::Access,
             rusb::Error::NoDevice,
             rusb::Error::Io,
             rusb::Error::NotSupported,
+            rusb::Error::Busy,
         ] {
-            assert_eq!(fallback_config_index(error, 1), None);
+            assert!(!allows_indexed_fallback(error));
         }
     }
 
