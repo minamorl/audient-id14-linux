@@ -1,24 +1,31 @@
+//! `id14ctl` — command-line control tool for the Audient iD14 (mk2 primary).
+
 use std::error::Error;
-use std::fmt;
+use std::io::{self, Write};
 use std::process::ExitCode;
 
 use clap::{Parser, Subcommand, ValueEnum};
-use id14_protocol::{
-    ControlRequest, ProductDefinition, ProtocolError, RequestKind, PID_MK2, PRODUCTS, VID,
-};
-
-const TRANSPORT_UNIMPLEMENTED: &str =
-    "not yet implemented: control transport undecided (see spec quarantine control.path) and no hardware verified";
+use id14_protocol::db::parse_db;
+use id14_protocol::descriptor::find_control_interface;
+use id14_protocol::plan::{dump_plan, volume_target};
+use id14_protocol::{AudioControl, ControlRequest, RequestKind, Variant};
+use id14ctl::ops::{dry_run_dump, dry_run_volume, format_bytes, mute_error, run_dump, run_volume};
+use id14ctl::usb::{enumerate, select_primary, DetectedDevice};
+use id14ctl::CliError;
 
 #[derive(Debug, Parser)]
-#[command(name = "id14ctl")]
-#[command(about = "Minimal Linux CLI for Audient iD14 descriptor discovery and request dry-runs")]
+#[command(
+    name = "id14ctl",
+    version,
+    about = "Unofficial control tool for the Audient iD14 (Linux)"
+)]
 struct Cli {
-    /// Print request bytes without performing a USB transfer.
+    /// Print the exact bytes that would be sent (8-byte setup packet and
+    /// payload) and perform no USB transfer.
     #[arg(long, global = true)]
     dry_run: bool,
 
-    /// Explicitly enable commands that could write device state.
+    /// Allow write operations (volume, mute, SET requests). Off by default.
     #[arg(long, global = true)]
     enable_write: bool,
 
@@ -28,31 +35,35 @@ struct Cli {
 
 #[derive(Debug, Subcommand)]
 enum Command {
-    /// Enumerate attached iD14 MKI and MKII USB descriptors.
+    /// Enumerate connected iD14 devices (mk2 first).
     List,
-    /// Identify the preferred attached iD14 (MKII before MKI).
+    /// Identify the auto-detected device's product and PID.
     Info,
-    /// Read device state without issuing any write/OUT transfer.
+    /// Read-only: GET the descriptor-declared standard controls and print them.
     Dump,
-    /// Build a protocol request. A USB transfer is never attempted.
+    /// Print the bytes of a static-analysis framed request (--dry-run only).
     Request {
+        /// Request kind (selects the pinned header).
         #[arg(value_enum)]
         kind: RequestKindArg,
-
-        /// Body bytes, written as decimal or 0x-prefixed hexadecimal values.
+        /// Bytes following the header (hex like 0x0c or decimal).
         #[arg(value_parser = parse_byte)]
         body: Vec<u8>,
     },
-    /// Set volume. Live transport is quarantined and therefore unavailable.
-    Volume { value: u8 },
-    /// Set mute state. Live transport is quarantined and therefore unavailable.
-    Mute {
-        #[arg(value_enum)]
-        state: MuteState,
+    /// SET CUR the volume of the mixer-output Feature Unit (requires --enable-write).
+    Volume {
+        /// Level in dB, e.g. -20 or -20.5.
+        #[arg(allow_negative_numbers = true)]
+        db: String,
+        /// Channel number of the Feature Unit (0 = master).
+        #[arg(long)]
+        channel: u8,
     },
+    /// Mute (requires --enable-write; fails when no mute control is declared).
+    Mute,
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq, ValueEnum)]
+#[derive(Debug, Clone, Copy, ValueEnum)]
 enum RequestKindArg {
     Get,
     Set,
@@ -62,181 +73,134 @@ enum RequestKindArg {
 impl From<RequestKindArg> for RequestKind {
     fn from(value: RequestKindArg) -> Self {
         match value {
-            RequestKindArg::Get => Self::Get,
-            RequestKindArg::Set => Self::Set,
-            RequestKindArg::GetMem => Self::GetMem,
+            RequestKindArg::Get => RequestKind::Get,
+            RequestKindArg::Set => RequestKind::Set,
+            RequestKindArg::GetMem => RequestKind::GetMem,
         }
     }
-}
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq, ValueEnum)]
-enum MuteState {
-    On,
-    Off,
-}
-
-#[derive(Debug)]
-enum CliError {
-    Usb {
-        operation: &'static str,
-        source: rusb::Error,
-    },
-    Protocol(ProtocolError),
-    NoSupportedDevice,
-    WriteDisabled,
-    TransportUndecided,
-}
-
-impl fmt::Display for CliError {
-    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Usb { operation, source } => {
-                write!(formatter, "{operation} failed: {source}")
-            }
-            Self::Protocol(source) => write!(formatter, "product lookup failed: {source}"),
-            Self::NoSupportedDevice => write!(
-                formatter,
-                "no supported Audient iD14 device found (default target: mk2, PID 0x{PID_MK2:04x})"
-            ),
-            Self::WriteDisabled => write!(
-                formatter,
-                "write operation refused: pass --enable-write explicitly (writes are disabled by default)"
-            ),
-            Self::TransportUndecided => formatter.write_str(TRANSPORT_UNIMPLEMENTED),
-        }
-    }
-}
-
-impl Error for CliError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        match self {
-            Self::Usb { source, .. } => Some(source),
-            Self::Protocol(source) => Some(source),
-            Self::NoSupportedDevice | Self::WriteDisabled | Self::TransportUndecided => None,
-        }
-    }
-}
-
-impl From<ProtocolError> for CliError {
-    fn from(value: ProtocolError) -> Self {
-        Self::Protocol(value)
-    }
-}
-
-#[derive(Debug, Eq, PartialEq)]
-struct DetectedDevice {
-    bus: u8,
-    address: u8,
-    name: String,
-    variant: &'static str,
-    vid: u16,
-    pid: u16,
 }
 
 fn main() -> ExitCode {
-    match run(Cli::parse()) {
+    let cli = Cli::parse();
+    let stdout = io::stdout();
+    let mut out = stdout.lock();
+    match run(cli, &mut out) {
         Ok(()) => ExitCode::SUCCESS,
-        Err(error) => {
-            eprintln!("error: {error}");
+        Err(err) => {
+            let _ = out.flush();
+            eprintln!("error: {err}");
+            let mut cause = err.source();
+            while let Some(inner) = cause {
+                eprintln!("  caused by: {inner}");
+                cause = inner.source();
+            }
             ExitCode::FAILURE
         }
     }
 }
 
-fn run(cli: Cli) -> Result<(), CliError> {
+fn run(cli: Cli, out: &mut dyn Write) -> Result<(), CliError> {
     match cli.command {
-        Command::List => list_devices(),
-        Command::Info => show_info(),
-        Command::Dump => Err(CliError::TransportUndecided),
-        Command::Request { kind, body } => {
-            let request = build_request(kind, body);
-            if cli.dry_run {
-                println!("bytes: {}", format_bytes(&request.to_bytes()));
-                Ok(())
-            } else {
-                if kind == RequestKindArg::Set && !cli.enable_write {
-                    return Err(CliError::WriteDisabled);
-                }
-                Err(CliError::TransportUndecided)
-            }
-        }
-        Command::Volume { value } => {
-            let _requested_value = value;
+        Command::List => list_devices(out),
+        Command::Info => show_info(out),
+        Command::Dump => dump(cli.dry_run, out),
+        Command::Request { kind, body } => request(kind, body, cli.dry_run, cli.enable_write, out),
+        Command::Volume { db, channel } => {
             require_write_enabled(cli.enable_write)?;
-            Err(CliError::TransportUndecided)
+            volume(&db, channel, cli.dry_run, out)
         }
-        Command::Mute { state } => {
-            let _requested_state = state;
+        Command::Mute => {
             require_write_enabled(cli.enable_write)?;
-            Err(CliError::TransportUndecided)
+            let device = select_primary()?;
+            let ac = AudioControl::from_interfaces(&device.interfaces()?)?;
+            Err(mute_error(&ac))
         }
     }
 }
 
-fn list_devices() -> Result<(), CliError> {
-    let devices = enumerate_supported_devices()?;
-    for device in devices {
-        println!(
-            "bus {:03} device {:03}: {} {} {:04x}:{:04x}",
-            device.bus, device.address, device.name, device.variant, device.vid, device.pid
-        );
+fn describe(device: &DetectedDevice) -> String {
+    format!(
+        "bus {:03} address {:03}  {:04x}:{:04x}  {}",
+        device.bus, device.address, device.product.vid, device.product.pid, device.product.name
+    )
+}
+
+fn list_devices(out: &mut dyn Write) -> Result<(), CliError> {
+    let devices = enumerate()?;
+    if devices.is_empty() {
+        writeln!(out, "no supported Audient iD14 device found")?;
+    }
+    for device in &devices {
+        writeln!(out, "{}", describe(device))?;
     }
     Ok(())
 }
 
-fn show_info() -> Result<(), CliError> {
-    let mut devices = enumerate_supported_devices()?;
-    devices.sort_by_key(|device| if device.pid == PID_MK2 { 0 } else { 1 });
-    let device = devices.first().ok_or(CliError::NoSupportedDevice)?;
-    println!(
-        "{} {} (VID 0x{:04x}, PID 0x{:04x}) at bus {:03} device {:03}",
-        device.name, device.variant, device.vid, device.pid, device.bus, device.address
-    );
+fn evidence_note(variant: Variant) -> &'static str {
+    match variant {
+        Variant::Mk2 => "mk2 (primary target)",
+        Variant::Mk1 => "mk1 (static-analysis inferred only, not verified on hardware)",
+    }
+}
+
+fn show_info(out: &mut dyn Write) -> Result<(), CliError> {
+    let device = select_primary()?;
+    writeln!(out, "product: {}", device.product.name)?;
+    writeln!(out, "variant: {}", evidence_note(device.product.variant))?;
+    writeln!(
+        out,
+        "vid:pid: {:04x}:{:04x}",
+        device.product.vid, device.product.pid
+    )?;
+    writeln!(
+        out,
+        "usb:     bus {:03} address {:03}",
+        device.bus, device.address
+    )?;
     Ok(())
 }
 
-fn enumerate_supported_devices() -> Result<Vec<DetectedDevice>, CliError> {
-    let usb_devices = rusb::devices().map_err(|source| CliError::Usb {
-        operation: "USB descriptor enumeration",
-        source,
-    })?;
-    let mut matches = Vec::new();
-
-    for device in usb_devices.iter() {
-        let descriptor = device.device_descriptor().map_err(|source| CliError::Usb {
-            operation: "USB device descriptor read",
-            source,
-        })?;
-        let vid = descriptor.vendor_id();
-        let pid = descriptor.product_id();
-        if vid != VID || !PRODUCTS.iter().any(|product| product.pid == pid) {
-            continue;
-        }
-
-        let product = lookup_product(vid, pid)?;
-        let variant = match product.variant {
-            id14_protocol::Variant::Mk1 => "mk1",
-            id14_protocol::Variant::Mk2 => "mk2",
-        };
-        matches.push(DetectedDevice {
-            bus: device.bus_number(),
-            address: device.address(),
-            name: product.name.to_string(),
-            variant,
-            vid: product.vid,
-            pid: product.pid,
-        });
+fn dump(dry_run: bool, out: &mut dyn Write) -> Result<(), CliError> {
+    let device = select_primary()?;
+    let interfaces = device.interfaces()?;
+    let ac = AudioControl::from_interfaces(&interfaces)?;
+    let plan = dump_plan(&ac, find_control_interface(&interfaces)?);
+    if dry_run {
+        return dry_run_dump(&plan, out);
     }
-
-    Ok(matches)
+    let mut transport = device.open_control(&interfaces)?;
+    run_dump(&plan, &mut transport, out)
 }
 
-fn lookup_product(vid: u16, pid: u16) -> Result<ProductDefinition, CliError> {
-    ProductDefinition::lookup(vid, pid).map_err(CliError::from)
+fn volume(db: &str, channel: u8, dry_run: bool, out: &mut dyn Write) -> Result<(), CliError> {
+    let raw = parse_db(db)?;
+    let device = select_primary()?;
+    let interfaces = device.interfaces()?;
+    let ac = AudioControl::from_interfaces(&interfaces)?;
+    let target = volume_target(&ac, find_control_interface(&interfaces)?, channel)?;
+    if dry_run {
+        return dry_run_volume(&target, raw, out);
+    }
+    let mut transport = device.open_control(&interfaces)?;
+    run_volume(&target, raw, &mut transport, out).map(|_| ())
 }
 
-fn build_request(kind: RequestKindArg, body: Vec<u8>) -> ControlRequest {
-    ControlRequest::new(kind.into(), body)
+fn request(
+    kind: RequestKindArg,
+    body: Vec<u8>,
+    dry_run: bool,
+    enable_write: bool,
+    out: &mut dyn Write,
+) -> Result<(), CliError> {
+    if matches!(kind, RequestKindArg::Set) {
+        require_write_enabled(enable_write)?;
+    }
+    if !dry_run {
+        return Err(CliError::RequestSendUnsupported);
+    }
+    let request = ControlRequest::new(kind.into(), body);
+    writeln!(out, "{}", format_bytes(&request.to_bytes()))?;
+    Ok(())
 }
 
 fn require_write_enabled(enable_write: bool) -> Result<(), CliError> {
@@ -248,66 +212,75 @@ fn require_write_enabled(enable_write: bool) -> Result<(), CliError> {
 }
 
 fn parse_byte(input: &str) -> Result<u8, String> {
-    if let Some(hex) = input
+    let parsed = match input
         .strip_prefix("0x")
         .or_else(|| input.strip_prefix("0X"))
     {
-        u8::from_str_radix(hex, 16).map_err(|error| format!("invalid byte {input:?}: {error}"))
-    } else {
-        input
-            .parse::<u8>()
-            .map_err(|error| format!("invalid byte {input:?}: {error}"))
-    }
-}
-
-fn format_bytes(bytes: &[u8]) -> String {
-    bytes
-        .iter()
-        .map(|byte| format!("{byte:02x}"))
-        .collect::<Vec<_>>()
-        .join(" ")
+        Some(hex) => u8::from_str_radix(hex, 16),
+        None => input.parse::<u8>(),
+    };
+    parsed.map_err(|e| format!("invalid byte {input:?}: {e}"))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use clap::CommandFactory;
-    use id14_protocol::{Variant, PID_MK1};
+    use id14_protocol::{ProductDefinition, PID_MK1, PID_MK2, VID};
 
     #[test]
     fn clap_definition_and_representative_arguments_are_valid() {
         Cli::command().debug_assert();
-
-        let parsed =
-            Cli::try_parse_from(["id14ctl", "--dry-run", "request", "get-mem", "0x10", "32"]);
-        assert!(parsed.is_ok());
-
-        let parsed = Cli::try_parse_from(["id14ctl", "--enable-write", "mute", "on"]);
-        assert!(parsed.is_ok());
+        for args in [
+            vec!["id14ctl", "list"],
+            vec!["id14ctl", "info"],
+            vec!["id14ctl", "dump", "--dry-run"],
+            vec!["id14ctl", "--dry-run", "request", "get", "0x01", "2"],
+            vec![
+                "id14ctl",
+                "--enable-write",
+                "volume",
+                "-20",
+                "--channel",
+                "1",
+            ],
+            vec!["id14ctl", "volume", "--dry-run", "-20.5", "--channel", "0"],
+            vec!["id14ctl", "--enable-write", "mute"],
+        ] {
+            Cli::try_parse_from(&args).unwrap_or_else(|e| panic!("{args:?}: {e}"));
+        }
+        assert!(Cli::try_parse_from(["id14ctl", "volume", "-20"]).is_err());
     }
 
     #[test]
     fn request_bytes_are_deterministic_for_all_pinned_headers() {
-        let get = build_request(RequestKindArg::Get, vec![0x10, 0x20]).to_bytes();
-        let set = build_request(RequestKindArg::Set, vec![0x30]).to_bytes();
-        let get_mem = build_request(RequestKindArg::GetMem, Vec::new()).to_bytes();
-
-        assert_eq!(get, vec![0xa1, 0x01, 0x10, 0x20]);
-        assert_eq!(set, vec![0x21, 0x01, 0x30]);
-        assert_eq!(get_mem, vec![0xa1, 0x03]);
+        for (kind, header) in [
+            (RequestKindArg::Get, "a1 01"),
+            (RequestKindArg::Set, "21 01"),
+            (RequestKindArg::GetMem, "a1 03"),
+        ] {
+            let mut out = Vec::new();
+            request(kind, vec![0x0c, 0x02], true, true, &mut out).unwrap();
+            assert_eq!(String::from_utf8(out).unwrap(), format!("{header} 0c 02\n"));
+        }
     }
 
     #[test]
     fn protocol_lookup_identifies_mk1_and_mk2_vid_pid_pairs() {
-        let mk1 = lookup_product(VID, PID_MK1);
-        let mk2 = lookup_product(VID, PID_MK2);
-
-        assert!(
-            matches!(mk1, Ok(product) if product.variant == Variant::Mk1 && product.pid == PID_MK1)
+        assert_eq!(
+            ProductDefinition::lookup(VID, PID_MK2).unwrap().variant,
+            Variant::Mk2
         );
-        assert!(
-            matches!(mk2, Ok(product) if product.variant == Variant::Mk2 && product.pid == PID_MK2)
+        assert_eq!(
+            ProductDefinition::lookup(VID, PID_MK1).unwrap().variant,
+            Variant::Mk1
         );
+        assert!(ProductDefinition::lookup(VID, 0xffff).is_err());
+        assert!(
+            id14ctl::usb::autodetect_rank(Variant::Mk2)
+                < id14ctl::usb::autodetect_rank(Variant::Mk1)
+        );
+        assert!(evidence_note(Variant::Mk1).contains("not verified on hardware"));
     }
 
     #[test]
@@ -317,10 +290,33 @@ mod tests {
             Err(CliError::WriteDisabled)
         ));
         assert!(require_write_enabled(true).is_ok());
+        for args in [
+            vec!["id14ctl", "volume", "-20", "--channel", "1"],
+            vec!["id14ctl", "--dry-run", "volume", "-20", "--channel", "1"],
+            vec!["id14ctl", "mute"],
+            vec!["id14ctl", "--dry-run", "request", "set", "0x01"],
+        ] {
+            let cli = Cli::try_parse_from(&args).unwrap();
+            let mut out = Vec::new();
+            assert!(
+                matches!(run(cli, &mut out), Err(CliError::WriteDisabled)),
+                "{args:?} was not gated"
+            );
+            assert!(out.is_empty());
+        }
     }
 
     #[test]
     fn dry_run_format_is_exact_lowercase_hex() {
-        assert_eq!(format_bytes(&[0xa1, 0x01, 0xff]), "a1 01 ff");
+        let mut out = Vec::new();
+        request(RequestKindArg::Get, vec![0xAB, 0x0C], true, false, &mut out).unwrap();
+        assert_eq!(String::from_utf8(out).unwrap(), "a1 01 ab 0c\n");
+        assert!(matches!(
+            request(RequestKindArg::Get, vec![], false, false, &mut Vec::new()),
+            Err(CliError::RequestSendUnsupported)
+        ));
+        assert_eq!(parse_byte("0x0C"), Ok(0x0c));
+        assert_eq!(parse_byte("12"), Ok(12));
+        assert!(parse_byte("0x100").is_err());
     }
 }
