@@ -8,6 +8,7 @@ CONFIG_DIR=$HOME/.config/pipewire/filter-chain.conf.d
 CONFIG=$CONFIG_DIR/90-id14-sr.conf
 STATE_DIR=${XDG_STATE_HOME:-"$HOME/.local/state"}/id14-sr
 MODE_FILE=$STATE_DIR/output
+MIX_FILE=$STATE_DIR/mix
 MARKER='# Managed by id14-sr; removed when processing is off.'
 OWNER_KEY=id14-sr.owner
 
@@ -103,8 +104,40 @@ current_default_name() {
 
 owned_config() { [ -f "$CONFIG" ] && [ "$(head -n 1 "$CONFIG")" = "$MARKER" ]; }
 
+valid_mix() { [[ $1 =~ ^(100|[0-9]|[1-9][0-9])$ ]]; }
+
+read_mix() {
+    local value=auto
+    [ ! -f "$MIX_FILE" ] || value=$(<"$MIX_FILE")
+    case "$value" in
+        auto) ;;
+        manual:*)
+            value=${value#manual:}
+            valid_mix "$value" || die "invalid saved mix in $MIX_FILE" ;;
+        *)
+            # Numeric files from the older detector-scaled implementation
+            # remain conservative until the owner sets a new manual value.
+            valid_mix "$value" || die "invalid saved mix in $MIX_FILE"
+            value=auto ;;
+    esac
+    printf '%s\n' "$value"
+}
+
+port_mix_value() {
+    if [ "$1" = auto ]; then printf '%s\n' -1
+    else printf '%s\n' "$1"
+    fi
+}
+
+apply_mix_to_output() {
+    local output=$1 value=$2 id
+    id=$(node_id "$(filter_main "$output")") || return 1
+    value=$(port_mix_value "$value")
+    pw-cli set-param "$id" Props "{ params = [ \"sr:Mix\" $value.0 ] }" >/dev/null
+}
+
 emit_modules() {
-    local output=$1 channels main stream transport transport_out
+    local output=$1 mix=$2 channels main stream transport transport_out
     channels=$(hardware_channels "$output")
     main=$(filter_main "$output")
     stream=$(filter_stream "$output")
@@ -143,6 +176,7 @@ emit_modules() {
                     name = sr
                     plugin = libid14_sr_ladspa
                     label = id14_sr_stereo
+                    control = { Mix = $mix }
                 } ]
                 inputs = [ "sr:Input L" "sr:Input R" ]
                 outputs = [ "sr:Output L" "sr:Output R" ]
@@ -190,7 +224,8 @@ config_targets() {
 }
 
 write_config() {
-    local mode=$1 temporary output
+    local mode=$1 mix=${2:-$(read_mix)} temporary output
+    mix=$(port_mix_value "$mix")
     if [ -e "$CONFIG" ] && ! owned_config; then
         printf 'id14-sr: refusing to overwrite unmanaged configuration: %s\n' "$CONFIG" >&2
         return 1
@@ -199,7 +234,7 @@ write_config() {
     temporary=$CONFIG.tmp.$$
     {
         printf '%s\ncontext.modules = [\n' "$MARKER"
-        while IFS= read -r output; do emit_modules "$output"; done < <(outputs_for_mode "$mode")
+        while IFS= read -r output; do emit_modules "$output" "$mix"; done < <(outputs_for_mode "$mode")
         printf ']\n'
     } >"$temporary" || return 1
     mv "$temporary" "$CONFIG" || return 1
@@ -483,6 +518,7 @@ reconcile() {
         done
         physical_id=$(node_id "$physical") || return 1
         apply_smart_metadata "$output" "$physical" "$physical_id" || return 1
+        apply_mix_to_output "$output" "$(read_mix)" || return 1
     done < <(outputs_for_mode "$mode")
     printf 'reconciled: active_outputs=%s\n' "$(outputs_for_mode "$mode" | paste -sd, -)"
 }
@@ -508,6 +544,10 @@ enable() {
         if ! all_selected_outputs_ok "$mode"; then
             reconcile || activation_failed 'metadata/node recovery failed'; recovered=1
         fi
+        need pw-cli
+        while IFS= read -r output; do
+            apply_mix_to_output "$output" "$(read_mix)" || die "could not restore mix on $output"
+        done < <(outputs_for_mode "$mode")
         if [ "$recovered" -eq 1 ]; then
             printf 'on: requested=%s active_outputs=%s (metadata recovered)\n' \
                 "$mode" "$(outputs_for_mode "$mode" | paste -sd, -)"
@@ -562,9 +602,9 @@ status() {
     elif runtime_present; then state=degraded
     fi
     default=$(current_default_name 2>/dev/null || printf none)
-    printf 'state=%s requested=%s service=%s active_outputs=%s degraded_outputs=%s pending_outputs=%s default=%s plugin=%s\n' \
+    printf 'state=%s requested=%s service=%s active_outputs=%s degraded_outputs=%s pending_outputs=%s default=%s plugin=%s mix=%s\n' \
         "$state" "$mode" "$service" "${active:-none}" "${degraded:-none}" "${pending:-none}" \
-        "$default" "$PLUGIN"
+        "$default" "$PLUGIN" "$(read_mix)"
     for output in line headphones; do
         physical=$(sink_for_output "$output")
         physical_id=$(node_id "$physical" 2>/dev/null || printf none)
@@ -577,11 +617,141 @@ status() {
     done
 }
 
+restore_mix() {
+    local mode=$1 value=$2 output failed=0
+    write_config "$mode" "$value" || failed=1
+    while IFS= read -r output; do
+        apply_mix_to_output "$output" "$value" || failed=1
+    done < <(outputs_for_mode "$mode")
+    [ "$failed" -eq 0 ]
+}
+
+set_mix() {
+    local value=$1 operation=${2:-set} old base mode output failure_output temporary saved
+    if [ "$operation" = set ]; then
+        [ "$value" = auto ] || valid_mix "$value" || die 'mix must be auto or an integer from 0 to 100'
+    else
+        [[ $value =~ ^[+-]?(0|[1-9][0-9]{0,2})$ ]] ||
+            die 'step must be an integer from -999 to 999'
+    fi
+    need flock
+    mkdir -p "$STATE_DIR"
+    exec 9>"$STATE_DIR/mix.lock"
+    flock -x 9
+    old=$(read_mix)
+    if [ "$operation" = step ]; then
+        base=$old
+        [ "$base" != auto ] || base=0
+        value=$(( base + value ))
+        (( value < 0 )) && value=0
+        (( value > 100 )) && value=100
+    fi
+    if [ -f "$MODE_FILE" ]; then
+        mode=$(<"$MODE_FILE")
+        normalize_mode "$mode" >/dev/null
+        systemctl --user is-active --quiet "$SERVICE" || die 'SR is enabled but its service is inactive'
+        need pw-cli
+        while IFS= read -r output; do
+            node_id "$(filter_main "$output")" >/dev/null || die "SR node for $output is unavailable"
+        done < <(outputs_for_mode "$mode")
+        write_config "$mode" "$value" || die 'could not update saved filter configuration'
+        while IFS= read -r output; do
+            if ! apply_mix_to_output "$output" "$value"; then
+                failure_output=$output
+                restore_mix "$mode" "$old" || die "could not set live mix on $failure_output; rollback incomplete"
+                die "could not set live mix on $failure_output"
+            fi
+        done < <(outputs_for_mode "$mode")
+    fi
+    if [ "$value" = auto ]; then saved=auto
+    else saved=manual:$value
+    fi
+    temporary=$MIX_FILE.tmp.$$
+    if ! printf '%s\n' "$saved" >"$temporary" || ! mv "$temporary" "$MIX_FILE"; then
+        rm -f "$temporary"
+        if [ -f "$MODE_FILE" ]; then
+            restore_mix "$mode" "$old" || die 'could not save mix; rollback incomplete'
+        fi
+        die 'could not save mix'
+    fi
+    flock -u 9
+    exec 9>&-
+    printf '%s\n' "$value"
+}
+
+mix_graph_present() {
+    local mode=$1 output snapshot
+    snapshot=$(pw-dump) || return 1
+    while IFS= read -r output; do
+        jq -e --arg main "$(filter_main "$output")" \
+            --arg stream "$(filter_stream "$output")" \
+            --arg transport "$(transport_main "$output")" \
+            --arg transport_stream "$(transport_stream "$output")" '
+            [.[] | select(.type == "PipeWire:Interface:Node") | .info.props["node.name"]] as $names
+            | all([$main, $stream, $transport, $transport_stream][]; . as $name | $names | index($name) != null)
+        ' <<<"$snapshot" >/dev/null || return 1
+    done < <(outputs_for_mode "$mode")
+}
+
+mix_bar() {
+    local value state=off text tooltip percentage mode
+    value=$(read_mix)
+    if [ -f "$MODE_FILE" ]; then
+        if systemctl --user is-active --quiet "$SERVICE" &&
+            mix_graph_present "$(<"$MODE_FILE")"; then state=on
+        else state=degraded
+        fi
+    fi
+    if [ "$value" = auto ]; then
+        text='SR auto'; tooltip="iD14 SR: $state, automatic bandwidth detection"
+        percentage=0; mode=auto
+    else
+        text="SR $value%"; tooltip="iD14 SR: $state, manual mix $value%"
+        percentage=$value; mode=manual
+    fi
+    jq -nc --arg text "$text" --arg tooltip "$tooltip" --arg state "$state" \
+        --arg mode "$mode" --argjson percentage "$percentage" \
+        '{text:$text,tooltip:$tooltip,class:$state,percentage:$percentage,mode:$mode}'
+}
+
+mix_slider() {
+    local value initial original zenity_result updates_result
+    need zenity
+    initial=$(read_mix)
+    original=$initial
+    [ "$initial" != auto ] || initial=0
+    set +e
+    zenity --scale --min-value=0 --max-value=100 --step=1 --print-partial \
+        --value="$initial" --title='iD14 SR mix' |
+        while IFS= read -r value; do
+            valid_mix "$value" || continue
+            set_mix "$value" >/dev/null || exit 1
+        done
+    zenity_result=${PIPESTATUS[0]} updates_result=${PIPESTATUS[1]}
+    set -e
+    [ "$updates_result" -eq 0 ] || die 'slider could not update mix'
+    if [ "$zenity_result" -eq 1 ]; then
+        set_mix "$original" >/dev/null
+        return 0
+    fi
+    [ "$zenity_result" -le 1 ] || die 'slider failed'
+}
+
 for command in pw-dump wpctl pw-metadata jq systemctl; do need "$command"; done
 case "${1:-status}" in
     on) enable "${2:-all}" ;;
     off) disable ;;
     status) status ;;
     reconcile) reconcile ;;
-    *) die 'usage: id14-sr on [all|line|headphones] | off | status' ;;
+    mix)
+        case "${2:-get}" in
+            get) read_mix ;;
+            set) [ "$#" -eq 3 ] || die 'usage: id14-sr mix set 0..100|auto'; set_mix "$3" ;;
+            auto) [ "$#" -eq 2 ] || die 'usage: id14-sr mix auto'; set_mix auto ;;
+            step) [ "$#" -eq 3 ] || die 'usage: id14-sr mix step +/-N'; set_mix "$3" step ;;
+            bar) mix_bar ;;
+            slider) mix_slider ;;
+            *) die 'usage: id14-sr mix [get|set N|auto|step +/-N|bar|slider]' ;;
+        esac ;;
+    *) die 'usage: id14-sr on [all|line|headphones] | off | status | mix [get|set N|auto|step +/-N|bar|slider]' ;;
 esac

@@ -12,7 +12,8 @@ const INPUT_L: usize = 0;
 const INPUT_R: usize = 1;
 const OUTPUT_L: usize = 2;
 const OUTPUT_R: usize = 3;
-const PORT_COUNT: usize = 4;
+const MIX: usize = 4;
+const PORT_COUNT: usize = 5;
 const DETECTOR_LOW_FIRST: usize = 4;
 const DETECTOR_LOW_LAST: usize = 64;
 const DETECTOR_HIGH_FIRST: usize = 72;
@@ -21,6 +22,8 @@ const BANDLIMITED_RATIO: f32 = 0.0002;
 const FULLBAND_RATIO: f32 = 0.002;
 const MIX_ATTACK_PER_CHUNK: f32 = 0.125;
 const MIX_RELEASE_PER_CHUNK: f32 = 0.5;
+// Ten 256-frame chunks at 48 kHz: a full-scale change takes about 53 ms.
+const USER_MIX_STEP_PER_CHUNK: f32 = 0.1;
 
 /// Fixed latency added by the arbitrary-block adapter itself.
 pub const ADAPTER_DELAY_FRAMES: usize = CHUNK_FRAMES;
@@ -109,6 +112,9 @@ pub struct Adapter {
     output: [f32; CHUNK_FRAMES * CHANNELS],
     input_frames: usize,
     output_frame: usize,
+    user_mix: f32,
+    user_mix_initialized: bool,
+    auto_last_chunk: bool,
 }
 
 impl Adapter {
@@ -121,11 +127,27 @@ impl Adapter {
             output: [0.0; CHUNK_FRAMES * CHANNELS],
             input_frames: 0,
             output_frame: CHUNK_FRAMES,
+            user_mix: 0.0,
+            user_mix_initialized: false,
+            auto_last_chunk: true,
         }
     }
 
     /// Adapts planar buffers and any host block length to 256-frame interleaved chunks.
     pub fn process(&mut self, left: &[f32], right: &[f32], out_l: &mut [f32], out_r: &mut [f32]) {
+        self.process_with_user_mix(left, right, out_l, out_r, -1.0);
+    }
+
+    /// Negative or non-finite values keep the conservative automatic detector.
+    /// A nonnegative percentage directly controls restoration on any input.
+    pub fn process_with_user_mix(
+        &mut self,
+        left: &[f32],
+        right: &[f32],
+        out_l: &mut [f32],
+        out_r: &mut [f32],
+        requested_percent: f32,
+    ) {
         let frames = left
             .len()
             .min(right.len())
@@ -136,6 +158,11 @@ impl Adapter {
             out_r[..frames].copy_from_slice(&right[..frames]);
             return;
         }
+        let manual_target = if requested_percent.is_finite() && requested_percent >= 0.0 {
+            Some((requested_percent / 100.0).clamp(0.0, 1.0))
+        } else {
+            None
+        };
         for frame in 0..frames {
             if self.output_frame < CHUNK_FRAMES {
                 out_l[frame] = self.output[self.output_frame * CHANNELS];
@@ -150,10 +177,19 @@ impl Adapter {
             self.input[self.input_frames * CHANNELS + 1] = right[frame];
             self.input_frames += 1;
             if self.input_frames == CHUNK_FRAMES {
-                let mix = self.detector.update(&self.input);
+                let detected = self.detector.update(&self.input);
+                let target = manual_target.unwrap_or(detected);
+                if !self.user_mix_initialized || (manual_target.is_none() && self.auto_last_chunk) {
+                    self.user_mix = target;
+                    self.user_mix_initialized = true;
+                } else {
+                    self.user_mix += (target - self.user_mix)
+                        .clamp(-USER_MIX_STEP_PER_CHUNK, USER_MIX_STEP_PER_CHUNK);
+                }
+                self.auto_last_chunk = manual_target.is_none();
                 if self
                     .engine
-                    .process_with_mix(&self.input, &mut self.output, mix)
+                    .process_with_mix(&self.input, &mut self.output, self.user_mix)
                     .is_err()
                 {
                     self.output.fill(0.0);
@@ -234,7 +270,7 @@ unsafe extern "C" fn run(instance: *mut c_void, sample_count: c_ulong) {
     if instance.is_null() || sample_count == 0 {
         return;
     }
-    // SAFETY: the LADSPA host connects all four ports before run and guarantees
+    // SAFETY: the LADSPA host connects all five ports before run and guarantees
     // each buffer contains SampleCount f32 values for the duration of this call.
     let instance = unsafe { &mut *instance.cast::<Instance>() };
     if instance.ports.iter().any(|port| port.is_null()) {
@@ -245,10 +281,15 @@ unsafe extern "C" fn run(instance: *mut c_void, sample_count: c_ulong) {
     let input_r = unsafe { std::slice::from_raw_parts(instance.ports[INPUT_R], frames) };
     let output_l = unsafe { std::slice::from_raw_parts_mut(instance.ports[OUTPUT_L], frames) };
     let output_r = unsafe { std::slice::from_raw_parts_mut(instance.ports[OUTPUT_R], frames) };
+    let requested_percent = unsafe { *instance.ports[MIX] };
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        instance
-            .adapter
-            .process(input_l, input_r, output_l, output_r);
+        instance.adapter.process_with_user_mix(
+            input_l,
+            input_r,
+            output_l,
+            output_r,
+            requested_percent,
+        );
     }));
     if result.is_err() {
         output_l.copy_from_slice(input_l);
@@ -265,8 +306,14 @@ unsafe extern "C" fn cleanup(instance: *mut c_void) {
 
 const AUDIO_INPUT: c_int = 0x1 | 0x8;
 const AUDIO_OUTPUT: c_int = 0x2 | 0x8;
-static PORT_DESCRIPTORS: [c_int; PORT_COUNT] =
-    [AUDIO_INPUT, AUDIO_INPUT, AUDIO_OUTPUT, AUDIO_OUTPUT];
+const CONTROL_INPUT: c_int = 0x1 | 0x4;
+static PORT_DESCRIPTORS: [c_int; PORT_COUNT] = [
+    AUDIO_INPUT,
+    AUDIO_INPUT,
+    AUDIO_OUTPUT,
+    AUDIO_OUTPUT,
+    CONTROL_INPUT,
+];
 // Raw pointers do not implement Sync, so wrap only the immutable static name array.
 #[repr(transparent)]
 struct PortNames([*const c_char; PORT_COUNT]);
@@ -276,35 +323,31 @@ static PORT_NAMES: PortNames = PortNames([
     b"Input R\0".as_ptr().cast(),
     b"Output L\0".as_ptr().cast(),
     b"Output R\0".as_ptr().cast(),
+    b"Mix\0".as_ptr().cast(),
 ]);
 
+const NO_HINT: LadspaPortRangeHint = LadspaPortRangeHint {
+    hint_descriptor: 0,
+    lower_bound: 0.0,
+    upper_bound: 0.0,
+};
 static PORT_HINTS: [LadspaPortRangeHint; PORT_COUNT] = [
+    NO_HINT,
+    NO_HINT,
+    NO_HINT,
+    NO_HINT,
     LadspaPortRangeHint {
-        hint_descriptor: 0,
-        lower_bound: 0.0,
-        upper_bound: 0.0,
-    },
-    LadspaPortRangeHint {
-        hint_descriptor: 0,
-        lower_bound: 0.0,
-        upper_bound: 0.0,
-    },
-    LadspaPortRangeHint {
-        hint_descriptor: 0,
-        lower_bound: 0.0,
-        upper_bound: 0.0,
-    },
-    LadspaPortRangeHint {
-        hint_descriptor: 0,
-        lower_bound: 0.0,
-        upper_bound: 0.0,
+        // -1 is conservative automatic mode, including before CLI state exists.
+        hint_descriptor: 0x1 | 0x2 | 0x40,
+        lower_bound: -1.0,
+        upper_bound: 100.0,
     },
 ];
 
 static DESCRIPTOR: LadspaDescriptor = LadspaDescriptor {
     unique_id: 0x4944_31,
     label: b"id14_sr_stereo\0".as_ptr().cast(),
-    // Our four Rust slices must not alias. LADSPA hosts honor this flag by
+    // Our four Rust audio slices must not alias. LADSPA hosts honor this flag by
     // providing distinct input and output buffers.
     properties: 0x2,
     name: b"iD14 Stereo High-Frequency Completion\0".as_ptr().cast(),
@@ -462,5 +505,117 @@ mod tests {
     fn descriptor_has_one_stereo_plugin() {
         assert!(!ladspa_descriptor(0).is_null());
         assert!(ladspa_descriptor(1).is_null());
+        assert_eq!(DESCRIPTOR.port_count, 5);
+        assert_eq!(PORT_DESCRIPTORS[MIX], CONTROL_INPUT);
+        assert_eq!(PORT_HINTS[MIX].lower_bound, -1.0);
+        assert_eq!(PORT_HINTS[MIX].upper_bound, 100.0);
+    }
+
+    #[test]
+    fn owner_mix_is_bounded_and_ramped_then_reaches_exact_bypass() {
+        let mut adapter = Adapter::new(SAMPLE_RATE);
+        let input = [0.2; CHUNK_FRAMES];
+        let mut out_l = [0.0; CHUNK_FRAMES];
+        let mut out_r = [0.0; CHUNK_FRAMES];
+        adapter.process_with_user_mix(&input, &input, &mut out_l, &mut out_r, 0.0);
+        assert_eq!(adapter.user_mix, 0.0);
+        adapter.process_with_user_mix(&input, &input, &mut out_l, &mut out_r, 500.0);
+        assert!((adapter.user_mix - 0.1).abs() < 1e-6);
+        for _ in 0..9 {
+            adapter.process_with_user_mix(&input, &input, &mut out_l, &mut out_r, 100.0);
+        }
+        assert_eq!(adapter.user_mix, 1.0);
+        for _ in 0..10 {
+            adapter.process_with_user_mix(&input, &input, &mut out_l, &mut out_r, 0.0);
+        }
+        assert_eq!(adapter.user_mix, 0.0);
+        adapter.process_with_user_mix(&input, &input, &mut out_l, &mut out_r, f32::NAN);
+        assert!(adapter.auto_last_chunk);
+    }
+
+    #[test]
+    fn zero_mix_matches_the_engine_bypass_with_adapter_delay() {
+        let mut adapter = Adapter::new(SAMPLE_RATE);
+        let mut bypass = StreamingSr::new();
+        let mut previous = [0.0; CHUNK_FRAMES * CHANNELS];
+        for chunk in 0..8 {
+            let left: [f32; CHUNK_FRAMES] = std::array::from_fn(|frame| {
+                ((chunk * CHUNK_FRAMES + frame) as f32 * 0.031).sin() * 0.2
+            });
+            let right: [f32; CHUNK_FRAMES] = std::array::from_fn(|frame| {
+                ((chunk * CHUNK_FRAMES + frame) as f32 * 0.019).cos() * 0.15
+            });
+            let mut interleaved = [0.0; CHUNK_FRAMES * CHANNELS];
+            for frame in 0..CHUNK_FRAMES {
+                interleaved[frame * CHANNELS] = left[frame];
+                interleaved[frame * CHANNELS + 1] = right[frame];
+            }
+            let mut out_l = [0.0; CHUNK_FRAMES];
+            let mut out_r = [0.0; CHUNK_FRAMES];
+            adapter.process_with_user_mix(&left, &right, &mut out_l, &mut out_r, 0.0);
+            for frame in 0..CHUNK_FRAMES {
+                assert_eq!(out_l[frame], previous[frame * CHANNELS]);
+                assert_eq!(out_r[frame], previous[frame * CHANNELS + 1]);
+            }
+            bypass
+                .process_with_mix(&interleaved, &mut previous, 0.0)
+                .unwrap();
+        }
+    }
+
+    #[test]
+    fn manual_mix_restores_fullband_input_even_when_detector_bypasses() {
+        let mut automatic = Adapter::new(SAMPLE_RATE);
+        let mut bypass = Adapter::new(SAMPLE_RATE);
+        let mut twenty = Adapter::new(SAMPLE_RATE);
+        let mut hundred = Adapter::new(SAMPLE_RATE);
+        let mut difference_twenty = 0.0_f64;
+        let mut difference_hundred = 0.0_f64;
+        let mut fullband_ratio = 0.0_f32;
+        for chunk in 0..23 {
+            let signal: [f32; CHUNK_FRAMES] = std::array::from_fn(|frame| {
+                let index = chunk * CHUNK_FRAMES + frame;
+                (2.0 * PI * 3_000.0 * index as f32 / SAMPLE_RATE as f32).sin() * 0.2
+                    + (2.0 * PI * 16_000.0 * index as f32 / SAMPLE_RATE as f32).sin() * 0.02
+            });
+            if chunk == 0 {
+                let mut interleaved = [0.0; CHUNK_FRAMES * CHANNELS];
+                for frame in 0..CHUNK_FRAMES {
+                    interleaved[frame * CHANNELS] = signal[frame];
+                    interleaved[frame * CHANNELS + 1] = signal[frame];
+                }
+                let (low, high) = automatic.detector.channel_energy(&interleaved, 0);
+                fullband_ratio = high / low;
+                assert!(fullband_ratio > FULLBAND_RATIO);
+            }
+            let mut auto_l = [0.0; CHUNK_FRAMES];
+            let mut auto_r = [0.0; CHUNK_FRAMES];
+            let mut zero_l = [0.0; CHUNK_FRAMES];
+            let mut zero_r = [0.0; CHUNK_FRAMES];
+            let mut twenty_l = [0.0; CHUNK_FRAMES];
+            let mut twenty_r = [0.0; CHUNK_FRAMES];
+            let mut hundred_l = [0.0; CHUNK_FRAMES];
+            let mut hundred_r = [0.0; CHUNK_FRAMES];
+            automatic.process(&signal, &signal, &mut auto_l, &mut auto_r);
+            bypass.process_with_user_mix(&signal, &signal, &mut zero_l, &mut zero_r, 0.0);
+            twenty.process_with_user_mix(&signal, &signal, &mut twenty_l, &mut twenty_r, 20.0);
+            hundred.process_with_user_mix(&signal, &signal, &mut hundred_l, &mut hundred_r, 100.0);
+            if chunk >= 12 {
+                for frame in 0..CHUNK_FRAMES {
+                    difference_twenty += (twenty_l[frame] - zero_l[frame]).abs() as f64;
+                    difference_hundred += (hundred_l[frame] - zero_l[frame]).abs() as f64;
+                    assert!((auto_l[frame] - zero_l[frame]).abs() < 1e-5);
+                }
+            }
+        }
+        println!(
+            "fullband_ratio={fullband_ratio:.6} diff_20={difference_twenty:.6} diff_100={difference_hundred:.6}"
+        );
+        assert!(automatic.completion_mix() < 0.01);
+        assert!(difference_twenty > 0.01, "diff at 20%: {difference_twenty}");
+        assert!(
+            difference_hundred > difference_twenty * 2.0,
+            "20%={difference_twenty}, 100%={difference_hundred}"
+        );
     }
 }

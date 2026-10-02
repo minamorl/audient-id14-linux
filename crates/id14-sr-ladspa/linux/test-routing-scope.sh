@@ -220,6 +220,7 @@ original_default=$(default_name)
 }
 "$cli" off
 assert_clean_off
+"$cli" mix auto >/dev/null
 
 module_id=$(pactl load-module module-null-sink \
     sink_name="$null_sink" sink_properties=device.description=ID14_SR_Test_Null)
@@ -252,6 +253,21 @@ grep -Fq 'state=on requested=all service=active active_outputs=line,headphones' 
 idempotent=$("$cli" on)
 printf 'IDEMPOTENT_ON=%s\n' "$idempotent"
 grep -Fq '(already active)' <<<"$idempotent"
+
+printf 'LIVE_MIX_ROUTING\n'
+service_pid_before=$(systemctl --user show "$service" -p MainPID --value)
+line_main_before=$(node_id "$line_main")
+headphones_main_before=$(node_id "$headphones_main")
+for mix in 25 75 0 100; do
+    [ "$("$cli" mix set "$mix")" = "$mix" ]
+    [ "$("$cli" mix get)" = "$mix" ]
+    assert_on_graph
+    [ "$(systemctl --user show "$service" -p MainPID --value)" = "$service_pid_before" ]
+    [ "$(node_id "$line_main")" = "$line_main_before" ]
+    [ "$(node_id "$headphones_main")" = "$headphones_main_before" ]
+    printf 'MIX=%s service_pid=%s line_node=%s headphones_node=%s\n' \
+        "$mix" "$service_pid_before" "$line_main_before" "$headphones_main_before"
+done
 
 line_id=$(node_id "$line_sink")
 headphones_id=$(node_id "$headphones_sink")

@@ -64,6 +64,57 @@ id14-sr on headphones   # compatibility: Headphones only
 id14-sr off
 ```
 
+The playback mix is adjustable while `on` without stopping the filter or
+changing the Line/Headphones routes. The default `auto` uses the existing
+conservative bandwidth detector. A manual integer percentage from 0 to 100
+directly controls restoration even on full-band material: `0` reaches the
+engine's fixed-delay bypass after a short ramp (and starts in bypass if set
+before `on`); `100` is full restoration. Changes ramp over about 53 ms. The
+setting survives `off`, `on`, and service restarts. On upgrade, an absent mix
+file or a numeric file from the earlier detector-scaled implementation stays
+`auto` until a new manual value is set.
+
+```sh
+id14-sr mix get          # prints auto or one integer, 0..100
+id14-sr mix set 35       # applies to every enabled iD14 output
+id14-sr mix auto         # restores conservative bandwidth detection
+id14-sr mix step +5      # clamps at 100; -5 clamps at 0
+id14-sr mix bar          # Waybar JSON: text, tooltip, class, percentage, mode
+id14-sr mix slider       # optional Zenity slider, applies while dragging
+```
+
+For UI clients, `mix get` is the literal `auto` or an integer line. `status`
+includes `mix=auto` or `mix=N`. `mix bar` returns one JSON object with `mode`
+(`auto` or `manual`), `class` (`on`, `off`, or `degraded`), and `percentage`
+(`0` in auto mode, otherwise `N`), alongside `text` and `tooltip`.
+
+For Hyprland Waybar, an example custom module is:
+
+```json
+"custom/id14-sr": {
+  "exec": "id14-sr mix bar",
+  "return-type": "json",
+  "interval": 1,
+  "on-click": "id14-sr mix slider",
+  "on-scroll-up": "id14-sr mix step +5",
+  "on-scroll-down": "id14-sr mix step -5"
+}
+```
+
+`mix get` and `mix bar` work while processing is off. `mix set` while on
+requires both selected SR nodes and updates each live PipeWire `Props.params`
+control. The CLI saves the setting only after both updates succeed, restores
+the previous value on a failed update, and serializes simultaneous slider and
+scroll commands with `flock`. Live changes require `pw-cli`; `mix slider`
+requires `zenity` and uses its `--print-partial` output so movement applies
+before the dialog closes. In `auto`, a new slider starts at 0; moving it enters
+manual mode. Cancel restores the mix from before the dialog opened. `mix step`
+from `auto` also starts at 0. The control file is under
+`${XDG_STATE_HOME:-~/.local/state}/id14-sr/mix`; audio callbacks never read it.
+PipeWire's filter-chain control support and `pw-cli set-param` syntax are
+documented in the [filter-chain manual](https://docs.pipewire.org/page_module_filter_chain.html)
+and [pw-cli manual](https://docs.pipewire.org/page_man_pw-cli_1.html).
+
 `on` and `off` are idempotent. `on` writes one marked PipeWire fragment and
 enables/starts `id14-sr-filter.service`; its default `all` mode creates two
 independent filter/transport pairs. `ExecStartPost` waits for every requested
