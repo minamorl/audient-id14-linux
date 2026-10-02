@@ -1,0 +1,169 @@
+{
+  "source": "https://github.com/mdeff/fma",
+  "license_scope": "each track carries its own CC0 or CC BY URL",
+  "audio_distribution": "WAV files remain ignored in corpus/audio/fma/ab; regenerate locally",
+  "examples": [
+    {
+      "selection": "worst",
+      "selection_rule": "worst/median/best whole-track official-test log-spectral model-vs-zero result",
+      "track": {
+        "id": 132448,
+        "artist_id": "21691",
+        "artist": "Nihilore",
+        "album_id": "19952",
+        "title": "Liberosis (Instrumental)",
+        "genre": "Electronic",
+        "split": "test",
+        "license_title": "Attribution",
+        "license_url": "http://creativecommons.org/licenses/by/4.0/",
+        "track_url": "http://freemusicarchive.org/music/Nihilore/Misophonia/Nihilore_-_Misophonia_-_10_Liberosis_Instrumental",
+        "archive_member": "fma_small/132/132448.mp3",
+        "sha256": "aa4a66bda29a97e1bdf0c71628cb9a61cd5b3398c496e8600d4f10d01e79e7d7",
+        "bytes": 1202209
+      },
+      "heldout_track_metric": {
+        "id": 132448,
+        "genre": "Electronic",
+        "frames": 11244,
+        "model_log_mse": 9.188245012665176e-06,
+        "zero_log_mse": 8.735517489376544e-07,
+        "copy_log_mse": 7.608477259764999e-07,
+        "model_vs_zero_percent": -951.8260679850054,
+        "mean_model_high_low_power": 4.221067690884333e-07,
+        "mean_truth_high_low_power": 3.276718762820302e-08
+      },
+      "excerpt_start_seconds": 9,
+      "excerpt_duration_seconds": 12,
+      "codec_note": "FMA 30-second MP3 decoded and resampled to 48 kHz; not original 48 kHz PCM",
+      "files": {
+        "full": "corpus/audio/fma/ab/worst-132448-full.wav",
+        "lowpass": "corpus/audio/fma/ab/worst-132448-lowpass.wav",
+        "model": "corpus/audio/fma/ab/worst-132448-model.wav"
+      },
+      "sha256": {
+        "full": "f63bce340a6efb0baa16d650e403da068ae011926d5eb09b1096a759110fafe1",
+        "lowpass": "a710dcaeeb45dcfb2feccde3ed0189a1bfe6e870c5a03ecaf09529a429dae97b",
+        "model": "77818d8f4c519d89b72b9e0556aeeba0b825bc1fb1bc48208880016f3bc8c4cf"
+      },
+      "peak": {
+        "full": 0.7142618894577026,
+        "lowpass": 0.7142618894577026,
+        "model": 0.7144075632095337
+      },
+      "excerpt_metrics": {
+        "zero_log_mse": 8.214535149963973e-07,
+        "model_log_mse": 2.930195638217765e-06,
+        "model_vs_zero_percent": -256.708637156494,
+        "lowband_relative_power_error_sum_channels": 2.0984338331103518e-14
+      }
+    },
+    {
+      "selection": "median",
+      "selection_rule": "worst/median/best whole-track official-test log-spectral model-vs-zero result",
+      "track": {
+        "id": 141617,
+        "artist_id": "13437",
+        "artist": "Barbarix",
+        "album_id": "21286",
+        "title": "The Secret Garden",
+        "genre": "Electronic",
+        "split": "test",
+        "license_title": "Attribution",
+        "license_url": "http://creativecommons.org/licenses/by/4.0/",
+        "track_url": "http://freemusicarchive.org/music/Barbarix/The_Mystics/02_The_Secret_Garden",
+        "archive_member": "fma_small/141/141617.mp3",
+        "sha256": "40dbbcee873e4be4491ed8e942dbcb9b1525e3185dd9696feefbdef79a320b5a",
+        "bytes": 1202376
+      },
+      "heldout_track_metric": {
+        "id": 141617,
+        "genre": "Electronic",
+        "frames": 11244,
+        "model_log_mse": 0.03802939416946069,
+        "zero_log_mse": 0.07867404839455869,
+        "copy_log_mse": 0.06355269440865778,
+        "model_vs_zero_percent": 51.66208559811331,
+        "mean_model_high_low_power": 0.005926434614179108,
+        "mean_truth_high_low_power": 0.031222943552446616
+      },
+      "excerpt_start_seconds": 9,
+      "excerpt_duration_seconds": 12,
+      "codec_note": "FMA 30-second MP3 decoded and resampled to 48 kHz; not original 48 kHz PCM",
+      "files": {
+        "full": "corpus/audio/fma/ab/median-141617-full.wav",
+        "lowpass": "corpus/audio/fma/ab/median-141617-lowpass.wav",
+        "model": "corpus/audio/fma/ab/median-141617-model.wav"
+      },
+      "sha256": {
+        "full": "d18cd8fd8aa6f7aa0884f65e47000435a71b34798c6f2b11a8fa45cf00350ab9",
+        "lowpass": "56fdef432e70d827698037361d4fda330ebdeaec4cf181701668b8e7c808d750",
+        "model": "560f9bae8eab0c323b23b40e6033675f41ca69bffb1a258a5af6aef176a6b2ec"
+      },
+      "peak": {
+        "full": 1.143189787864685,
+        "lowpass": 1.118412733078003,
+        "model": 1.1183362007141113
+      },
+      "excerpt_metrics": {
+        "zero_log_mse": 0.0842322059518901,
+        "model_log_mse": 0.060445859491577006,
+        "model_vs_zero_percent": 28.239016408876736,
+        "lowband_relative_power_error_sum_channels": 2.3276016801899307e-13
+      }
+    },
+    {
+      "selection": "best",
+      "selection_rule": "worst/median/best whole-track official-test log-spectral model-vs-zero result",
+      "track": {
+        "id": 154303,
+        "artist_id": "23208",
+        "artist": "Fleslit",
+        "album_id": "22780",
+        "title": "In It to Win It",
+        "genre": "Hip-Hop",
+        "split": "test",
+        "license_title": "Attribution",
+        "license_url": "http://creativecommons.org/licenses/by/4.0/",
+        "track_url": "http://freemusicarchive.org/music/Fleslit/Journey_1002/12_In_It_to_Win_It",
+        "archive_member": "fma_small/154/154303.mp3",
+        "sha256": "f01914dea5797a089d6a614bea0cf9a924adacbb656ae48764daaa7282cab9e8",
+        "bytes": 1201217
+      },
+      "heldout_track_metric": {
+        "id": 154303,
+        "genre": "Hip-Hop",
+        "frames": 11234,
+        "model_log_mse": 0.017818539453664167,
+        "zero_log_mse": 0.09002878770730209,
+        "copy_log_mse": 0.06684769451957209,
+        "model_vs_zero_percent": 80.20795358080898,
+        "mean_model_high_low_power": 0.01969803783672673,
+        "mean_truth_high_low_power": 0.036438577652055645
+      },
+      "excerpt_start_seconds": 9,
+      "excerpt_duration_seconds": 12,
+      "codec_note": "FMA 30-second MP3 decoded and resampled to 48 kHz; not original 48 kHz PCM",
+      "files": {
+        "full": "corpus/audio/fma/ab/best-154303-full.wav",
+        "lowpass": "corpus/audio/fma/ab/best-154303-lowpass.wav",
+        "model": "corpus/audio/fma/ab/best-154303-model.wav"
+      },
+      "sha256": {
+        "full": "64ca320be47ce01d7c687c8c6a4ac77973a680b8921bea8b947b91a826b179dc",
+        "lowpass": "d69d771768a838b467ba92f56dae7e042ffa51740ea0ab3ba372e45a9ddc5302",
+        "model": "c692f9527e79e8ffc0dd7a0aa40837d570b8641417101f9e3936083fedde81d2"
+      },
+      "peak": {
+        "full": 0.9141802191734314,
+        "lowpass": 0.8307440280914307,
+        "model": 0.8339352607727051
+      },
+      "excerpt_metrics": {
+        "zero_log_mse": 0.07920516775635487,
+        "model_log_mse": 0.041109043829272364,
+        "model_vs_zero_percent": 48.09802820476439,
+        "lowband_relative_power_error_sum_channels": 3.015521317893677e-13
+      }
+    }
+  ]
+}

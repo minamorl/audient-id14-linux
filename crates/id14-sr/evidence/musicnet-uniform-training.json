@@ -1,0 +1,170 @@
+{
+  "corpus": "MusicNet 1.0",
+  "record": "https://zenodo.org/records/5120004",
+  "license": "CC BY 4.0",
+  "train_recordings": 300,
+  "validation_recordings": 20,
+  "test_recordings": 10,
+  "train_excerpt_fractions": [
+    0.15,
+    0.45,
+    0.75
+  ],
+  "train_excerpt_seconds": 8,
+  "active_definition": "frame high-band (12\u201320 kHz) squared magnitude exceeds 0.001 times low-band (0\u201312 kHz) squared magnitude",
+  "validation_ids": [
+    "1757",
+    "2487",
+    "2168",
+    "2161",
+    "1923",
+    "2480",
+    "2481",
+    "2607",
+    "2397",
+    "2466",
+    "2540",
+    "2213",
+    "2221",
+    "1775",
+    "1773",
+    "2178",
+    "2514",
+    "1729",
+    "2436",
+    "2614"
+  ],
+  "train_frames": 1347300,
+  "train_active_frames": 31938,
+  "steps": 5000,
+  "selected_step": 4000,
+  "batch": 512,
+  "seed": 1407,
+  "device": "cpu",
+  "validation": {
+    "all": {
+      "frames": 89820,
+      "model_mse": 0.00042205867754846574,
+      "zero_mse": 0.0004215139439312793,
+      "improvement_percent": -0.12923264462048056
+    },
+    "active": {
+      "frames": 1465,
+      "model_mse": 0.007547258759114522,
+      "zero_mse": 0.007546999755812275,
+      "improvement_percent": -0.0034318710829150945
+    },
+    "inactive": {
+      "frames": 88355,
+      "model_mse": 0.0003039168960818594,
+      "zero_mse": 0.0003033674147747397,
+      "improvement_percent": -0.181127332850739
+    }
+  },
+  "heldout": {
+    "all": {
+      "frames": 277668,
+      "model_mse": 0.0008816936217339462,
+      "zero_mse": 0.000880955040528214,
+      "improvement_percent": -0.08383869457053716
+    },
+    "active": {
+      "frames": 6695,
+      "model_mse": 0.028024719689513197,
+      "zero_mse": 0.028022985777645868,
+      "improvement_percent": -0.006187462967299773
+    },
+    "inactive": {
+      "frames": 270973,
+      "model_mse": 0.00021106385285925354,
+      "zero_mse": 0.00021034986460116638,
+      "improvement_percent": -0.33942891260752006
+    },
+    "by_recording": [
+      {
+        "id": "1759",
+        "frames": 36496,
+        "model_mse": 2.0868776118732058e-05,
+        "zero_mse": 2.0275881979614496e-05,
+        "improvement_percent": -2.9241323471069336
+      },
+      {
+        "id": "1819",
+        "frames": 33273,
+        "model_mse": 0.0011148113990202546,
+        "zero_mse": 0.001114223268814385,
+        "improvement_percent": -0.05278587341308594
+      },
+      {
+        "id": "2106",
+        "frames": 42494,
+        "model_mse": 3.3914011510205455e-06,
+        "zero_mse": 2.732815346462303e-06,
+        "improvement_percent": -24.099170684814453
+      },
+      {
+        "id": "2191",
+        "frames": 19280,
+        "model_mse": 4.377217464934802e-06,
+        "zero_mse": 2.042982259808923e-06,
+        "improvement_percent": -114.25626373291016
+      },
+      {
+        "id": "2298",
+        "frames": 28782,
+        "model_mse": 0.00023059023078531027,
+        "zero_mse": 0.00023007369600236416,
+        "improvement_percent": -0.22450685501098633
+      },
+      {
+        "id": "2303",
+        "frames": 17370,
+        "model_mse": 6.8514436861732975e-06,
+        "zero_mse": 6.354458946589148e-06,
+        "improvement_percent": -7.821035385131836
+      },
+      {
+        "id": "2382",
+        "frames": 22121,
+        "model_mse": 0.000711004831828177,
+        "zero_mse": 0.0007100353250280023,
+        "improvement_percent": -0.13654232025146484
+      },
+      {
+        "id": "2416",
+        "frames": 26083,
+        "model_mse": 8.967555913841352e-05,
+        "zero_mse": 8.905169670470059e-05,
+        "improvement_percent": -0.7005572319030762
+      },
+      {
+        "id": "2556",
+        "frames": 28395,
+        "model_mse": 5.479784158524126e-05,
+        "zero_mse": 5.430942837847397e-05,
+        "improvement_percent": -0.8993148803710938
+      },
+      {
+        "id": "2628",
+        "frames": 23374,
+        "model_mse": 0.007716089487075806,
+        "zero_mse": 0.007715413346886635,
+        "improvement_percent": -0.008761882781982422
+      }
+    ]
+  },
+  "checkpoint_sha256": "33aabc7fcca4349d720aef7cf1c3b71921a07a5502c33d63c874d9a08ab01a65",
+  "checkpoint_bytes": 608868,
+  "test_ids": [
+    "1759",
+    "1819",
+    "2106",
+    "2191",
+    "2298",
+    "2303",
+    "2382",
+    "2416",
+    "2556",
+    "2628"
+  ]
+}

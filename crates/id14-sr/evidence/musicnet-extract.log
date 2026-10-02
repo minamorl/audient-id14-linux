@@ -1,0 +1,7 @@
+{"ts": "2026-10-02T11:27:32.934130+00:00", "level": "info", "trace_id": "01M3Y5WWSZ7JBD714E8WQKV7RC", "msg": "extracted", "recordings": 50}
+{"ts": "2026-10-02T11:27:44.410650+00:00", "level": "info", "trace_id": "01M3Y5WWSZ7JBD714E8WQKV7RC", "msg": "extracted", "recordings": 100}
+{"ts": "2026-10-02T11:27:55.169318+00:00", "level": "info", "trace_id": "01M3Y5WWSZ7JBD714E8WQKV7RC", "msg": "extracted", "recordings": 150}
+{"ts": "2026-10-02T11:28:07.245123+00:00", "level": "info", "trace_id": "01M3Y5WWSZ7JBD714E8WQKV7RC", "msg": "extracted", "recordings": 200}
+{"ts": "2026-10-02T11:28:19.622478+00:00", "level": "info", "trace_id": "01M3Y5WWSZ7JBD714E8WQKV7RC", "msg": "extracted", "recordings": 250}
+{"ts": "2026-10-02T11:28:31.906144+00:00", "level": "info", "trace_id": "01M3Y5WWSZ7JBD714E8WQKV7RC", "msg": "extracted", "recordings": 300}
+{"ts": "2026-10-02T11:28:38.281636+00:00", "level": "info", "trace_id": "01M3Y5WWSZ7JBD714E8WQKV7RC", "msg": "complete", "recordings": 330}

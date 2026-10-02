@@ -1,0 +1,37 @@
+[#c96f4d 0B/0B CN:1 DL:0B]
+[#c96f4d 0B/0B CN:1 DL:0B]
+[#c96f4d 0B/0B CN:1 DL:0B]
+[#c96f4d 75MiB/341MiB(22%) CN:16 DL:0B]
+[#c96f4d 75MiB/341MiB(22%) CN:16 DL:403KiB ETA:11m15s]
+[#c96f4d 78MiB/341MiB(23%) CN:16 DL:2.4MiB ETA:1m48s]
+[#c96f4d 93MiB/341MiB(27%) CN:16 DL:7.7MiB ETA:32s]
+[#c96f4d 111MiB/341MiB(32%) CN:16 DL:10MiB ETA:21s]
+[#c96f4d 134MiB/341MiB(39%) CN:16 DL:13MiB ETA:15s]
+[#c96f4d 157MiB/341MiB(45%) CN:16 DL:15MiB ETA:12s]
+[#c96f4d 178MiB/341MiB(52%) CN:16 DL:16MiB ETA:10s]
+[#c96f4d 199MiB/341MiB(58%) CN:16 DL:16MiB ETA:8s]
+[#c96f4d 216MiB/341MiB(63%) CN:16 DL:16MiB ETA:7s]
+[#c96f4d 232MiB/341MiB(67%) CN:16 DL:16MiB ETA:6s]
+[#c96f4d 245MiB/341MiB(71%) CN:15 DL:17MiB ETA:5s]
+[#c96f4d 258MiB/341MiB(75%) CN:15 DL:18MiB ETA:4s]
+[#c96f4d 270MiB/341MiB(79%) CN:14 DL:17MiB ETA:3s]
+[#c96f4d 283MiB/341MiB(82%) CN:14 DL:17MiB ETA:3s]
+[#c96f4d 295MiB/341MiB(86%) CN:12 DL:15MiB ETA:2s]
+[#c96f4d 305MiB/341MiB(89%) CN:11 DL:14MiB ETA:2s]
+[#c96f4d 315MiB/341MiB(92%) CN:9 DL:13MiB ETA:2s]
+[#c96f4d 323MiB/341MiB(94%) CN:7 DL:12MiB ETA:1s]
+[#c96f4d 330MiB/341MiB(96%) CN:5 DL:11MiB ETA:1s]
+[#c96f4d 337MiB/341MiB(98%) CN:3 DL:10MiB]
+[#c96f4d 340MiB/341MiB(99%) CN:2 DL:8.9MiB]
+[#c96f4d 341MiB/341MiB(99%) CN:1 DL:7.5MiB]
+[#c96f4d 341MiB/341MiB(100%) CN:0] [Checksum:#c96f4d 32MiB/341MiB(9%)]
+[#c96f4d 341MiB/341MiB(100%) CN:0] [Checksum:#c96f4d 167MiB/341MiB(49%)]
+[#c96f4d 341MiB/341MiB(100%) CN:0] [Checksum:#c96f4d 279MiB/341MiB(81%)]
+
+ダウンロード結果：
+gid   |stat|avg speed  |path/URI
+======+====+===========+=======================================================
+c96f4d|OK  |    11MiB/s|crates/id14-sr/corpus/audio/fma/fma_metadata.zip
+
+凡例：
+(OK)：ダウンロードが完了しました。

@@ -1,0 +1,15 @@
+{"ts": "2026-10-02T11:03:35.554487+00:00", "level": "info", "trace_id": "01M3Y4H7JZK9FHYW7159X9A65J", "msg": "verified", "file": "musicnet_metadata.csv", "bytes": 43775, "checksum": "md5:1caef62cee9c875235e62aac368b49d8"}
+Traceback (most recent call last):
+  File "/Users/minamorl/repos/.worktrees/audient-id14-linux/id14-sr/crates/id14-sr/scripts/download_musicnet.py", line 73, in <module>
+    block = response.read(8 * 1024 * 1024)
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/client.py", line 459, in read
+    n = self.readinto(b)
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/http/client.py", line 503, in readinto
+    n = self.fp.readinto(b)
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/socket.py", line 704, in readinto
+    return self._sock.recv_into(b)
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/ssl.py", line 1241, in recv_into
+    return self.read(nbytes, buffer)
+  File "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/ssl.py", line 1099, in read
+    return self._sslobj.read(len, buffer)
+KeyboardInterrupt

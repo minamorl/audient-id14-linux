@@ -1,0 +1,32 @@
+   Compiling id14-sr v0.1.0 (/Users/minamorl/repos/.worktrees/audient-id14-linux/id14-sr/crates/id14-sr)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.36s
+     Running unittests src/lib.rs (crates/id14-sr/target/debug/deps/id14_sr-474ec7bcc648671b)
+
+running 6 tests
+test tests::embedded_output_matches_training_runtime ... ok
+test tests::on_off_and_fullband_bypass_are_callable ... ok
+test tests::completion_keeps_stereo_channels_independent ... ok
+test tests::bypass_preserves_stereo_with_fixed_delay ... ok
+test tests::trained_path_changes_bandlimited_audio ... ok
+test tests::enabled_path_preserves_existing_low_tone ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running unittests src/bin/bench.rs (crates/id14-sr/target/debug/deps/sr_bench-b30b501866fa683c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/render.rs (crates/id14-sr/target/debug/deps/sr_render-7f7067939bb157a6)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests id14_sr
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

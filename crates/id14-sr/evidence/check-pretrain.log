@@ -1,0 +1,23 @@
+    Updating crates.io index
+     Locking 9 packages to latest compatible versions
+      Adding autocfg v1.5.1
+      Adding hound v3.5.1
+      Adding num-complex v0.4.6
+      Adding num-integer v0.1.47
+      Adding num-traits v0.2.19
+      Adding primal-check v0.3.4
+      Adding rustfft v6.4.1
+      Adding strength_reduce v0.2.4
+      Adding transpose v0.2.3
+ Downloading crates ...
+  Downloaded hound v3.5.1
+    Checking strength_reduce v0.2.4
+    Checking hound v3.5.1
+    Checking num-traits v0.2.19
+    Checking num-integer v0.1.47
+    Checking num-complex v0.4.6
+    Checking primal-check v0.3.4
+    Checking transpose v0.2.3
+    Checking rustfft v6.4.1
+    Checking id14-sr v0.1.0 (/Users/minamorl/repos/.worktrees/audient-id14-linux/id14-sr/crates/id14-sr)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.15s

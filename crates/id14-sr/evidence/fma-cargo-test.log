@@ -1,0 +1,131 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.04s
+     Running unittests src/lib.rs (crates/id14-sr/target/debug/deps/id14_protocol-06e4f4ed1d0c4907)
+
+running 40 tests
+test db::tests::unrepresentable_decibels_are_rejected ... ok
+test control_error::tests::dfu_missing_message_states_no_interface_0_fallback ... ok
+test descriptor::tests::ambiguous_dfu_interfaces_are_refused ... ok
+test descriptor::tests::dfu_interface_is_found_from_descriptor ... ok
+test descriptor::tests::extension_code_is_the_wire_field_not_the_unit_id ... ok
+test descriptor::tests::dfu_interface_numbered_0_to_2_is_refused ... ok
+test db::tests::formatting ... ok
+test descriptor::tests::missing_dfu_interface_is_an_error_without_interface_0_fallback ... ok
+test descriptor::tests::missing_mixer_output_volume_is_an_error ... ok
+test db::tests::whole_and_fractional_decibels ... ok
+test evidence::tests::never_hardware_confirmed ... ok
+test evidence::tests::status_is_static_inferred_unverified ... ok
+test descriptor::tests::non_uac2_audio_control_is_refused ... ok
+test descriptor::tests::mk2_fixture_entities_parse ... ok
+test extension::tests::pinned_codes ... ok
+test extension::tests::round_trip ... ok
+test descriptor::tests::truncated_and_zero_length_descriptors_are_errors ... ok
+test plan::tests::dump_plan_covers_the_four_targets_and_nothing_else ... ok
+test plan::tests::mixer_nodes_use_uac2_mixer_control_numbers ... ok
+test plan::tests::dump_plan_is_get_only_and_never_addresses_extension_units ... ok
+test plan::tests::mk2_declares_no_mute_control ... ok
+test plan::tests::values_render_by_kind ... ok
+test plan::tests::volume_on_undeclared_channel_is_refused ... ok
+test plan::tests::volume_targets_the_mixer_output_feature_unit ... ok
+test product::tests::lookup_by_vid_pid ... ok
+test product::tests::pinned_vid_pid ... ok
+test product::tests::table_covers_both_variants ... ok
+test request::tests::header_wire_bytes_le ... ok
+test request::tests::pinned_headers ... ok
+test request::tests::request_bytes_are_header_then_body ... ok
+test row_evidence::tests::get_direction_rows_are_mk2_observed ... ok
+test row_evidence::tests::set_header_stays_static_inferred ... ok
+test uac2::tests::cur_encoding_round_trips ... ok
+test uac2::tests::feature_controls_map_selectors_and_capabilities ... ok
+test uac2::tests::get_cur_setup_packet_bytes ... ok
+test uac2::tests::get_range_and_set_cur_headers ... ok
+test uac2::tests::header_evidence_follows_rows ... ok
+test uac2::tests::range_block_decoding_ignores_trailing_bytes ... ok
+test uac2::tests::range_block_rejects_short_and_empty ... ok
+test uac2::tests::setup_headers_match_the_pinned_request_headers ... ok
+
+test result: ok. 40 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/pinned_values.rs (crates/id14-sr/target/debug/deps/pinned_values-138288f5b694c17d)
+
+running 4 tests
+test extension_code_pins ... ok
+test product_table_pins ... ok
+test evidence_status_pins ... ok
+test request_header_pins ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (crates/id14-sr/target/debug/deps/id14_sr-474ec7bcc648671b)
+
+running 6 tests
+test tests::embedded_output_matches_training_runtime ... ok
+test tests::on_off_and_fullband_bypass_are_callable ... ok
+test tests::completion_keeps_stereo_channels_independent ... ok
+test tests::bypass_preserves_stereo_with_fixed_delay ... ok
+test tests::trained_path_changes_bandlimited_audio ... ok
+test tests::enabled_path_preserves_existing_low_tone ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+     Running unittests src/bin/bench.rs (crates/id14-sr/target/debug/deps/sr_bench-b30b501866fa683c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/render.rs (crates/id14-sr/target/debug/deps/sr_render-7f7067939bb157a6)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (crates/id14-sr/target/debug/deps/id14ctl-9b0cf6dbb3ee0361)
+
+running 15 tests
+test ops::tests::mute_fails_stating_no_declared_mute_control ... ok
+test ops::tests::format_bytes_is_exact_lowercase_hex ... ok
+test ops::tests::dry_run_line_shows_setup_payload_and_evidence ... ok
+test ops::tests::dry_run_volume_prints_set_bytes_and_payload ... ok
+test usb::tests::autodetect_prefers_mk2 ... ok
+test usb::tests::differing_configuration_values_are_refused ... ok
+test ops::tests::volume_out_of_range_is_rejected_without_set ... ok
+test ops::tests::volume_in_range_sets_then_reads_back ... ok
+test usb::tests::only_not_found_allows_the_indexed_fallback ... ok
+test usb::tests::no_readable_candidate_is_not_guessed_around ... ok
+test usb::tests::differing_interface_content_is_refused ... ok
+test usb::tests::identical_candidates_are_selected ... ok
+test ops::tests::dump_reports_failed_reads_and_continues ... ok
+test ops::tests::dump_sends_only_get_requests_and_never_touches_extension_units ... ok
+test ops::tests::dry_run_dump_lists_requests ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (crates/id14-sr/target/debug/deps/id14ctl-4549f1bcf394dc56)
+
+running 5 tests
+test tests::request_bytes_are_deterministic_for_all_pinned_headers ... ok
+test tests::dry_run_format_is_exact_lowercase_hex ... ok
+test tests::protocol_lookup_identifies_mk1_and_mk2_vid_pid_pairs ... ok
+test tests::write_commands_are_disabled_without_explicit_gate ... ok
+test tests::clap_definition_and_representative_arguments_are_valid ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests id14_protocol
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests id14_sr
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests id14ctl
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

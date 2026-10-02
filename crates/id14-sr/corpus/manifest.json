@@ -1,0 +1,17 @@
+{
+  "source": "Wikimedia Commons: Melomics 0music recordings",
+  "license": "CC0 1.0 public domain dedication (verify each linked file description)",
+  "files": [
+    {"title": "File:0music 01 Melomics.flac", "split": "train"},
+    {"title": "File:0music 02 Melomics.flac", "split": "train"},
+    {"title": "File:0music 03 Melomics.flac", "split": "train"},
+    {"title": "File:0music 04 Melomics.flac", "split": "train"},
+    {"title": "File:0music 05 Melomics.flac", "split": "train"},
+    {"title": "File:0music 06 Melomics.flac", "split": "train"},
+    {"title": "File:0music 07 Melomics.flac", "split": "train"},
+    {"title": "File:0music 08 Melomics.flac", "split": "train"},
+    {"title": "File:0music 09 Melomics.flac", "split": "test"},
+    {"title": "File:0music 10 Melomics.flac", "split": "test"},
+    {"title": "File:0music 11 Melomics.flac", "split": "test"}
+  ]
+}

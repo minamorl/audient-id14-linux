@@ -1,0 +1,2124 @@
+{
+  "source": "official FMA small test split; selected CC0/CC BY tracks only",
+  "input": "full MP3 decoded at 48 kHz, then ideal 12 kHz lowpass",
+  "output": "actual Rust sr-render result, delay-aligned to input",
+  "metrics": {
+    "all": {
+      "frames": 573144,
+      "model_log_mse": 0.01194417128190727,
+      "zero_log_mse": 0.01846716898983882,
+      "copy_log_mse": 0.014319772319368521,
+      "model_vs_zero_percent": 35.322131462167796,
+      "model_vs_copy_percent": 16.58965648670322
+    },
+    "active": {
+      "frames": 140531,
+      "model_log_mse": 0.04494855255310147,
+      "zero_log_mse": 0.06946715123484985,
+      "copy_log_mse": 0.05389727021822784,
+      "model_vs_zero_percent": 35.29524134199422,
+      "model_vs_copy_percent": 16.603285526137736
+    },
+    "inactive": {
+      "frames": 432613,
+      "model_log_mse": 0.001222952306929189,
+      "zero_log_mse": 0.001900217684922777,
+      "copy_log_mse": 0.001463327050214336,
+      "model_vs_zero_percent": 35.64146273173494,
+      "model_vs_copy_percent": 16.426590573169484
+    }
+  },
+  "tracks": [
+    {
+      "id": 11204,
+      "genre": "Hip-Hop",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.005552577896407677,
+          "zero_log_mse": 0.010854285398403786,
+          "copy_log_mse": 0.0071226296638303025,
+          "model_vs_zero_percent": 48.84437166886887,
+          "model_vs_copy_percent": 22.043147566629294,
+          "model_to_truth_high_power": 0.27408390064542704,
+          "lowband_relative_power_error": 1.813734414373125e-13
+        },
+        "active": {
+          "frames": 3874,
+          "model_log_mse": 0.011844353888990116,
+          "zero_log_mse": 0.023768157520434364,
+          "copy_log_mse": 0.015192041932720177,
+          "model_vs_zero_percent": 50.16713483656826,
+          "model_vs_copy_percent": 22.03580044444129,
+          "model_to_truth_high_power": 0.2557651137548984,
+          "lowband_relative_power_error": 4.879758967831695e-13
+        },
+        "inactive": {
+          "frames": 7360,
+          "model_log_mse": 0.0022408468916163215,
+          "zero_log_mse": 0.004056956512432801,
+          "copy_log_mse": 0.0028752243472977787,
+          "model_vs_zero_percent": 44.76532137455494,
+          "model_vs_copy_percent": 22.06358110029445,
+          "model_to_truth_high_power": 0.4273621826359793,
+          "lowband_relative_power_error": 5.402034563886086e-14
+        }
+      },
+      "peak": {
+        "full": 0.3690229058265686,
+        "lowpass": 0.40681958198547363,
+        "model": 0.4100608825683594
+      }
+    },
+    {
+      "id": 39605,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.01166269532867056,
+          "zero_log_mse": 0.020204855813126543,
+          "copy_log_mse": 0.015638172323194612,
+          "model_vs_zero_percent": 42.27776017538504,
+          "model_vs_copy_percent": 25.4216216087324,
+          "model_to_truth_high_power": 0.22128823043476548,
+          "lowband_relative_power_error": 5.379348535279932e-14
+        },
+        "active": {
+          "frames": 5463,
+          "model_log_mse": 0.020015778634343607,
+          "zero_log_mse": 0.035762382294127114,
+          "copy_log_mse": 0.027635360808244188,
+          "model_vs_zero_percent": 44.03119325294335,
+          "model_vs_copy_percent": 27.57185703769609,
+          "model_to_truth_high_power": 0.22207325466535144,
+          "lowband_relative_power_error": 3.422218329892625e-13
+        },
+        "inactive": {
+          "frames": 5771,
+          "model_log_mse": 0.0037554185830646234,
+          "zero_log_mse": 0.005477639184170362,
+          "copy_log_mse": 0.004281277384046139,
+          "model_vs_zero_percent": 31.44092816632983,
+          "model_vs_copy_percent": 12.282754743738145,
+          "model_to_truth_high_power": 0.21901017267252468,
+          "lowband_relative_power_error": 2.588369508583097e-14
+        }
+      },
+      "peak": {
+        "full": 1.0209825038909912,
+        "lowpass": 1.0383409261703491,
+        "model": 1.0383849143981934
+      }
+    },
+    {
+      "id": 39607,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.03029352821027878,
+          "zero_log_mse": 0.04541119720392514,
+          "copy_log_mse": 0.03518123150338608,
+          "model_vs_zero_percent": 33.290619768861006,
+          "model_vs_copy_percent": 13.892928371870317,
+          "model_to_truth_high_power": 0.01683347257509184,
+          "lowband_relative_power_error": 7.610585439663812e-14
+        },
+        "active": {
+          "frames": 5854,
+          "model_log_mse": 0.05695599606166138,
+          "zero_log_mse": 0.0849681225046448,
+          "copy_log_mse": 0.0659219939587869,
+          "model_vs_zero_percent": 32.96780676947656,
+          "model_vs_copy_percent": 13.600920358584535,
+          "model_to_truth_high_power": 0.015773209170734787,
+          "lowband_relative_power_error": 2.1936454719420719e-13
+        },
+        "inactive": {
+          "frames": 5380,
+          "model_log_mse": 0.0012819879125104236,
+          "zero_log_mse": 0.002369145027268463,
+          "copy_log_mse": 0.001732082169944381,
+          "model_vs_zero_percent": 45.888162279853816,
+          "model_vs_copy_percent": 25.98573354336938,
+          "model_to_truth_high_power": 0.23839811969578925,
+          "lowband_relative_power_error": 2.1380361124842834e-14
+        }
+      },
+      "peak": {
+        "full": 1.120767593383789,
+        "lowpass": 0.9827157258987427,
+        "model": 0.9826950430870056
+      }
+    },
+    {
+      "id": 42372,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11244,
+          "model_log_mse": 0.01582480116180667,
+          "zero_log_mse": 0.02143088963023286,
+          "copy_log_mse": 0.015299727114133835,
+          "model_vs_zero_percent": 26.158916242644448,
+          "model_vs_copy_percent": -3.431917731315459,
+          "model_to_truth_high_power": 0.017807559030737764,
+          "lowband_relative_power_error": 4.122850306795785e-14
+        },
+        "active": {
+          "frames": 4481,
+          "model_log_mse": 0.03708056277803702,
+          "zero_log_mse": 0.04969481036235431,
+          "copy_log_mse": 0.03585505439808327,
+          "model_vs_zero_percent": 25.383430366952474,
+          "model_vs_copy_percent": -3.417951528806662,
+          "model_to_truth_high_power": 0.015782308621301512,
+          "lowband_relative_power_error": 8.151995805252863e-14
+        },
+        "inactive": {
+          "frames": 6763,
+          "model_log_mse": 0.001741248329878803,
+          "zero_log_mse": 0.0027039003058744082,
+          "copy_log_mse": 0.00168026510624127,
+          "model_vs_zero_percent": 35.6023472427655,
+          "model_vs_copy_percent": -3.629381066774151,
+          "model_to_truth_high_power": 0.12795047978279933,
+          "lowband_relative_power_error": 1.8884807617777775e-14
+        }
+      },
+      "peak": {
+        "full": 1.1135371923446655,
+        "lowpass": 1.1897711753845215,
+        "model": 1.1900466680526733
+      }
+    },
+    {
+      "id": 42373,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11244,
+          "model_log_mse": 0.013860634909299157,
+          "zero_log_mse": 0.020314729106872657,
+          "copy_log_mse": 0.01503665228688551,
+          "model_vs_zero_percent": 31.77051568652236,
+          "model_vs_copy_percent": 7.821005335157194,
+          "model_to_truth_high_power": 0.055849974130953356,
+          "lowband_relative_power_error": 4.198493128840963e-14
+        },
+        "active": {
+          "frames": 3732,
+          "model_log_mse": 0.035519139501457894,
+          "zero_log_mse": 0.05061868297656152,
+          "copy_log_mse": 0.03798497726349386,
+          "model_vs_zero_percent": 29.82998092244975,
+          "model_vs_copy_percent": 6.491613105178306,
+          "model_to_truth_high_power": 0.046713082483787784,
+          "lowband_relative_power_error": 1.176990207062363e-13
+        },
+        "inactive": {
+          "frames": 7512,
+          "model_log_mse": 0.0031005791135142254,
+          "zero_log_mse": 0.005259569916020845,
+          "copy_log_mse": 0.00363580713077497,
+          "model_vs_zero_percent": 41.048808875612686,
+          "model_vs_copy_percent": 14.721023365908337,
+          "model_to_truth_high_power": 0.24355504599662198,
+          "lowband_relative_power_error": 2.0705851226134255e-14
+        }
+      },
+      "peak": {
+        "full": 1.1984139680862427,
+        "lowpass": 1.0703554153442383,
+        "model": 1.070319652557373
+      }
+    },
+    {
+      "id": 42374,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.05371568425802303,
+          "zero_log_mse": 0.08447081908036506,
+          "copy_log_mse": 0.06712320758421832,
+          "model_vs_zero_percent": 36.40918267062353,
+          "model_vs_copy_percent": 19.974497359014176,
+          "model_to_truth_high_power": 0.05224227266635908,
+          "lowband_relative_power_error": 6.959960862141246e-14
+        },
+        "active": {
+          "frames": 5562,
+          "model_log_mse": 0.10584280136263098,
+          "zero_log_mse": 0.16647533053861574,
+          "copy_log_mse": 0.13253451436915242,
+          "model_vs_zero_percent": 36.42132980292862,
+          "model_vs_copy_percent": 20.139443022499183,
+          "model_to_truth_high_power": 0.05190423640841577,
+          "lowband_relative_power_error": 1.6900119565181805e-13
+        },
+        "inactive": {
+          "frames": 5672,
+          "model_log_mse": 0.002599495023920526,
+          "zero_log_mse": 0.004056663098208778,
+          "copy_log_mse": 0.002980455761615468,
+          "model_vs_zero_percent": 35.92036210578259,
+          "model_vs_copy_percent": 12.781962497187127,
+          "model_to_truth_high_power": 0.08001860096586152,
+          "lowband_relative_power_error": 1.7000114338596186e-14
+        }
+      },
+      "peak": {
+        "full": 1.0301259756088257,
+        "lowpass": 1.02439284324646,
+        "model": 1.0246795415878296
+      }
+    },
+    {
+      "id": 42375,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11244,
+          "model_log_mse": 0.03424166049919548,
+          "zero_log_mse": 0.04578689288425119,
+          "copy_log_mse": 0.03827823529919026,
+          "model_vs_zero_percent": 25.21514708203054,
+          "model_vs_copy_percent": 10.545352387444485,
+          "model_to_truth_high_power": 0.017998983987901226,
+          "lowband_relative_power_error": 3.8784605149182815e-14
+        },
+        "active": {
+          "frames": 4277,
+          "model_log_mse": 0.08651342854793426,
+          "zero_log_mse": 0.11564539738476853,
+          "copy_log_mse": 0.09668788406540642,
+          "model_vs_zero_percent": 25.190772391838568,
+          "model_vs_copy_percent": 10.522989116805414,
+          "model_to_truth_high_power": 0.017613189693094545,
+          "lowband_relative_power_error": 7.304348460864721e-14
+        },
+        "inactive": {
+          "frames": 6967,
+          "model_log_mse": 0.002152331958294693,
+          "zero_log_mse": 0.002901171088828101,
+          "copy_log_mse": 0.002420898170855743,
+          "model_vs_zero_percent": 25.81161564090637,
+          "model_vs_copy_percent": 11.093660022309681,
+          "model_to_truth_high_power": 0.05369975406878432,
+          "lowband_relative_power_error": 1.730606397605895e-14
+        }
+      },
+      "peak": {
+        "full": 1.2179663181304932,
+        "lowpass": 1.0887407064437866,
+        "model": 1.0885517597198486
+      }
+    },
+    {
+      "id": 42376,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.019666340604440193,
+          "zero_log_mse": 0.032271737077269026,
+          "copy_log_mse": 0.022913910301662555,
+          "model_vs_zero_percent": 39.06017343487714,
+          "model_vs_copy_percent": 14.172917910858407,
+          "model_to_truth_high_power": 0.05119318240893019,
+          "lowband_relative_power_error": 7.225601377008572e-14
+        },
+        "active": {
+          "frames": 3710,
+          "model_log_mse": 0.05747933738362455,
+          "zero_log_mse": 0.09385266125268332,
+          "copy_log_mse": 0.06688885779313321,
+          "model_vs_zero_percent": 38.75577248803782,
+          "model_vs_copy_percent": 14.067395856286613,
+          "model_to_truth_high_power": 0.0463665797945933,
+          "lowband_relative_power_error": 1.8683807068681287e-13
+        },
+        "inactive": {
+          "frames": 7524,
+          "model_log_mse": 0.0010211760575537026,
+          "zero_log_mse": 0.0019068741465424143,
+          "copy_log_mse": 0.0012303569798448866,
+          "model_vs_zero_percent": 46.44764262993857,
+          "model_vs_copy_percent": 17.001644702950824,
+          "model_to_truth_high_power": 0.33114822301538593,
+          "lowband_relative_power_error": 2.542010897922587e-14
+        }
+      },
+      "peak": {
+        "full": 1.1618504524230957,
+        "lowpass": 1.1431546211242676,
+        "model": 1.1429275274276733
+      }
+    },
+    {
+      "id": 42377,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.0151802323850355,
+          "zero_log_mse": 0.018720462328960703,
+          "copy_log_mse": 0.01379617798527265,
+          "model_vs_zero_percent": 18.911017696653985,
+          "model_vs_copy_percent": -10.032158190770812,
+          "model_to_truth_high_power": 0.010380001414764622,
+          "lowband_relative_power_error": 2.2752901929640794e-14
+        },
+        "active": {
+          "frames": 3002,
+          "model_log_mse": 0.052328456198318433,
+          "zero_log_mse": 0.06327933608450831,
+          "copy_log_mse": 0.04744262048536583,
+          "model_vs_zero_percent": 17.30561754245524,
+          "model_vs_copy_percent": -10.298410296412053,
+          "model_to_truth_high_power": 0.008320686379908003,
+          "lowband_relative_power_error": 3.461081587369742e-14
+        },
+        "inactive": {
+          "frames": 8232,
+          "model_log_mse": 0.0016332246241662863,
+          "zero_log_mse": 0.002470979941429854,
+          "copy_log_mse": 0.001526180368013208,
+          "model_vs_zero_percent": 33.90376842876327,
+          "model_vs_copy_percent": -7.013866669797952,
+          "model_to_truth_high_power": 0.09590367152001064,
+          "lowband_relative_power_error": 1.6897490872180375e-14
+        }
+      },
+      "peak": {
+        "full": 1.1527736186981201,
+        "lowpass": 1.0931988954544067,
+        "model": 1.092301368713379
+      }
+    },
+    {
+      "id": 68551,
+      "genre": "Experimental",
+      "metrics": {
+        "all": {
+          "frames": 11244,
+          "model_log_mse": 0.0009689325019741772,
+          "zero_log_mse": 0.0019771332250720962,
+          "copy_log_mse": 0.0012903296146574471,
+          "model_vs_zero_percent": 50.993059562850384,
+          "model_vs_copy_percent": 24.908140449724815,
+          "model_to_truth_high_power": 0.4372057528035315,
+          "lowband_relative_power_error": 4.0453707519226426e-14
+        },
+        "active": {
+          "frames": 537,
+          "model_log_mse": 0.0047592413452868,
+          "zero_log_mse": 0.00941126533126058,
+          "copy_log_mse": 0.006530509789719458,
+          "model_vs_zero_percent": 49.430377555306585,
+          "model_vs_copy_percent": 27.122973572768338,
+          "model_to_truth_high_power": 0.43020237795329413,
+          "lowband_relative_power_error": 1.5282844431589976e-13
+        },
+        "inactive": {
+          "frames": 10707,
+          "model_log_mse": 0.0007788329550554438,
+          "zero_log_mse": 0.0016042809843862629,
+          "copy_log_mse": 0.0010275130690323142,
+          "model_vs_zero_percent": 51.452833846721944,
+          "model_vs_copy_percent": 24.20213634957178,
+          "model_to_truth_high_power": 0.4401690216345813,
+          "lowband_relative_power_error": 3.579328246885948e-14
+        }
+      },
+      "peak": {
+        "full": 0.8521501421928406,
+        "lowpass": 0.8553367257118225,
+        "model": 0.8564385771751404
+      }
+    },
+    {
+      "id": 71503,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11244,
+          "model_log_mse": 0.009627164057175022,
+          "zero_log_mse": 0.01377069725397535,
+          "copy_log_mse": 0.01035616342245153,
+          "model_vs_zero_percent": 30.089494528711423,
+          "model_vs_copy_percent": 7.039280238626611,
+          "model_to_truth_high_power": 0.10386159407893818,
+          "lowband_relative_power_error": 4.78085979819538e-14
+        },
+        "active": {
+          "frames": 4471,
+          "model_log_mse": 0.019966532379419786,
+          "zero_log_mse": 0.029012819465937863,
+          "copy_log_mse": 0.021894454748712364,
+          "model_vs_zero_percent": 31.18031012855802,
+          "model_vs_copy_percent": 8.805528118511196,
+          "model_to_truth_high_power": 0.10664720545904366,
+          "lowband_relative_power_error": 1.513619760473255e-13
+        },
+        "inactive": {
+          "frames": 6773,
+          "model_log_mse": 0.002801929188024523,
+          "zero_log_mse": 0.0037090512463444046,
+          "copy_log_mse": 0.0027394942183009046,
+          "model_vs_zero_percent": 24.456983688589638,
+          "model_vs_copy_percent": -2.279069227689101,
+          "model_to_truth_high_power": 0.08084232148247089,
+          "lowband_relative_power_error": 1.8278605887554912e-14
+        }
+      },
+      "peak": {
+        "full": 1.0115820169448853,
+        "lowpass": 1.0360233783721924,
+        "model": 1.0359151363372803
+      }
+    },
+    {
+      "id": 86634,
+      "genre": "Pop",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.0057168627889426,
+          "zero_log_mse": 0.006053526403445348,
+          "copy_log_mse": 0.004896822206791952,
+          "model_vs_zero_percent": 5.5614462061508,
+          "model_vs_copy_percent": -16.746382603257292,
+          "model_to_truth_high_power": 0.2170746242346729,
+          "lowband_relative_power_error": 6.5800854296803e-14
+        },
+        "active": {
+          "frames": 4121,
+          "model_log_mse": 0.011223097826199107,
+          "zero_log_mse": 0.012479422198260513,
+          "copy_log_mse": 0.01003066523845471,
+          "model_vs_zero_percent": 10.067167791121957,
+          "model_vs_copy_percent": -11.887871436212926,
+          "model_to_truth_high_power": 0.1704437728626866,
+          "lowband_relative_power_error": 1.1879098812046137e-13
+        },
+        "inactive": {
+          "frames": 7113,
+          "model_log_mse": 0.0025267609207387386,
+          "zero_log_mse": 0.0023306082858531516,
+          "copy_log_mse": 0.0019224700159467074,
+          "model_vs_zero_percent": -8.416370785096671,
+          "model_vs_copy_percent": -31.433047058185302,
+          "model_to_truth_high_power": 0.43976002045172075,
+          "lowband_relative_power_error": 4.295708966476695e-14
+        }
+      },
+      "peak": {
+        "full": 1.1374638080596924,
+        "lowpass": 1.1581082344055176,
+        "model": 1.1571218967437744
+      }
+    },
+    {
+      "id": 89445,
+      "genre": "Hip-Hop",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.0016639222997790071,
+          "zero_log_mse": 0.0028495421554498765,
+          "copy_log_mse": 0.0023072275210425913,
+          "model_vs_zero_percent": 41.607380799870555,
+          "model_vs_copy_percent": 27.88217526864828,
+          "model_to_truth_high_power": 0.182724339832263,
+          "lowband_relative_power_error": 2.8169564503369144e-14
+        },
+        "active": {
+          "frames": 1277,
+          "model_log_mse": 0.007564765654699581,
+          "zero_log_mse": 0.01306052959614915,
+          "copy_log_mse": 0.009208967595272498,
+          "model_vs_zero_percent": 42.07918140677829,
+          "model_vs_copy_percent": 17.854356892481437,
+          "model_to_truth_high_power": 0.11755666936948231,
+          "lowband_relative_power_error": 7.905340662356627e-14
+        },
+        "inactive": {
+          "frames": 9957,
+          "model_log_mse": 0.0009071303981787687,
+          "zero_log_mse": 0.0015399678899308473,
+          "copy_log_mse": 0.0014220691324926674,
+          "model_vs_zero_percent": 41.09420046287434,
+          "model_vs_copy_percent": 36.21052750166166,
+          "model_to_truth_high_power": 0.30853999105396684,
+          "lowband_relative_power_error": 2.329030239189979e-14
+        }
+      },
+      "peak": {
+        "full": 1.0036113262176514,
+        "lowpass": 0.991544783115387,
+        "model": 0.991858184337616
+      }
+    },
+    {
+      "id": 93518,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 2.8426667489563607e-05,
+          "zero_log_mse": 3.4631641727582465e-05,
+          "copy_log_mse": 3.277014237125005e-05,
+          "model_vs_zero_percent": 17.917066383476964,
+          "model_vs_copy_percent": 13.254366833319187,
+          "model_to_truth_high_power": 0.22540125686781992,
+          "lowband_relative_power_error": 1.3878137787803544e-14
+        },
+        "active": {
+          "frames": 0,
+          "model_log_mse": 0.0,
+          "zero_log_mse": 0.0,
+          "copy_log_mse": 0.0,
+          "model_vs_zero_percent": null,
+          "model_vs_copy_percent": null,
+          "model_to_truth_high_power": null,
+          "lowband_relative_power_error": null
+        },
+        "inactive": {
+          "frames": 11234,
+          "model_log_mse": 2.8426667489563607e-05,
+          "zero_log_mse": 3.4631641727582465e-05,
+          "copy_log_mse": 3.277014237125005e-05,
+          "model_vs_zero_percent": 17.917066383476964,
+          "model_vs_copy_percent": 13.254366833319187,
+          "model_to_truth_high_power": 0.22540125686781992,
+          "lowband_relative_power_error": 1.3878137787803544e-14
+        }
+      },
+      "peak": {
+        "full": 0.7451465129852295,
+        "lowpass": 0.7453882098197937,
+        "model": 0.7454714775085449
+      }
+    },
+    {
+      "id": 93519,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11244,
+          "model_log_mse": 3.245132883499105e-05,
+          "zero_log_mse": 3.879058962179171e-05,
+          "copy_log_mse": 4.6491361353695724e-05,
+          "model_vs_zero_percent": 16.34226457655957,
+          "model_vs_copy_percent": 30.199228652160336,
+          "model_to_truth_high_power": 0.18438984816384585,
+          "lowband_relative_power_error": 1.3614070570142677e-14
+        },
+        "active": {
+          "frames": 0,
+          "model_log_mse": 0.0,
+          "zero_log_mse": 0.0,
+          "copy_log_mse": 0.0,
+          "model_vs_zero_percent": null,
+          "model_vs_copy_percent": null,
+          "model_to_truth_high_power": null,
+          "lowband_relative_power_error": null
+        },
+        "inactive": {
+          "frames": 11244,
+          "model_log_mse": 3.245132883499105e-05,
+          "zero_log_mse": 3.879058962179171e-05,
+          "copy_log_mse": 4.6491361353695724e-05,
+          "model_vs_zero_percent": 16.34226457655957,
+          "model_vs_copy_percent": 30.199228652160336,
+          "model_to_truth_high_power": 0.18438984816384585,
+          "lowband_relative_power_error": 1.3614070570142677e-14
+        }
+      },
+      "peak": {
+        "full": 0.7365370392799377,
+        "lowpass": 0.7359504103660583,
+        "model": 0.7358736991882324
+      }
+    },
+    {
+      "id": 93520,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 8.3469418044537e-05,
+          "zero_log_mse": 0.00012054327485954982,
+          "copy_log_mse": 0.00015299122359929392,
+          "model_vs_zero_percent": 30.755640958161447,
+          "model_vs_copy_percent": 45.44169522876983,
+          "model_to_truth_high_power": 0.3984627079771473,
+          "lowband_relative_power_error": 1.7208006546662914e-14
+        },
+        "active": {
+          "frames": 0,
+          "model_log_mse": 0.0,
+          "zero_log_mse": 0.0,
+          "copy_log_mse": 0.0,
+          "model_vs_zero_percent": null,
+          "model_vs_copy_percent": null,
+          "model_to_truth_high_power": null,
+          "lowband_relative_power_error": null
+        },
+        "inactive": {
+          "frames": 11234,
+          "model_log_mse": 8.3469418044537e-05,
+          "zero_log_mse": 0.00012054327485954982,
+          "copy_log_mse": 0.00015299122359929392,
+          "model_vs_zero_percent": 30.755640958161447,
+          "model_vs_copy_percent": 45.44169522876983,
+          "model_to_truth_high_power": 0.3984627079771473,
+          "lowband_relative_power_error": 1.7208006546662914e-14
+        }
+      },
+      "peak": {
+        "full": 0.8376196622848511,
+        "lowpass": 0.8366050124168396,
+        "model": 0.8353133201599121
+      }
+    },
+    {
+      "id": 93521,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11244,
+          "model_log_mse": 7.758028465493473e-05,
+          "zero_log_mse": 0.00011238445070224774,
+          "copy_log_mse": 0.0001493712182178515,
+          "model_vs_zero_percent": 30.968844737715052,
+          "model_vs_copy_percent": 48.06209283117233,
+          "model_to_truth_high_power": 0.4291001242505876,
+          "lowband_relative_power_error": 1.6914222770033898e-14
+        },
+        "active": {
+          "frames": 0,
+          "model_log_mse": 0.0,
+          "zero_log_mse": 0.0,
+          "copy_log_mse": 0.0,
+          "model_vs_zero_percent": null,
+          "model_vs_copy_percent": null,
+          "model_to_truth_high_power": null,
+          "lowband_relative_power_error": null
+        },
+        "inactive": {
+          "frames": 11244,
+          "model_log_mse": 7.758028465493473e-05,
+          "zero_log_mse": 0.00011238445070224774,
+          "copy_log_mse": 0.0001493712182178515,
+          "model_vs_zero_percent": 30.968844737715052,
+          "model_vs_copy_percent": 48.06209283117233,
+          "model_to_truth_high_power": 0.4291001242505876,
+          "lowband_relative_power_error": 1.6914222770033898e-14
+        }
+      },
+      "peak": {
+        "full": 0.8372943997383118,
+        "lowpass": 0.8362621068954468,
+        "model": 0.8353941440582275
+      }
+    },
+    {
+      "id": 93522,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11244,
+          "model_log_mse": 8.222921758067367e-05,
+          "zero_log_mse": 0.00011854634532169767,
+          "copy_log_mse": 0.00014795864256336865,
+          "model_vs_zero_percent": 30.635383691054074,
+          "model_vs_copy_percent": 44.42418762698771,
+          "model_to_truth_high_power": 0.4086363839839899,
+          "lowband_relative_power_error": 1.716791104168862e-14
+        },
+        "active": {
+          "frames": 0,
+          "model_log_mse": 0.0,
+          "zero_log_mse": 0.0,
+          "copy_log_mse": 0.0,
+          "model_vs_zero_percent": null,
+          "model_vs_copy_percent": null,
+          "model_to_truth_high_power": null,
+          "lowband_relative_power_error": null
+        },
+        "inactive": {
+          "frames": 11244,
+          "model_log_mse": 8.222921758067367e-05,
+          "zero_log_mse": 0.00011854634532169767,
+          "copy_log_mse": 0.00014795864256336865,
+          "model_vs_zero_percent": 30.635383691054074,
+          "model_vs_copy_percent": 44.42418762698771,
+          "model_to_truth_high_power": 0.4086363839839899,
+          "lowband_relative_power_error": 1.716791104168862e-14
+        }
+      },
+      "peak": {
+        "full": 0.8360821008682251,
+        "lowpass": 0.8357051014900208,
+        "model": 0.8348727226257324
+      }
+    },
+    {
+      "id": 93523,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11244,
+          "model_log_mse": 7.546011251617693e-05,
+          "zero_log_mse": 0.00010795482232001193,
+          "copy_log_mse": 0.00010796094492305734,
+          "model_vs_zero_percent": 30.10028556900449,
+          "model_vs_copy_percent": 30.104249671067084,
+          "model_to_truth_high_power": 0.41682502778266367,
+          "lowband_relative_power_error": 1.6952222037867514e-14
+        },
+        "active": {
+          "frames": 0,
+          "model_log_mse": 0.0,
+          "zero_log_mse": 0.0,
+          "copy_log_mse": 0.0,
+          "model_vs_zero_percent": null,
+          "model_vs_copy_percent": null,
+          "model_to_truth_high_power": null,
+          "lowband_relative_power_error": null
+        },
+        "inactive": {
+          "frames": 11244,
+          "model_log_mse": 7.546011251617693e-05,
+          "zero_log_mse": 0.00010795482232001193,
+          "copy_log_mse": 0.00010796094492305734,
+          "model_vs_zero_percent": 30.10028556900449,
+          "model_vs_copy_percent": 30.104249671067084,
+          "model_to_truth_high_power": 0.41682502778266367,
+          "lowband_relative_power_error": 1.6952222037867514e-14
+        }
+      },
+      "peak": {
+        "full": 0.8379913568496704,
+        "lowpass": 0.8370119333267212,
+        "model": 0.8361412882804871
+      }
+    },
+    {
+      "id": 97286,
+      "genre": "Rock",
+      "metrics": {
+        "all": {
+          "frames": 11244,
+          "model_log_mse": 0.01384073870849273,
+          "zero_log_mse": 0.015368827022561277,
+          "copy_log_mse": 0.011563011944522349,
+          "model_vs_zero_percent": 9.942777752819588,
+          "model_vs_copy_percent": -19.698386327875326,
+          "model_to_truth_high_power": 0.01082098609847778,
+          "lowband_relative_power_error": 2.2319508345729683e-14
+        },
+        "active": {
+          "frames": 7312,
+          "model_log_mse": 0.019767400284998685,
+          "zero_log_mse": 0.021816626262681674,
+          "copy_log_mse": 0.01664526849943885,
+          "model_vs_zero_percent": 9.392955413955473,
+          "model_vs_copy_percent": -18.75687247499245,
+          "model_to_truth_high_power": 0.008769674522155048,
+          "lowband_relative_power_error": 2.4773312108382377e-14
+        },
+        "inactive": {
+          "frames": 3932,
+          "model_log_mse": 0.002819439255946561,
+          "zero_log_mse": 0.003378412972774823,
+          "copy_log_mse": 0.00211197940903164,
+          "model_vs_zero_percent": 16.54545259365243,
+          "model_vs_copy_percent": -33.49747842661481,
+          "model_to_truth_high_power": 0.04395900203291198,
+          "lowband_relative_power_error": 1.8840252546366458e-14
+        }
+      },
+      "peak": {
+        "full": 1.0631992816925049,
+        "lowpass": 1.0525139570236206,
+        "model": 1.0521862506866455
+      }
+    },
+    {
+      "id": 98077,
+      "genre": "Rock",
+      "metrics": {
+        "all": {
+          "frames": 11244,
+          "model_log_mse": 0.0018611687786381904,
+          "zero_log_mse": 0.003048094103275734,
+          "copy_log_mse": 0.0022332210304349485,
+          "model_vs_zero_percent": 38.9399173523539,
+          "model_vs_copy_percent": 16.659893791359124,
+          "model_to_truth_high_power": 0.13100499197871143,
+          "lowband_relative_power_error": 2.783683002172954e-14
+        },
+        "active": {
+          "frames": 1332,
+          "model_log_mse": 0.012204929012551869,
+          "zero_log_mse": 0.020581055951505937,
+          "copy_log_mse": 0.015416899918351698,
+          "model_vs_zero_percent": 40.698237052026364,
+          "model_vs_copy_percent": 20.834090659020355,
+          "model_to_truth_high_power": 0.12312767061535572,
+          "lowband_relative_power_error": 1.5117673444213227e-13
+        },
+        "inactive": {
+          "frames": 9912,
+          "model_log_mse": 0.0004711477302551173,
+          "zero_log_mse": 0.0006919696902569056,
+          "copy_log_mse": 0.0004615644244316082,
+          "model_vs_zero_percent": 31.912085617479057,
+          "model_vs_copy_percent": -2.0762661323628695,
+          "model_to_truth_high_power": 0.16886501356367653,
+          "lowband_relative_power_error": 1.7430765120254126e-14
+        }
+      },
+      "peak": {
+        "full": 1.042887806892395,
+        "lowpass": 1.0483770370483398,
+        "model": 1.0483438968658447
+      }
+    },
+    {
+      "id": 114212,
+      "genre": "Instrumental",
+      "metrics": {
+        "all": {
+          "frames": 11244,
+          "model_log_mse": 0.0014148546422819586,
+          "zero_log_mse": 0.002005894212806793,
+          "copy_log_mse": 0.0015521888698426846,
+          "model_vs_zero_percent": 29.46514161870025,
+          "model_vs_copy_percent": 8.847778142787789,
+          "model_to_truth_high_power": 0.04984414076124904,
+          "lowband_relative_power_error": 1.175708668112933e-14
+        },
+        "active": {
+          "frames": 471,
+          "model_log_mse": 0.017900693542027987,
+          "zero_log_mse": 0.025024076788199442,
+          "copy_log_mse": 0.017711519922554472,
+          "model_vs_zero_percent": 28.466118076853952,
+          "model_vs_copy_percent": -1.0680823571364906,
+          "model_to_truth_high_power": 0.03532097342258512,
+          "lowband_relative_power_error": 3.465259852274269e-14
+        },
+        "inactive": {
+          "frames": 10773,
+          "model_log_mse": 0.0006940869710872702,
+          "zero_log_mse": 0.000999529783863143,
+          "copy_log_mse": 0.0008456962562877555,
+          "model_vs_zero_percent": 30.558650448148583,
+          "model_vs_copy_percent": 17.92715576937579,
+          "model_to_truth_high_power": 0.11834157136200969,
+          "lowband_relative_power_error": 1.066628090072304e-14
+        }
+      },
+      "peak": {
+        "full": 0.9894914627075195,
+        "lowpass": 0.9846964478492737,
+        "model": 0.9848647713661194
+      }
+    },
+    {
+      "id": 114222,
+      "genre": "Instrumental",
+      "metrics": {
+        "all": {
+          "frames": 11244,
+          "model_log_mse": 1.0146982686543011e-05,
+          "zero_log_mse": 7.712464065940757e-06,
+          "copy_log_mse": 2.0439814722005143e-05,
+          "model_vs_zero_percent": -31.566028700910344,
+          "model_vs_copy_percent": 50.356777570889875,
+          "model_to_truth_high_power": 0.31534643139829704,
+          "lowband_relative_power_error": 1.3282698539699644e-14
+        },
+        "active": {
+          "frames": 0,
+          "model_log_mse": 0.0,
+          "zero_log_mse": 0.0,
+          "copy_log_mse": 0.0,
+          "model_vs_zero_percent": null,
+          "model_vs_copy_percent": null,
+          "model_to_truth_high_power": null,
+          "lowband_relative_power_error": null
+        },
+        "inactive": {
+          "frames": 11244,
+          "model_log_mse": 1.0146982686543011e-05,
+          "zero_log_mse": 7.712464065940757e-06,
+          "copy_log_mse": 2.0439814722005143e-05,
+          "model_vs_zero_percent": -31.566028700910344,
+          "model_vs_copy_percent": 50.356777570889875,
+          "model_to_truth_high_power": 0.31534643139829704,
+          "lowband_relative_power_error": 1.3282698539699644e-14
+        }
+      },
+      "peak": {
+        "full": 0.9763413071632385,
+        "lowpass": 0.9772132635116577,
+        "model": 0.9775332808494568
+      }
+    },
+    {
+      "id": 114223,
+      "genre": "Instrumental",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 7.024321051819169e-06,
+          "zero_log_mse": 4.911078426116185e-06,
+          "copy_log_mse": 2.7989723614374573e-05,
+          "model_vs_zero_percent": -43.030113599187516,
+          "model_vs_copy_percent": 74.9039284967726,
+          "model_to_truth_high_power": 0.3185879293206075,
+          "lowband_relative_power_error": 1.3319430854645578e-14
+        },
+        "active": {
+          "frames": 0,
+          "model_log_mse": 0.0,
+          "zero_log_mse": 0.0,
+          "copy_log_mse": 0.0,
+          "model_vs_zero_percent": null,
+          "model_vs_copy_percent": null,
+          "model_to_truth_high_power": null,
+          "lowband_relative_power_error": null
+        },
+        "inactive": {
+          "frames": 11234,
+          "model_log_mse": 7.024321051819169e-06,
+          "zero_log_mse": 4.911078426116185e-06,
+          "copy_log_mse": 2.7989723614374573e-05,
+          "model_vs_zero_percent": -43.030113599187516,
+          "model_vs_copy_percent": 74.9039284967726,
+          "model_to_truth_high_power": 0.3185879293206075,
+          "lowband_relative_power_error": 1.3319430854645578e-14
+        }
+      },
+      "peak": {
+        "full": 0.9792593121528625,
+        "lowpass": 0.9980764985084534,
+        "model": 0.9979036450386047
+      }
+    },
+    {
+      "id": 118505,
+      "genre": "Experimental",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.00020316255157130778,
+          "zero_log_mse": 0.0003387595232751314,
+          "copy_log_mse": 0.00032483322296937025,
+          "model_vs_zero_percent": 40.027501040522885,
+          "model_vs_copy_percent": 37.45635076543118,
+          "model_to_truth_high_power": 0.2529072942262586,
+          "lowband_relative_power_error": 1.3578359468736391e-14
+        },
+        "active": {
+          "frames": 34,
+          "model_log_mse": 0.002745990571163105,
+          "zero_log_mse": 0.004807409618346336,
+          "copy_log_mse": 0.004660804023173441,
+          "model_vs_zero_percent": 42.880037501200555,
+          "model_vs_copy_percent": 41.08332902413221,
+          "model_to_truth_high_power": 0.1728148055502147,
+          "lowband_relative_power_error": 1.1742386187322113e-13
+        },
+        "inactive": {
+          "frames": 11200,
+          "model_log_mse": 0.00019544325222611841,
+          "zero_log_mse": 0.00032519397834366524,
+          "copy_log_mse": 0.0003116704544687508,
+          "model_vs_zero_percent": 39.89948607856021,
+          "model_vs_copy_percent": 37.291697232175636,
+          "model_to_truth_high_power": 0.25384584369710944,
+          "lowband_relative_power_error": 1.357342647997292e-14
+        }
+      },
+      "peak": {
+        "full": 0.25345849990844727,
+        "lowpass": 0.25335273146629333,
+        "model": 0.25344884395599365
+      }
+    },
+    {
+      "id": 121595,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11244,
+          "model_log_mse": 0.015886346033187133,
+          "zero_log_mse": 0.02693298598183905,
+          "copy_log_mse": 0.019990680082354367,
+          "model_vs_zero_percent": 41.015281246946344,
+          "model_vs_copy_percent": 20.531237718070948,
+          "model_to_truth_high_power": 0.10699195827392735,
+          "lowband_relative_power_error": 1.4139676242222107e-13
+        },
+        "active": {
+          "frames": 8743,
+          "model_log_mse": 0.019273425515511096,
+          "zero_log_mse": 0.0326137242021741,
+          "copy_log_mse": 0.024203479385133637,
+          "model_vs_zero_percent": 40.903941555296875,
+          "model_vs_copy_percent": 20.36919482184325,
+          "model_to_truth_high_power": 0.10214520225430661,
+          "lowband_relative_power_error": 2.0693179449273744e-13
+        },
+        "inactive": {
+          "frames": 2501,
+          "model_log_mse": 0.004045787890860687,
+          "zero_log_mse": 0.00707425177136749,
+          "copy_log_mse": 0.00526356920502563,
+          "model_vs_zero_percent": 42.80967059674475,
+          "model_vs_copy_percent": 23.13603691202941,
+          "model_to_truth_high_power": 0.2715158670709634,
+          "lowband_relative_power_error": 3.492807275706981e-14
+        }
+      },
+      "peak": {
+        "full": 0.8922182321548462,
+        "lowpass": 0.8971964120864868,
+        "model": 0.8965597152709961
+      }
+    },
+    {
+      "id": 127559,
+      "genre": "Rock",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.0024118983492583,
+          "zero_log_mse": 0.004342377268145303,
+          "copy_log_mse": 0.002594340523313647,
+          "model_vs_zero_percent": 44.45672956720181,
+          "model_vs_copy_percent": 7.032314085828684,
+          "model_to_truth_high_power": 0.13725982850551027,
+          "lowband_relative_power_error": 3.943464990568614e-14
+        },
+        "active": {
+          "frames": 2874,
+          "model_log_mse": 0.006372239941502277,
+          "zero_log_mse": 0.010814247089893527,
+          "copy_log_mse": 0.006727814294726914,
+          "model_vs_zero_percent": 41.075510032894805,
+          "model_vs_copy_percent": 5.285139239103653,
+          "model_to_truth_high_power": 0.10289458728913234,
+          "lowband_relative_power_error": 6.880919010855243e-14
+        },
+        "inactive": {
+          "frames": 8360,
+          "model_log_mse": 0.0010504124956567217,
+          "zero_log_mse": 0.002117478480142385,
+          "copy_log_mse": 0.0011733353057249232,
+          "model_vs_zero_percent": 50.39323867952182,
+          "model_vs_copy_percent": 10.47635824716413,
+          "model_to_truth_high_power": 0.21543562765511426,
+          "lowband_relative_power_error": 3.067503293241148e-14
+        }
+      },
+      "peak": {
+        "full": 0.9217022061347961,
+        "lowpass": 0.9281922578811646,
+        "model": 0.9258285164833069
+      }
+    },
+    {
+      "id": 132448,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11244,
+          "model_log_mse": 3.042986838606077e-06,
+          "zero_log_mse": 8.731322762514866e-07,
+          "copy_log_mse": 7.608474924195176e-07,
+          "model_vs_zero_percent": -248.5138416449527,
+          "model_vs_copy_percent": -299.9470155220316,
+          "model_to_truth_high_power": 5.0264938039478,
+          "lowband_relative_power_error": 1.2574276441594632e-14
+        },
+        "active": {
+          "frames": 0,
+          "model_log_mse": 0.0,
+          "zero_log_mse": 0.0,
+          "copy_log_mse": 0.0,
+          "model_vs_zero_percent": null,
+          "model_vs_copy_percent": null,
+          "model_to_truth_high_power": null,
+          "lowband_relative_power_error": null
+        },
+        "inactive": {
+          "frames": 11244,
+          "model_log_mse": 3.042986838606077e-06,
+          "zero_log_mse": 8.731322762514866e-07,
+          "copy_log_mse": 7.608474924195176e-07,
+          "model_vs_zero_percent": -248.5138416449527,
+          "model_vs_copy_percent": -299.9470155220316,
+          "model_to_truth_high_power": 5.0264938039478,
+          "lowband_relative_power_error": 1.2574276441594632e-14
+        }
+      },
+      "peak": {
+        "full": 0.8072860240936279,
+        "lowpass": 0.8072516918182373,
+        "model": 0.8071275949478149
+      }
+    },
+    {
+      "id": 140922,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.011165462656239383,
+          "zero_log_mse": 0.01975068718004267,
+          "copy_log_mse": 0.013605175670573224,
+          "model_vs_zero_percent": 43.46797883811524,
+          "model_vs_copy_percent": 17.932241915925584,
+          "model_to_truth_high_power": 0.1285989484245402,
+          "lowband_relative_power_error": 1.0128832611618615e-13
+        },
+        "active": {
+          "frames": 4912,
+          "model_log_mse": 0.02190844947052861,
+          "zero_log_mse": 0.03896770948969923,
+          "copy_log_mse": 0.02727065110371419,
+          "model_vs_zero_percent": 43.77793881798488,
+          "model_vs_copy_percent": 19.66290285036599,
+          "model_to_truth_high_power": 0.1210887661493186,
+          "lowband_relative_power_error": 1.8077729194313542e-13
+        },
+        "inactive": {
+          "frames": 6322,
+          "model_log_mse": 0.00281849156611147,
+          "zero_log_mse": 0.004819650548433529,
+          "copy_log_mse": 0.0029875206045200096,
+          "model_vs_zero_percent": 41.52083148377781,
+          "model_vs_copy_percent": 5.657836741035515,
+          "model_to_truth_high_power": 0.22692341794651152,
+          "lowband_relative_power_error": 3.8968085257791433e-14
+        }
+      },
+      "peak": {
+        "full": 0.7963173985481262,
+        "lowpass": 0.7770636677742004,
+        "model": 0.7895985841751099
+      }
+    },
+    {
+      "id": 140923,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11244,
+          "model_log_mse": 0.014420668361785625,
+          "zero_log_mse": 0.023356391391519286,
+          "copy_log_mse": 0.01714649583309598,
+          "model_vs_zero_percent": 38.258149043427245,
+          "model_vs_copy_percent": 15.897285940191875,
+          "model_to_truth_high_power": 0.11977668431545482,
+          "lowband_relative_power_error": 6.030645974575767e-14
+        },
+        "active": {
+          "frames": 4148,
+          "model_log_mse": 0.03663910772733636,
+          "zero_log_mse": 0.05876307812373511,
+          "copy_log_mse": 0.043163009738371345,
+          "model_vs_zero_percent": 37.64944094625739,
+          "model_vs_copy_percent": 15.114566965044895,
+          "model_to_truth_high_power": 0.1025173350004789,
+          "lowband_relative_power_error": 1.2473194212355312e-13
+        },
+        "inactive": {
+          "frames": 7096,
+          "model_log_mse": 0.0014327756774135225,
+          "zero_log_mse": 0.0026592470052127443,
+          "copy_log_mse": 0.001938420906506036,
+          "model_vs_zero_percent": 46.121000621418474,
+          "model_vs_copy_percent": 26.085419704017156,
+          "model_to_truth_high_power": 0.5930914541044242,
+          "lowband_relative_power_error": 2.93576178551297e-14
+        }
+      },
+      "peak": {
+        "full": 0.8398039937019348,
+        "lowpass": 0.8129006624221802,
+        "model": 0.8203210830688477
+      }
+    },
+    {
+      "id": 140924,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.015152282054061123,
+          "zero_log_mse": 0.024442073082291182,
+          "copy_log_mse": 0.018896154443119713,
+          "model_vs_zero_percent": 38.007377675998846,
+          "model_vs_copy_percent": 19.81287991865336,
+          "model_to_truth_high_power": 0.07659166519595165,
+          "lowband_relative_power_error": 6.364836662685755e-14
+        },
+        "active": {
+          "frames": 4426,
+          "model_log_mse": 0.03383562266676117,
+          "zero_log_mse": 0.05261256121862848,
+          "copy_log_mse": 0.0416237555515338,
+          "model_vs_zero_percent": 35.68907902780254,
+          "model_vs_copy_percent": 18.710788542687496,
+          "model_to_truth_high_power": 0.05812725759535687,
+          "lowband_relative_power_error": 1.17957895576538e-13
+        },
+        "inactive": {
+          "frames": 6808,
+          "model_log_mse": 0.003005915198624812,
+          "zero_log_mse": 0.0061279455130448775,
+          "copy_log_mse": 0.004120543029218307,
+          "model_vs_zero_percent": 50.94742288054026,
+          "model_vs_copy_percent": 27.05050821432503,
+          "model_to_truth_high_power": 0.26721439361554994,
+          "lowband_relative_power_error": 3.877181717845138e-14
+        }
+      },
+      "peak": {
+        "full": 0.9789528250694275,
+        "lowpass": 0.9642142653465271,
+        "model": 0.9648647904396057
+      }
+    },
+    {
+      "id": 140925,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11244,
+          "model_log_mse": 0.007532607358332602,
+          "zero_log_mse": 0.014608087980076933,
+          "copy_log_mse": 0.00862416794299931,
+          "model_vs_zero_percent": 48.43536424064629,
+          "model_vs_copy_percent": 12.656995919853165,
+          "model_to_truth_high_power": 0.20027898185309642,
+          "lowband_relative_power_error": 5.532986572226106e-14
+        },
+        "active": {
+          "frames": 3995,
+          "model_log_mse": 0.014539358716496205,
+          "zero_log_mse": 0.02879282033260025,
+          "copy_log_mse": 0.016828706535948645,
+          "model_vs_zero_percent": 49.50352709965606,
+          "model_vs_copy_percent": 13.603825193350715,
+          "model_to_truth_high_power": 0.1769082928240952,
+          "lowband_relative_power_error": 1.5381594420820538e-13
+        },
+        "inactive": {
+          "frames": 7249,
+          "model_log_mse": 0.0036711131279748154,
+          "zero_log_mse": 0.006790733069285009,
+          "copy_log_mse": 0.004102560593181043,
+          "model_vs_zero_percent": 45.93936927694106,
+          "model_vs_copy_percent": 10.516540960378418,
+          "model_to_truth_high_power": 0.28557193916871537,
+          "lowband_relative_power_error": 2.907850386453133e-14
+        }
+      },
+      "peak": {
+        "full": 0.9864255785942078,
+        "lowpass": 0.9690478444099426,
+        "model": 0.968441367149353
+      }
+    },
+    {
+      "id": 140926,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.030286594557162472,
+          "zero_log_mse": 0.05309748486684526,
+          "copy_log_mse": 0.041398688976072205,
+          "model_vs_zero_percent": 42.96039702612392,
+          "model_vs_copy_percent": 26.841657776487427,
+          "model_to_truth_high_power": 0.09387650388276794,
+          "lowband_relative_power_error": 1.5406092665587372e-13
+        },
+        "active": {
+          "frames": 5536,
+          "model_log_mse": 0.05720837821437262,
+          "zero_log_mse": 0.09907363835964143,
+          "copy_log_mse": 0.0774803155052752,
+          "model_vs_zero_percent": 42.256710098095084,
+          "model_vs_copy_percent": 26.16398392120949,
+          "model_to_truth_high_power": 0.0901797843755944,
+          "lowband_relative_power_error": 2.6133188590876475e-13
+        },
+        "inactive": {
+          "frames": 5698,
+          "model_log_mse": 0.004130224896524465,
+          "zero_log_mse": 0.008428480701152109,
+          "copy_log_mse": 0.006342900196558727,
+          "model_vs_zero_percent": 50.996804252516185,
+          "model_vs_copy_percent": 34.88428371038733,
+          "model_to_truth_high_power": 0.24644687250835648,
+          "lowband_relative_power_error": 4.101733290523732e-14
+        }
+      },
+      "peak": {
+        "full": 0.9426624178886414,
+        "lowpass": 0.9414730668067932,
+        "model": 0.9410419464111328
+      }
+    },
+    {
+      "id": 140933,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.02388080451481542,
+          "zero_log_mse": 0.0370479537352004,
+          "copy_log_mse": 0.030006211106977126,
+          "model_vs_zero_percent": 35.54082720599617,
+          "model_vs_copy_percent": 20.41379556493692,
+          "model_to_truth_high_power": 0.07721486706125061,
+          "lowband_relative_power_error": 1.261826014821345e-13
+        },
+        "active": {
+          "frames": 3589,
+          "model_log_mse": 0.07285385893870375,
+          "zero_log_mse": 0.11329414534752057,
+          "copy_log_mse": 0.09171461340166297,
+          "model_vs_zero_percent": 35.69494812355002,
+          "model_vs_copy_percent": 20.56461207589546,
+          "model_to_truth_high_power": 0.07599535111628343,
+          "lowband_relative_power_error": 3.3944729618728473e-13
+        },
+        "inactive": {
+          "frames": 7645,
+          "model_log_mse": 0.0008900533928618332,
+          "zero_log_mse": 0.0012536330423793295,
+          "copy_log_mse": 0.0010367597223299785,
+          "model_vs_zero_percent": 29.002079334750253,
+          "model_vs_copy_percent": 14.150465754827223,
+          "model_to_truth_high_power": 0.2147006261028763,
+          "lowband_relative_power_error": 3.271197119824786e-14
+        }
+      },
+      "peak": {
+        "full": 0.9686044454574585,
+        "lowpass": 0.9623298645019531,
+        "model": 0.9621723890304565
+      }
+    },
+    {
+      "id": 140934,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.003831732107056086,
+          "zero_log_mse": 0.007675288474791493,
+          "copy_log_mse": 0.006629648949229597,
+          "model_vs_zero_percent": 50.07702811899616,
+          "model_vs_copy_percent": 42.2030919525331,
+          "model_to_truth_high_power": 0.19717627739041874,
+          "lowband_relative_power_error": 5.696858132224489e-14
+        },
+        "active": {
+          "frames": 2598,
+          "model_log_mse": 0.012053834339274405,
+          "zero_log_mse": 0.024245769691031108,
+          "copy_log_mse": 0.015690409983697858,
+          "model_vs_zero_percent": 50.28479403673744,
+          "model_vs_copy_percent": 23.17705941528495,
+          "model_to_truth_high_power": 0.17009651588499008,
+          "lowband_relative_power_error": 1.4933201227095284e-13
+        },
+        "inactive": {
+          "frames": 8636,
+          "model_log_mse": 0.0013582465119538172,
+          "zero_log_mse": 0.0026903289796791127,
+          "copy_log_mse": 0.0039038665074106363,
+          "model_vs_zero_percent": 49.51373894371011,
+          "model_vs_copy_percent": 65.2076599090803,
+          "model_to_truth_high_power": 0.3272280321393288,
+          "lowband_relative_power_error": 3.350825421229709e-14
+        }
+      },
+      "peak": {
+        "full": 1.001460075378418,
+        "lowpass": 0.988865852355957,
+        "model": 0.9910263419151306
+      }
+    },
+    {
+      "id": 141616,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.004885808099721298,
+          "zero_log_mse": 0.006548893493881521,
+          "copy_log_mse": 0.005895768055543881,
+          "model_vs_zero_percent": 25.394906723006027,
+          "model_vs_copy_percent": 17.130252518548495,
+          "model_to_truth_high_power": 0.13739220128361962,
+          "lowband_relative_power_error": 2.307991431272201e-14
+        },
+        "active": {
+          "frames": 1100,
+          "model_log_mse": 0.03298981112241745,
+          "zero_log_mse": 0.04560622086244471,
+          "copy_log_mse": 0.040902885787627276,
+          "model_vs_zero_percent": 27.663791257952,
+          "model_vs_copy_percent": 19.3460058204584,
+          "model_to_truth_high_power": 0.09642460458246627,
+          "lowband_relative_power_error": 4.271131060929683e-14
+        },
+        "inactive": {
+          "frames": 10134,
+          "model_log_mse": 0.0018352453086254062,
+          "zero_log_mse": 0.002309396739843677,
+          "copy_log_mse": 0.0020959032928350068,
+          "model_vs_zero_percent": 20.5313977905055,
+          "model_vs_copy_percent": 12.436546337833343,
+          "model_to_truth_high_power": 0.32258752872826035,
+          "lowband_relative_power_error": 2.120278742117365e-14
+        }
+      },
+      "peak": {
+        "full": 0.9994922876358032,
+        "lowpass": 1.0009294748306274,
+        "model": 1.000924825668335
+      }
+    },
+    {
+      "id": 141617,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11244,
+          "model_log_mse": 0.055995260032800497,
+          "zero_log_mse": 0.078414678569104,
+          "copy_log_mse": 0.06355269462975943,
+          "model_vs_zero_percent": 28.59084414475548,
+          "model_vs_copy_percent": 11.89160371717749,
+          "model_to_truth_high_power": 0.03084090449064462,
+          "lowband_relative_power_error": 2.159000315719482e-13
+        },
+        "active": {
+          "frames": 7973,
+          "model_log_mse": 0.07794733882241056,
+          "zero_log_mse": 0.10898006145586375,
+          "copy_log_mse": 0.08827547599512309,
+          "model_vs_zero_percent": 28.475596562240202,
+          "model_vs_copy_percent": 11.699894060365212,
+          "model_to_truth_high_power": 0.030089115698601943,
+          "lowband_relative_power_error": 2.772873919471291e-13
+        },
+        "inactive": {
+          "frames": 3271,
+          "model_log_mse": 0.0024874874282266738,
+          "zero_log_mse": 0.003912141804770298,
+          "copy_log_mse": 0.0032913874374499216,
+          "model_vs_zero_percent": 36.41622537318209,
+          "model_vs_copy_percent": 24.42435065760864,
+          "model_to_truth_high_power": 0.29658055938230743,
+          "lowband_relative_power_error": 5.590328770050911e-14
+        }
+      },
+      "peak": {
+        "full": 1.143189787864685,
+        "lowpass": 1.118391513824463,
+        "model": 1.1184192895889282
+      }
+    },
+    {
+      "id": 141618,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.0071310647688327495,
+          "zero_log_mse": 0.009910610057128004,
+          "copy_log_mse": 0.007994147892128253,
+          "model_vs_zero_percent": 28.046157323041122,
+          "model_vs_copy_percent": 10.796436780277396,
+          "model_to_truth_high_power": 0.06594574414859458,
+          "lowband_relative_power_error": 3.632456248875402e-14
+        },
+        "active": {
+          "frames": 3545,
+          "model_log_mse": 0.01912150140076883,
+          "zero_log_mse": 0.026558895998749606,
+          "copy_log_mse": 0.021480084943057275,
+          "model_vs_zero_percent": 28.003402695394144,
+          "model_vs_copy_percent": 10.980326886699654,
+          "model_to_truth_high_power": 0.05941160275079875,
+          "lowband_relative_power_error": 7.822217881335163e-14
+        },
+        "inactive": {
+          "frames": 7689,
+          "model_log_mse": 0.0016028949339760175,
+          "zero_log_mse": 0.002234946945793816,
+          "copy_log_mse": 0.0017764802051021941,
+          "model_vs_zero_percent": 28.28040338976834,
+          "model_vs_copy_percent": 9.771303425032585,
+          "model_to_truth_high_power": 0.12170532241749134,
+          "lowband_relative_power_error": 2.2273423869302663e-14
+        }
+      },
+      "peak": {
+        "full": 0.9218800663948059,
+        "lowpass": 0.9255796670913696,
+        "model": 0.9254441857337952
+      }
+    },
+    {
+      "id": 141619,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11244,
+          "model_log_mse": 0.020038150022666474,
+          "zero_log_mse": 0.027855468687926436,
+          "copy_log_mse": 0.02120782095458514,
+          "model_vs_zero_percent": 28.06385615995135,
+          "model_vs_copy_percent": 5.515281057980548,
+          "model_to_truth_high_power": 0.039716240748107215,
+          "lowband_relative_power_error": 6.040026027842398e-14
+        },
+        "active": {
+          "frames": 4056,
+          "model_log_mse": 0.052545971400523174,
+          "zero_log_mse": 0.07167160032568377,
+          "copy_log_mse": 0.05458941092706671,
+          "model_vs_zero_percent": 26.6850870334297,
+          "model_vs_copy_percent": 3.743289205435174,
+          "model_to_truth_high_power": 0.029892115108167958,
+          "lowband_relative_power_error": 8.646358259576096e-14
+        },
+        "inactive": {
+          "frames": 7188,
+          "model_log_mse": 0.001694838460536983,
+          "zero_log_mse": 0.003131174040911443,
+          "copy_log_mse": 0.0023714646762900255,
+          "model_vs_zero_percent": 45.87210936241545,
+          "model_vs_copy_percent": 28.531996386788784,
+          "model_to_truth_high_power": 0.5603253772385998,
+          "lowband_relative_power_error": 4.46776108737137e-14
+        }
+      },
+      "peak": {
+        "full": 1.2634555101394653,
+        "lowpass": 1.2931429147720337,
+        "model": 1.2930595874786377
+      }
+    },
+    {
+      "id": 141877,
+      "genre": "Rock",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.00026569134103953215,
+          "zero_log_mse": 0.0004013004186338602,
+          "copy_log_mse": 0.00034386449560005306,
+          "model_vs_zero_percent": 33.7924087036788,
+          "model_vs_copy_percent": 22.733709225811914,
+          "model_to_truth_high_power": 0.582103173861973,
+          "lowband_relative_power_error": 1.6539696276786682e-14
+        },
+        "active": {
+          "frames": 3,
+          "model_log_mse": 0.005219179625604667,
+          "zero_log_mse": 0.005060538474251242,
+          "copy_log_mse": 0.005056673755832747,
+          "model_vs_zero_percent": -3.1348670138684698,
+          "model_vs_copy_percent": -3.2136910075417413,
+          "model_to_truth_high_power": 1.3767082591285653,
+          "lowband_relative_power_error": 1.3444371856232619e-13
+        },
+        "inactive": {
+          "frames": 11231,
+          "model_log_mse": 0.0002643681761518378,
+          "zero_log_mse": 0.0004000558532196627,
+          "copy_log_mse": 0.0003426056203635916,
+          "model_vs_zero_percent": 33.917183307232236,
+          "model_vs_copy_percent": 22.83600722274317,
+          "model_to_truth_high_power": 0.5791492985933564,
+          "lowband_relative_power_error": 1.652544829058504e-14
+        }
+      },
+      "peak": {
+        "full": 0.7020390033721924,
+        "lowpass": 0.7015469670295715,
+        "model": 0.7023634314537048
+      }
+    },
+    {
+      "id": 141878,
+      "genre": "Rock",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.0009434700527674823,
+          "zero_log_mse": 0.0010778595908707504,
+          "copy_log_mse": 0.0010697907512291745,
+          "model_vs_zero_percent": 12.468185953116706,
+          "model_vs_copy_percent": 11.807981917636834,
+          "model_to_truth_high_power": 0.6735369877088786,
+          "lowband_relative_power_error": 2.7373218157038732e-14
+        },
+        "active": {
+          "frames": 405,
+          "model_log_mse": 0.009606785179050227,
+          "zero_log_mse": 0.011545982060435897,
+          "copy_log_mse": 0.012561292533175013,
+          "model_vs_zero_percent": 16.795426073201945,
+          "model_vs_copy_percent": 23.520727236642102,
+          "model_to_truth_high_power": 0.5166145984119683,
+          "lowband_relative_power_error": 2.0540677792644769e-13
+        },
+        "inactive": {
+          "frames": 10829,
+          "model_log_mse": 0.0006194657470934117,
+          "zero_log_mse": 0.0006863562572135444,
+          "copy_log_mse": 0.0006400134660054175,
+          "model_vs_zero_percent": 9.745742013294013,
+          "model_vs_copy_percent": 3.2105135287625153,
+          "model_to_truth_high_power": 0.8626500188545189,
+          "lowband_relative_power_error": 2.2646551987421274e-14
+        }
+      },
+      "peak": {
+        "full": 0.6984012722969055,
+        "lowpass": 0.6991013884544373,
+        "model": 0.6991046667098999
+      }
+    },
+    {
+      "id": 144592,
+      "genre": "Electronic",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.0017818810922917356,
+          "zero_log_mse": 0.002366607774258035,
+          "copy_log_mse": 0.0016663720114590914,
+          "model_vs_zero_percent": 24.707376031062832,
+          "model_vs_copy_percent": -6.931770339295573,
+          "model_to_truth_high_power": 0.12387636895501883,
+          "lowband_relative_power_error": 1.4203075103959757e-14
+        },
+        "active": {
+          "frames": 61,
+          "model_log_mse": 0.0065475821868662895,
+          "zero_log_mse": 0.014676446544514788,
+          "copy_log_mse": 0.009632840462337925,
+          "model_vs_zero_percent": 55.38714247343886,
+          "model_vs_copy_percent": 32.02854119233313,
+          "model_to_truth_high_power": 0.26606427105458447,
+          "lowband_relative_power_error": 3.7910653880330295e-14
+        },
+        "inactive": {
+          "frames": 11173,
+          "model_log_mse": 0.0017558623178561277,
+          "zero_log_mse": 0.0022994011005817027,
+          "copy_log_mse": 0.0016228783593062578,
+          "model_vs_zero_percent": 23.638276183658025,
+          "model_vs_copy_percent": -8.194326936907181,
+          "model_to_truth_high_power": 0.11626490024877549,
+          "lowband_relative_power_error": 1.4126813764450127e-14
+        }
+      },
+      "peak": {
+        "full": 0.7560521960258484,
+        "lowpass": 0.759027361869812,
+        "model": 0.7584664821624756
+      }
+    },
+    {
+      "id": 148028,
+      "genre": "Hip-Hop",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.008865770378750923,
+          "zero_log_mse": 0.011973475780768544,
+          "copy_log_mse": 0.009513042605115532,
+          "model_vs_zero_percent": 25.954914503682623,
+          "model_vs_copy_percent": 6.80405053601405,
+          "model_to_truth_high_power": 0.021758539579224755,
+          "lowband_relative_power_error": 3.147558532957703e-14
+        },
+        "active": {
+          "frames": 2886,
+          "model_log_mse": 0.02914478247053959,
+          "zero_log_mse": 0.0398407125744792,
+          "copy_log_mse": 0.029874152454272072,
+          "model_vs_zero_percent": 26.846733938165336,
+          "model_vs_copy_percent": 2.4414750672807073,
+          "model_to_truth_high_power": 0.015030104205645411,
+          "lowband_relative_power_error": 7.193086494689478e-14
+        },
+        "inactive": {
+          "frames": 8348,
+          "model_log_mse": 0.0018550817231565173,
+          "zero_log_mse": 0.002339450219358751,
+          "copy_log_mse": 0.002473971806760743,
+          "model_vs_zero_percent": 20.704372856243136,
+          "model_vs_copy_percent": 25.016052402576083,
+          "model_to_truth_high_power": 0.19491887495151353,
+          "lowband_relative_power_error": 2.075651286670541e-14
+        }
+      },
+      "peak": {
+        "full": 1.3070155382156372,
+        "lowpass": 1.3250830173492432,
+        "model": 1.325426697731018
+      }
+    },
+    {
+      "id": 148031,
+      "genre": "Hip-Hop",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.023662591325459476,
+          "zero_log_mse": 0.036442435127099645,
+          "copy_log_mse": 0.03349269776083697,
+          "model_vs_zero_percent": 35.06857803839982,
+          "model_vs_copy_percent": 29.349998932817655,
+          "model_to_truth_high_power": 0.08555970120089153,
+          "lowband_relative_power_error": 1.0967843712128266e-13
+        },
+        "active": {
+          "frames": 3524,
+          "model_log_mse": 0.07127988970483855,
+          "zero_log_mse": 0.1094667366198977,
+          "copy_log_mse": 0.10095533420238936,
+          "model_vs_zero_percent": 34.884429822417815,
+          "model_vs_copy_percent": 29.394627566740773,
+          "model_to_truth_high_power": 0.07617472161600639,
+          "lowband_relative_power_error": 2.739817523410094e-13
+        },
+        "inactive": {
+          "frames": 7710,
+          "model_log_mse": 0.0018982126628224012,
+          "zero_log_mse": 0.0030653095161242445,
+          "copy_log_mse": 0.002657635397668275,
+          "model_vs_zero_percent": 38.074355857463694,
+          "model_vs_copy_percent": 28.575128684399942,
+          "model_to_truth_high_power": 0.46776822877681845,
+          "lowband_relative_power_error": 3.675424819022673e-14
+        }
+      },
+      "peak": {
+        "full": 0.9560718536376953,
+        "lowpass": 0.9459741115570068,
+        "model": 0.9468643665313721
+      }
+    },
+    {
+      "id": 148032,
+      "genre": "Hip-Hop",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.01139643617776515,
+          "zero_log_mse": 0.013254153073322221,
+          "copy_log_mse": 0.011153829668135933,
+          "model_vs_zero_percent": 14.016111669151154,
+          "model_vs_copy_percent": -2.175096059807058,
+          "model_to_truth_high_power": 0.016385404263546687,
+          "lowband_relative_power_error": 2.3305936845042746e-14
+        },
+        "active": {
+          "frames": 4540,
+          "model_log_mse": 0.02467230577914787,
+          "zero_log_mse": 0.02878040536778614,
+          "copy_log_mse": 0.02428313709411265,
+          "model_vs_zero_percent": 14.273946235783242,
+          "model_vs_copy_percent": -1.6026293617951382,
+          "model_to_truth_high_power": 0.013880302267934916,
+          "lowband_relative_power_error": 3.837335487699166e-14
+        },
+        "inactive": {
+          "frames": 6694,
+          "model_log_mse": 0.0023924851783212343,
+          "zero_log_mse": 0.002723949097094825,
+          "copy_log_mse": 0.002249279964829342,
+          "model_vs_zero_percent": 12.168506347167318,
+          "model_vs_copy_percent": -6.366713603068863,
+          "model_to_truth_high_power": 0.053055042898622985,
+          "lowband_relative_power_error": 1.611007895008432e-14
+        }
+      },
+      "peak": {
+        "full": 1.3308885097503662,
+        "lowpass": 1.3177261352539062,
+        "model": 1.3169546127319336
+      }
+    },
+    {
+      "id": 154303,
+      "genre": "Hip-Hop",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.04603387171129471,
+          "zero_log_mse": 0.08987221206498248,
+          "copy_log_mse": 0.06684769419200726,
+          "model_vs_zero_percent": 48.77852602758935,
+          "model_vs_copy_percent": 31.13618612024045,
+          "model_to_truth_high_power": 0.0587654904170694,
+          "lowband_relative_power_error": 3.807650078966316e-13
+        },
+        "active": {
+          "frames": 3846,
+          "model_log_mse": 0.1308636465728573,
+          "zero_log_mse": 0.2572886442298323,
+          "copy_log_mse": 0.19161391356113086,
+          "model_vs_zero_percent": 49.13741841790784,
+          "model_vs_copy_percent": 31.704517620476626,
+          "model_to_truth_high_power": 0.058600073122575466,
+          "lowband_relative_power_error": 6.14708118746307e-13
+        },
+        "inactive": {
+          "frames": 7388,
+          "model_log_mse": 0.0018737046677687653,
+          "zero_log_mse": 0.002719586441537405,
+          "copy_log_mse": 0.001897656334177078,
+          "model_vs_zero_percent": 31.103323683672123,
+          "model_vs_copy_percent": 1.2621709198309294,
+          "model_to_truth_high_power": 0.19434428168217877,
+          "lowband_relative_power_error": 6.264920125544826e-14
+        }
+      },
+      "peak": {
+        "full": 0.9141802191734314,
+        "lowpass": 0.8482633233070374,
+        "model": 0.8521572351455688
+      }
+    },
+    {
+      "id": 154305,
+      "genre": "Hip-Hop",
+      "metrics": {
+        "all": {
+          "frames": 11244,
+          "model_log_mse": 0.0011025712659212129,
+          "zero_log_mse": 0.002679480894128086,
+          "copy_log_mse": 0.0018044822137529687,
+          "model_vs_zero_percent": 58.85131077674677,
+          "model_vs_copy_percent": 38.89819154115788,
+          "model_to_truth_high_power": 0.3530738887610693,
+          "lowband_relative_power_error": 5.2812457120247296e-14
+        },
+        "active": {
+          "frames": 436,
+          "model_log_mse": 0.02384680290412433,
+          "zero_log_mse": 0.06113029107877646,
+          "copy_log_mse": 0.04177230059119475,
+          "model_vs_zero_percent": 60.99020226585574,
+          "model_vs_copy_percent": 42.91240231774298,
+          "model_to_truth_high_power": 0.33347940700693546,
+          "lowband_relative_power_error": 4.52006829593201e-13
+        },
+        "inactive": {
+          "frames": 10808,
+          "model_log_mse": 0.00018505785046446236,
+          "zero_log_mse": 0.00032154665647942846,
+          "copy_log_mse": 0.00019216089504787826,
+          "model_vs_zero_percent": 42.44758987991474,
+          "model_vs_copy_percent": 3.6964048182884013,
+          "model_to_truth_high_power": 0.6182689630667333,
+          "lowband_relative_power_error": 2.440926461728708e-14
+        }
+      },
+      "peak": {
+        "full": 0.5169939994812012,
+        "lowpass": 0.5192638635635376,
+        "model": 0.5234463810920715
+      }
+    },
+    {
+      "id": 154306,
+      "genre": "Hip-Hop",
+      "metrics": {
+        "all": {
+          "frames": 11244,
+          "model_log_mse": 0.004563947101995817,
+          "zero_log_mse": 0.00775098054228084,
+          "copy_log_mse": 0.0064542344763665865,
+          "model_vs_zero_percent": 41.11780984225244,
+          "model_vs_copy_percent": 29.28755348589237,
+          "model_to_truth_high_power": 0.6068197558824697,
+          "lowband_relative_power_error": 1.2054271138350326e-13
+        },
+        "active": {
+          "frames": 2256,
+          "model_log_mse": 0.020697994671298077,
+          "zero_log_mse": 0.03560222568088334,
+          "copy_log_mse": 0.029493729401695316,
+          "model_vs_zero_percent": 41.86320019197032,
+          "model_vs_copy_percent": 29.822389059728927,
+          "model_to_truth_high_power": 0.5704243599603381,
+          "lowband_relative_power_error": 3.024961638570558e-13
+        },
+        "inactive": {
+          "frames": 8988,
+          "model_log_mse": 0.0005142796213164783,
+          "zero_log_mse": 0.0007602808279186648,
+          "copy_log_mse": 0.0006712904897687212,
+          "model_vs_zero_percent": 32.3566237064844,
+          "model_vs_copy_percent": 23.389407543422468,
+          "model_to_truth_high_power": 0.9733503642722586,
+          "lowband_relative_power_error": 7.212068597889517e-14
+        }
+      },
+      "peak": {
+        "full": 0.5905381441116333,
+        "lowpass": 0.5847737789154053,
+        "model": 0.5958744287490845
+      }
+    },
+    {
+      "id": 154307,
+      "genre": "Hip-Hop",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.0107362492312001,
+          "zero_log_mse": 0.0184374464990273,
+          "copy_log_mse": 0.01566443920618286,
+          "model_vs_zero_percent": 41.76932672446528,
+          "model_vs_copy_percent": 31.461004828296502,
+          "model_to_truth_high_power": 0.12943839378062547,
+          "lowband_relative_power_error": 1.92526615857312e-14
+        },
+        "active": {
+          "frames": 925,
+          "model_log_mse": 0.1263163876954247,
+          "zero_log_mse": 0.22095371966293773,
+          "copy_log_mse": 0.17281429795127226,
+          "model_vs_zero_percent": 42.83129159892902,
+          "model_vs_copy_percent": 26.906286578763517,
+          "model_to_truth_high_power": 0.11161073308672669,
+          "lowband_relative_power_error": 1.2630041236044342e-12
+        },
+        "inactive": {
+          "frames": 10309,
+          "model_log_mse": 0.0003655412983833624,
+          "zero_log_mse": 0.0002661832652881264,
+          "copy_log_mse": 0.0015637874126812903,
+          "model_vs_zero_percent": -37.32692699057818,
+          "model_vs_copy_percent": 76.62461691281935,
+          "model_to_truth_high_power": 1.6824735594635771,
+          "lowband_relative_power_error": 1.4708718970389827e-14
+        }
+      },
+      "peak": {
+        "full": 1.029024600982666,
+        "lowpass": 1.044258952140808,
+        "model": 1.0443259477615356
+      }
+    },
+    {
+      "id": 154308,
+      "genre": "Hip-Hop",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.00030439624215746776,
+          "zero_log_mse": 0.00034828816563563925,
+          "copy_log_mse": 0.0004386374939301567,
+          "model_vs_zero_percent": 12.602186295381879,
+          "model_vs_copy_percent": 30.604144340215456,
+          "model_to_truth_high_power": 0.4992812104715316,
+          "lowband_relative_power_error": 4.1936233055125334e-14
+        },
+        "active": {
+          "frames": 292,
+          "model_log_mse": 0.0029613738730970072,
+          "zero_log_mse": 0.007270952389184551,
+          "copy_log_mse": 0.003268128805504894,
+          "model_vs_zero_percent": 59.27116951691207,
+          "model_vs_copy_percent": 9.386255887197093,
+          "model_to_truth_high_power": 0.3907798189178236,
+          "lowband_relative_power_error": 2.098243948179197e-13
+        },
+        "inactive": {
+          "frames": 10942,
+          "model_log_mse": 0.00023349170292932432,
+          "zero_log_mse": 0.00016354881695383681,
+          "copy_log_mse": 0.00036312922643062985,
+          "model_vs_zero_percent": -42.765754762524246,
+          "model_vs_copy_percent": 35.70010730768617,
+          "model_to_truth_high_power": 1.8829175227510526,
+          "lowband_relative_power_error": 2.4905841293442962e-14
+        }
+      },
+      "peak": {
+        "full": 0.8990874290466309,
+        "lowpass": 0.8992387056350708,
+        "model": 0.9007167816162109
+      }
+    },
+    {
+      "id": 154309,
+      "genre": "Hip-Hop",
+      "metrics": {
+        "all": {
+          "frames": 11234,
+          "model_log_mse": 0.05121743052716917,
+          "zero_log_mse": 0.07788680979857264,
+          "copy_log_mse": 0.05877545113556191,
+          "model_vs_zero_percent": 34.24120122569484,
+          "model_vs_copy_percent": 12.859145208363653,
+          "model_to_truth_high_power": 0.033364190458781806,
+          "lowband_relative_power_error": 2.8465407427732297e-13
+        },
+        "active": {
+          "frames": 4352,
+          "model_log_mse": 0.12661776469664318,
+          "zero_log_mse": 0.19395953292255919,
+          "copy_log_mse": 0.14901454019038793,
+          "model_vs_zero_percent": 34.719493912579715,
+          "model_vs_copy_percent": 15.029926250907844,
+          "model_to_truth_high_power": 0.033061347260291925,
+          "lowband_relative_power_error": 4.837296550203308e-13
+        },
+        "inactive": {
+          "frames": 6882,
+          "model_log_mse": 0.0035361962485363726,
+          "zero_log_mse": 0.004485401627170517,
+          "copy_log_mse": 0.001710569478107263,
+          "model_vs_zero_percent": 21.162104478767084,
+          "model_vs_copy_percent": -106.72625659433352,
+          "model_to_truth_high_power": 0.28026487818411366,
+          "lowband_relative_power_error": 4.980758892078986e-14
+        }
+      },
+      "peak": {
+        "full": 0.9347246885299683,
+        "lowpass": 0.856625497341156,
+        "model": 0.8557724356651306
+      }
+    }
+  ]
+}

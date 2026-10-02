@@ -1,0 +1,5 @@
+   Compiling hound v3.5.1
+   Compiling id14-sr v0.1.0 (/Users/minamorl/repos/.worktrees/audient-id14-linux/id14-sr/crates/id14-sr)
+    Finished `release` profile [optimized] target(s) in 3.98s
+     Running `crates/id14-sr/target/release/sr-bench`
+sample_rate=48000 frames=256 budget_us=5333.33 median_us=90.71 p95_us=92.96 max_us=902.88

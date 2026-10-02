@@ -1,0 +1,21 @@
+[Unit]
+Description=iD14 realtime high-frequency completion filter
+After=pipewire.service wireplumber.service
+BindsTo=pipewire.service wireplumber.service
+PartOf=wireplumber.service
+
+[Service]
+Type=simple
+ExecStart=/run/current-system/sw/bin/pipewire -c filter-chain.conf
+ExecStartPost=%h/.local/bin/id14-sr reconcile
+Environment=LADSPA_PATH=%h/.local/lib/ladspa
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+NoNewPrivileges=yes
+RestrictNamespaces=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+Slice=session.slice
+
+[Install]
+WantedBy=default.target

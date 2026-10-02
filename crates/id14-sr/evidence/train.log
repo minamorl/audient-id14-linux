@@ -1,0 +1,25 @@
+{"ts": "2026-10-02T10:57:38.719433+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "features", "split": "train", "file": "0music_01_Melomics.flac", "frames": 48786}
+{"ts": "2026-10-02T10:57:39.553648+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "features", "split": "train", "file": "0music_02_Melomics.flac", "frames": 80848}
+{"ts": "2026-10-02T10:57:40.481455+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "features", "split": "train", "file": "0music_03_Melomics.flac", "frames": 86570}
+{"ts": "2026-10-02T10:57:41.411841+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "features", "split": "train", "file": "0music_04_Melomics.flac", "frames": 93690}
+{"ts": "2026-10-02T10:57:41.938626+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "features", "split": "train", "file": "0music_05_Melomics.flac", "frames": 57622}
+{"ts": "2026-10-02T10:57:42.464031+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "features", "split": "train", "file": "0music_06_Melomics.flac", "frames": 61688}
+{"ts": "2026-10-02T10:57:43.410398+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "features", "split": "train", "file": "0music_07_Melomics.flac", "frames": 117848}
+{"ts": "2026-10-02T10:57:43.938876+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "features", "split": "train", "file": "0music_08_Melomics.flac", "frames": 67624}
+{"ts": "2026-10-02T10:57:44.387479+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "features", "split": "test", "file": "0music_09_Melomics.flac", "frames": 57594}
+{"ts": "2026-10-02T10:57:44.819796+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "features", "split": "test", "file": "0music_10_Melomics.flac", "frames": 55056}
+{"ts": "2026-10-02T10:57:45.413384+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "features", "split": "test", "file": "0music_11_Melomics.flac", "frames": 76998}
+{"ts": "2026-10-02T10:57:45.495619+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "dataset", "train_examples": 614676, "test_examples": 189648, "device": "cpu"}
+{"ts": "2026-10-02T10:57:46.235259+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "step", "step": 250, "total_steps": 3000, "loss": 0.005820677615702152}
+{"ts": "2026-10-02T10:57:46.536083+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "step", "step": 500, "total_steps": 3000, "loss": 0.004509052261710167}
+{"ts": "2026-10-02T10:57:46.843649+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "step", "step": 750, "total_steps": 3000, "loss": 0.0049035632982850075}
+{"ts": "2026-10-02T10:57:47.144710+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "step", "step": 1000, "total_steps": 3000, "loss": 0.005846079904586077}
+{"ts": "2026-10-02T10:57:47.443880+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "step", "step": 1250, "total_steps": 3000, "loss": 0.004442320670932531}
+{"ts": "2026-10-02T10:57:47.755643+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "step", "step": 1500, "total_steps": 3000, "loss": 0.004800567403435707}
+{"ts": "2026-10-02T10:57:48.084863+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "step", "step": 1750, "total_steps": 3000, "loss": 0.0038190926425158978}
+{"ts": "2026-10-02T10:57:48.436419+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "step", "step": 2000, "total_steps": 3000, "loss": 0.004549406003206968}
+{"ts": "2026-10-02T10:57:48.817470+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "step", "step": 2250, "total_steps": 3000, "loss": 0.0039806002750992775}
+{"ts": "2026-10-02T10:57:49.223468+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "step", "step": 2500, "total_steps": 3000, "loss": 0.004237474873661995}
+{"ts": "2026-10-02T10:57:49.620669+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "step", "step": 2750, "total_steps": 3000, "loss": 0.004864698275923729}
+{"ts": "2026-10-02T10:57:50.012171+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "step", "step": 3000, "total_steps": 3000, "loss": 0.003478027880191803}
+{"ts": "2026-10-02T10:57:50.231982+00:00", "level": "info", "trace_id": "01M3Y46DCY8ZJE2B1BWHDNET37", "msg": "evaluation", "source": "Wikimedia Commons: Melomics 0music recordings", "license": "CC0 1.0 public domain dedication (verify each linked file description)", "train_tracks": 8, "test_tracks": 3, "train_examples": 614676, "test_examples": 189648, "steps": 3000, "batch": 512, "seed": 1407, "device": "cpu", "heldout_log_magnitude_mse": 0.00021202914084122312, "heldout_zero_highband_mse": 0.0002116197946080487, "improvement_percent": -0.19343475591808712, "checkpoint_sha256": "5620cfb325424a2bb9a7c3076c6c946a53b702261ac72162214af4c2a3da765d", "checkpoint_bytes": 285884}

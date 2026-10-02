@@ -1,0 +1,16 @@
+{
+  "record": "https://zenodo.org/api/records/5120004",
+  "license": "cc-by-4.0",
+  "files": [
+    {
+      "key": "musicnet_metadata.csv",
+      "size": 43775,
+      "checksum": "md5:1caef62cee9c875235e62aac368b49d8"
+    },
+    {
+      "key": "musicnet.tar.gz",
+      "size": 11097394998,
+      "checksum": "md5:844764911fa0d5b97c97da944a057590"
+    }
+  ]
+}

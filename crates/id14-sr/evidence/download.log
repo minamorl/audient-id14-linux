@@ -1,0 +1,11 @@
+{"ts": "UTC", "level": "info", "trace_id": "corpus", "msg": "verified", "split": "train", "file": "0music_01_Melomics.flac", "bytes": 8235622, "sha1": "2719a23512f5ef1ce5e7278ed7d50b566e522a2d"}
+{"ts": "UTC", "level": "info", "trace_id": "corpus", "msg": "verified", "split": "train", "file": "0music_02_Melomics.flac", "bytes": 12400434, "sha1": "f62c74d3a108a9d69a452450db0da8e3ca10c2be"}
+{"ts": "UTC", "level": "info", "trace_id": "corpus", "msg": "verified", "split": "train", "file": "0music_03_Melomics.flac", "bytes": 14508043, "sha1": "1f15e9af99b97e3a374827d18a1ca641fa5e674c"}
+{"ts": "UTC", "level": "info", "trace_id": "corpus", "msg": "verified", "split": "train", "file": "0music_04_Melomics.flac", "bytes": 30945679, "sha1": "4eb6e8b3a999c1d066a6daeb50356caaa09632ee"}
+{"ts": "UTC", "level": "info", "trace_id": "corpus", "msg": "verified", "split": "train", "file": "0music_05_Melomics.flac", "bytes": 18862516, "sha1": "dccefd295a2814b50d376db435f14395c77dc3a4"}
+{"ts": "UTC", "level": "info", "trace_id": "corpus", "msg": "verified", "split": "train", "file": "0music_06_Melomics.flac", "bytes": 20381427, "sha1": "7f21e2e599eba28a38cab8bf8cb214d4d2f618f4"}
+{"ts": "UTC", "level": "info", "trace_id": "corpus", "msg": "verified", "split": "train", "file": "0music_07_Melomics.flac", "bytes": 21707488, "sha1": "e1e1fa4380466169ef3f684cf527e6501903e9bf"}
+{"ts": "UTC", "level": "info", "trace_id": "corpus", "msg": "verified", "split": "train", "file": "0music_08_Melomics.flac", "bytes": 17981797, "sha1": "7c7453253f9aa6539e1ecdbb827378c2d589193e"}
+{"ts": "UTC", "level": "info", "trace_id": "corpus", "msg": "verified", "split": "train", "file": "0music_09_Melomics.flac", "bytes": 13137656, "sha1": "52b89f72226847bff08d4577d79c10752b773195"}
+{"ts": "UTC", "level": "info", "trace_id": "corpus", "msg": "verified", "split": "train", "file": "0music_10_Melomics.flac", "bytes": 11141367, "sha1": "755f301b53495a89224bfcb8ffdee0092a149e38"}
+{"ts": "UTC", "level": "info", "trace_id": "corpus", "msg": "verified", "split": "test", "file": "0music_11_Melomics.flac", "bytes": 16980567, "sha1": "21f535afde754f5381bf195414a689be2ba0c795"}

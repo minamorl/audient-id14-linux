@@ -1,0 +1,2 @@
+{"ts": "2026-10-02T11:26:26.757624+00:00", "level": "info", "trace_id": "01M3Y5V4JDX2F4J72Z2664Q1AG", "msg": "verified", "file": "musicnet_metadata.csv", "bytes": 43775, "checksum": "md5:1caef62cee9c875235e62aac368b49d8"}
+{"ts": "2026-10-02T11:26:41.901023+00:00", "level": "info", "trace_id": "01M3Y5V4JDX2F4J72Z2664Q1AG", "msg": "verified", "file": "musicnet.tar.gz", "bytes": 11097394998, "checksum": "md5:844764911fa0d5b97c97da944a057590"}

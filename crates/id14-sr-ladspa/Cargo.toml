@@ -1,0 +1,13 @@
+[package]
+name = "id14-sr-ladspa"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "LADSPA adapter for id14-sr high-frequency completion"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+id14-sr = { path = "../id14-sr" }
+rustfft = "6.4.1"

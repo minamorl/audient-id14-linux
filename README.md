@@ -20,6 +20,9 @@ driver. What is missing is a way to drive the device's *control* features
   identification, read-only state dump, a gated volume write, and a
   `--dry-run` mode that prints the bytes it would send without touching the
   USB bus). See [Usage](#usage).
+- `id14-sr` / `id14-sr-ladspa` — an experimental self-trained high-frequency
+  completion engine and an opt-in PipeWire/WirePlumber Smart Filter. It
+  defaults off; see [its Linux usage](crates/id14-sr-ladspa/README.md).
 
 The tool is designed to coexist with `snd-usb-audio`; it does not replace the
 audio driver and does not require unloading it. See

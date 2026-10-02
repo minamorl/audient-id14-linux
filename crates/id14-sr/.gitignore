@@ -1,0 +1,9 @@
+/corpus/audio/
+/corpus/downloaded.json
+/.venv/
+/target/
+/.cargo-home/
+/.uv-cache/
+__pycache__/
+*.wav
+*.mp3

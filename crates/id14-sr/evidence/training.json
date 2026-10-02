@@ -1,0 +1,17 @@
+{
+  "source": "Wikimedia Commons: Melomics 0music recordings",
+  "license": "CC0 1.0 public domain dedication (verify each linked file description)",
+  "train_tracks": 8,
+  "test_tracks": 3,
+  "train_examples": 614676,
+  "test_examples": 189648,
+  "steps": 3000,
+  "batch": 512,
+  "seed": 1407,
+  "device": "cpu",
+  "heldout_log_magnitude_mse": 0.00021202914084122312,
+  "heldout_zero_highband_mse": 0.0002116197946080487,
+  "improvement_percent": -0.19343475591808712,
+  "checkpoint_sha256": "5620cfb325424a2bb9a7c3076c6c946a53b702261ac72162214af4c2a3da765d",
+  "checkpoint_bytes": 285884
+}

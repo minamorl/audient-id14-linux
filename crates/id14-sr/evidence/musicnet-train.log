@@ -1,0 +1,250 @@
+{"ts": "2026-10-02T11:29:27.420980+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "split", "train_recordings": 300, "validation_recordings": 20, "test_recordings": 10, "device": "cpu"}
+{"ts": "2026-10-02T11:29:46.479551+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "training_data", "frames": 1347300, "active_frames": 31938, "active_fraction": 0.02370518815408595}
+{"ts": "2026-10-02T11:29:51.926101+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1757.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:51.989481+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2487.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:52.048473+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2168.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:52.108135+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2161.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:52.167734+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1923.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:52.227437+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2480.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:52.286288+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2481.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:52.345353+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2607.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:52.404498+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2397.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:52.466340+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2466.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:52.527836+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2540.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:52.591311+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2213.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:52.655581+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2221.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:52.721587+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1775.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:52.787057+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1773.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:52.851871+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2178.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:52.917334+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2514.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:52.983278+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1729.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:53.044480+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2436.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:53.106048+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2614.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:53.107193+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "step", "step": 500, "loss": 0.0005295525188557804, "validation": {"all": {"frames": 89820, "model_mse": 0.0004267152715625873, "zero_mse": 0.0004215139439312793, "improvement_percent": -1.2339633614009138}, "active": {"frames": 1465, "model_mse": 0.0075574834866472046, "zero_mse": 0.007546999755812275, "improvement_percent": -0.13891256358999904}, "inactive": {"frames": 88355, "model_mse": 0.00030848115457502416, "zero_mse": 0.0003033674147747397, "improvement_percent": -1.6856588912430137}}, "best_step": 500}
+{"ts": "2026-10-02T11:29:54.693855+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1757.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:54.758302+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2487.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:54.822603+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2168.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:54.886842+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2161.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:54.951171+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1923.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:55.010664+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2480.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:55.068853+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2481.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:55.126871+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2607.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:55.184462+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2397.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:55.242435+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2466.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:55.299820+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2540.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:55.357342+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2213.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:55.414988+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2221.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:55.472866+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1775.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:55.531712+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1773.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:55.589264+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2178.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:55.647309+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2514.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:55.704755+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1729.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:55.762812+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2436.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:55.821694+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2614.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:55.823063+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "step", "step": 1000, "loss": 0.0006000294233672321, "validation": {"all": {"frames": 89820, "model_mse": 0.0004234437706957744, "zero_mse": 0.0004215139439312793, "improvement_percent": -0.4578322478484331}, "active": {"frames": 1465, "model_mse": 0.007550437794921629, "zero_mse": 0.007546999755812275, "improvement_percent": -0.045555044661371724}, "inactive": {"frames": 88355, "model_mse": 0.00030527222646485646, "zero_mse": 0.0003033674147747397, "improvement_percent": -0.6278893504535255}}, "best_step": 1000}
+{"ts": "2026-10-02T11:29:57.360884+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1757.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:57.419406+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2487.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:57.477911+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2168.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:57.536071+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2161.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:57.594256+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1923.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:57.652816+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2480.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:57.711497+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2481.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:57.775331+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2607.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:57.834207+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2397.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:57.894103+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2466.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:57.952614+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2540.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:58.015375+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2213.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:58.080091+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2221.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:58.144809+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1775.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:58.209116+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1773.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:58.273391+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2178.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:58.337578+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2514.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:58.401313+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1729.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:58.464995+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2436.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:58.528571+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2614.wav", "sampled": true}
+{"ts": "2026-10-02T11:29:58.529159+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "step", "step": 1500, "loss": 0.00046158168697729707, "validation": {"all": {"frames": 89820, "model_mse": 0.00042254395760111857, "zero_mse": 0.0004215139439312793, "improvement_percent": -0.24436052108567363}, "active": {"frames": 1465, "model_mse": 0.007548757292998888, "zero_mse": 0.007546999755812275, "improvement_percent": -0.023287892453671688}, "inactive": {"frames": 88355, "model_mse": 0.00030438535826038756, "zero_mse": 0.0003033674147747397, "improvement_percent": -0.33554806352675826}}, "best_step": 1500}
+{"ts": "2026-10-02T11:30:00.033659+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1757.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:00.092109+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2487.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:00.150572+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2168.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:00.208170+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2161.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:00.265895+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1923.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:00.324120+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2480.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:00.382094+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2481.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:00.439811+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2607.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:00.497946+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2397.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:00.555861+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2466.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:00.613606+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2540.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:00.671034+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2213.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:00.729127+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2221.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:00.786835+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1775.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:00.844419+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1773.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:00.901911+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2178.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:00.959608+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2514.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:01.017542+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1729.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:01.076242+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2436.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:01.134022+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2614.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:01.134567+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "step", "step": 2000, "loss": 0.002353968331590295, "validation": {"all": {"frames": 89820, "model_mse": 0.00042231345576379775, "zero_mse": 0.0004215139439312793, "improvement_percent": -0.18967624773258418}, "active": {"frames": 1465, "model_mse": 0.00754824313167778, "zero_mse": 0.007546999755812275, "improvement_percent": -0.01647510144078268}, "inactive": {"frames": 88355, "model_mse": 0.00030415956893362767, "zero_mse": 0.0003033674147747397, "improvement_percent": -0.26112038416392647}}, "best_step": 2000}
+{"ts": "2026-10-02T11:30:02.526542+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1757.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:02.586035+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2487.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:02.643230+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2168.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:02.705096+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2161.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:02.768852+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1923.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:02.829161+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2480.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:02.886969+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2481.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:02.945001+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2607.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:03.002730+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2397.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:03.060480+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2466.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:03.118741+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2540.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:03.181045+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2213.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:03.246531+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2221.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:03.311773+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1775.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:03.376550+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1773.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:03.440596+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2178.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:03.504759+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2514.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:03.569217+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1729.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:03.633102+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2436.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:03.696485+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2614.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:03.697025+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "step", "step": 2500, "loss": 0.00038699799915775657, "validation": {"all": {"frames": 89820, "model_mse": 0.000422304628669235, "zero_mse": 0.0004215139439312793, "improvement_percent": -0.18758210714961976}, "active": {"frames": 1465, "model_mse": 0.007549002443636021, "zero_mse": 0.007546999755812275, "improvement_percent": -0.026536211587968594}, "inactive": {"frames": 88355, "model_mse": 0.0003041379963501415, "zero_mse": 0.0003033674147747397, "improvement_percent": -0.2540093424252543}}, "best_step": 2500}
+{"ts": "2026-10-02T11:30:04.966887+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1757.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:05.019683+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2487.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:05.071956+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2168.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:05.124528+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2161.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:05.177457+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1923.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:05.237932+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2480.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:05.312020+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2481.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:05.371491+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2607.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:05.436818+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2397.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:05.503629+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2466.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:05.579233+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2540.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:05.655236+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2213.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:05.729322+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2221.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:05.803585+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1775.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:05.877071+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1773.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:05.951071+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2178.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:06.019419+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2514.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:06.083288+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1729.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:06.152315+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2436.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:06.217538+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2614.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:06.218320+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "step", "step": 3000, "loss": 0.0005596670089289546, "validation": {"all": {"frames": 89820, "model_mse": 0.0004221561045976563, "zero_mse": 0.0004215139439312793, "improvement_percent": -0.15234624515332307}, "active": {"frames": 1465, "model_mse": 0.007547426620441085, "zero_mse": 0.007546999755812275, "improvement_percent": -0.005656083776628407}, "inactive": {"frames": 88355, "model_mse": 0.0003040131340414729, "zero_mse": 0.0003033674147747397, "improvement_percent": -0.21285056841475747}}, "best_step": 3000}
+{"ts": "2026-10-02T11:30:07.900289+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1757.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:07.958866+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2487.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:08.017356+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2168.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:08.075676+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2161.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:08.129219+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1923.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:08.182319+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2480.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:08.238534+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2481.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:08.297505+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2607.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:08.360344+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2397.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:08.418757+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2466.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:08.476865+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2540.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:08.535079+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2213.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:08.594770+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2221.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:08.653637+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1775.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:08.711870+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1773.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:08.770374+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2178.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:08.828897+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2514.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:08.885403+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1729.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:08.939773+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2436.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:08.996946+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2614.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:08.997045+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "step", "step": 3500, "loss": 0.000432714557973668, "validation": {"all": {"frames": 89820, "model_mse": 0.00042218641249498165, "zero_mse": 0.0004215139439312793, "improvement_percent": -0.15953649301148065}, "active": {"frames": 1465, "model_mse": 0.007547845952579281, "zero_mse": 0.007546999755812275, "improvement_percent": -0.011212359803702832}, "inactive": {"frames": 88355, "model_mse": 0.00030403699722158476, "zero_mse": 0.0003033674147747397, "improvement_percent": -0.22071666706269255}}, "best_step": 3000}
+{"ts": "2026-10-02T11:30:10.575596+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1757.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:10.639337+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2487.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:10.704831+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2168.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:10.766911+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2161.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:10.835519+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1923.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:10.901067+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2480.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:10.965972+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2481.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:11.028318+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2607.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:11.088865+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2397.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:11.148383+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2466.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:11.207075+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2540.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:11.267243+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2213.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:11.332626+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2221.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:11.397364+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1775.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:11.462496+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1773.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:11.520962+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2178.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:11.582504+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2514.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:11.648035+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1729.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:11.712005+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2436.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:11.776124+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2614.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:11.776777+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "step", "step": 4000, "loss": 0.0006396707030944526, "validation": {"all": {"frames": 89820, "model_mse": 0.00042205867754846574, "zero_mse": 0.0004215139439312793, "improvement_percent": -0.12923264462048056}, "active": {"frames": 1465, "model_mse": 0.007547258759114522, "zero_mse": 0.007546999755812275, "improvement_percent": -0.0034318710829150945}, "inactive": {"frames": 88355, "model_mse": 0.0003039168960818594, "zero_mse": 0.0003033674147747397, "improvement_percent": -0.181127332850739}}, "best_step": 4000}
+{"ts": "2026-10-02T11:30:13.531773+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1757.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:13.591286+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2487.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:13.650560+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2168.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:13.709707+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2161.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:13.768687+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1923.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:13.825501+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2480.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:13.883816+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2481.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:13.942994+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2607.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:14.002083+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2397.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:14.058998+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2466.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:14.129143+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2540.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:14.188333+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2213.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:14.247394+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2221.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:14.306743+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1775.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:14.365521+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1773.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:14.424308+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2178.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:14.481726+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2514.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:14.539682+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1729.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:14.600591+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2436.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:14.658969+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2614.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:14.659067+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "step", "step": 4500, "loss": 0.0005435801576822996, "validation": {"all": {"frames": 89820, "model_mse": 0.0004220908096074478, "zero_mse": 0.0004215139439312793, "improvement_percent": -0.13685565672829636}, "active": {"frames": 1465, "model_mse": 0.0075479430523270035, "zero_mse": 0.007546999755812275, "improvement_percent": -0.012498960451168273}, "inactive": {"frames": 88355, "model_mse": 0.00030393820121929634, "zero_mse": 0.0003033674147747397, "improvement_percent": -0.18815021546743083}}, "best_step": 4000}
+{"ts": "2026-10-02T11:30:16.319518+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1757.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:16.379409+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2487.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:16.438604+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2168.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:16.497794+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2161.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:16.556561+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1923.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:16.615147+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2480.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:16.674033+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2481.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:16.734480+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2607.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:16.793612+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2397.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:16.861118+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2466.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:16.933767+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2540.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:17.000677+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2213.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:17.066290+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2221.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:17.131008+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1775.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:17.190415+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1773.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:17.248691+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2178.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:17.306731+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2514.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:17.364403+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1729.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:17.422099+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2436.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:17.480028+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2614.wav", "sampled": true}
+{"ts": "2026-10-02T11:30:17.480140+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "step", "step": 5000, "loss": 0.0004679704434238374, "validation": {"all": {"frames": 89820, "model_mse": 0.00042214440103805075, "zero_mse": 0.0004215139439312793, "improvement_percent": -0.14956969178563373}, "active": {"frames": 1465, "model_mse": 0.00754778382434014, "zero_mse": 0.007546999755812275, "improvement_percent": -0.010389142086042469}, "inactive": {"frames": 88355, "model_mse": 0.0003039953203554739, "zero_mse": 0.0003033674147747397, "improvement_percent": -0.20697858443381456}}, "best_step": 4000}
+{"ts": "2026-10-02T11:30:17.926623+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1759.wav", "sampled": false}
+{"ts": "2026-10-02T11:30:18.329657+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "1819.wav", "sampled": false}
+{"ts": "2026-10-02T11:30:18.907197+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2106.wav", "sampled": false}
+{"ts": "2026-10-02T11:30:19.227170+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2191.wav", "sampled": false}
+{"ts": "2026-10-02T11:30:19.695135+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2298.wav", "sampled": false}
+{"ts": "2026-10-02T11:30:19.942149+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2303.wav", "sampled": false}
+{"ts": "2026-10-02T11:30:20.252470+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2382.wav", "sampled": false}
+{"ts": "2026-10-02T11:30:20.621516+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2416.wav", "sampled": false}
+{"ts": "2026-10-02T11:30:21.070353+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2556.wav", "sampled": false}
+{"ts": "2026-10-02T11:30:21.398886+00:00", "level": "info", "trace_id": "01M3Y60NV5CQNS3CEHBK2MHM6E", "msg": "evaluated_recording", "file": "2628.wav", "sampled": false}
+Traceback (most recent call last):
+  File "/Users/minamorl/repos/.worktrees/audient-id14-linux/id14-sr/crates/id14-sr/scripts/train_musicnet.py", line 249, in <module>
+    main()
+  File "/Users/minamorl/repos/.worktrees/audient-id14-linux/id14-sr/crates/id14-sr/scripts/train_musicnet.py", line 244, in main
+    (ROOT / "evidence/musicnet-training.json").write_text(json.dumps(report, indent=2) + "\n")
+                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_2/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_2/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/encoder.py", line 202, in encode
+    chunks = list(chunks)
+             ^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_2/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/encoder.py", line 432, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_2/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_2/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_2/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/encoder.py", line 326, in _iterencode_list
+    yield from chunks
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_2/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_2/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/encoder.py", line 439, in _iterencode
+    o = _default(o)
+        ^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13_2/Frameworks/Python.framework/Versions/3.12/lib/python3.12/json/encoder.py", line 180, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+TypeError: Object of type float32 is not JSON serializable

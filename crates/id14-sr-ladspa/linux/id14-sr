@@ -1,0 +1,587 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SERVICE=id14-sr-filter.service
+PLUGIN=${ID14_SR_PLUGIN:-"$HOME/.local/lib/ladspa/libid14_sr_ladspa.so"}
+UNIT=$HOME/.config/systemd/user/$SERVICE
+CONFIG_DIR=$HOME/.config/pipewire/filter-chain.conf.d
+CONFIG=$CONFIG_DIR/90-id14-sr.conf
+STATE_DIR=${XDG_STATE_HOME:-"$HOME/.local/state"}/id14-sr
+MODE_FILE=$STATE_DIR/output
+MARKER='# Managed by id14-sr; removed when processing is off.'
+OWNER_KEY=id14-sr.owner
+
+line_sink=${ID14_SR_LINE_SINK:-alsa_output.usb-Audient_Audient_iD14-00.HiFi__Line__sink}
+headphones_sink=${ID14_SR_HEADPHONES_SINK:-alsa_output.usb-Audient_Audient_iD14-00.HiFi__Headphones__sink}
+hardware_sink=${ID14_SR_HARDWARE_SINK:-alsa_output.hw_iD14_0}
+
+die() { printf 'id14-sr: %s\n' "$*" >&2; exit 1; }
+need() { command -v "$1" >/dev/null 2>&1 || die "required command not found: $1"; }
+
+normalize_mode() {
+    case "${1:-all}" in
+        all | line | headphones) printf '%s\n' "${1:-all}" ;;
+        *) die "output mode must be 'all', 'line', or 'headphones'" ;;
+    esac
+}
+
+outputs_for_mode() {
+    case "$1" in
+        all) printf 'line\nheadphones\n' ;;
+        line | headphones) printf '%s\n' "$1" ;;
+        *) return 1 ;;
+    esac
+}
+
+sink_for_output() {
+    case "$1" in
+        line) printf '%s\n' "$line_sink" ;;
+        headphones) printf '%s\n' "$headphones_sink" ;;
+        *) return 1 ;;
+    esac
+}
+
+hardware_channels() {
+    case "$1" in
+        line) printf 'AUX2 AUX3\n' ;;
+        headphones) printf 'AUX0 AUX1\n' ;;
+        *) return 1 ;;
+    esac
+}
+
+filter_main() {
+    case "$1" in
+        line) printf 'id14_sr_sink\n' ;;
+        headphones) printf 'id14_sr_headphones_sink\n' ;;
+        *) return 1 ;;
+    esac
+}
+
+filter_stream() {
+    case "$1" in
+        line) printf 'id14_sr_output\n' ;;
+        headphones) printf 'id14_sr_headphones_output\n' ;;
+        *) return 1 ;;
+    esac
+}
+
+transport_main() {
+    case "$1" in
+        line) printf 'id14_sr_transport\n' ;;
+        headphones) printf 'id14_sr_headphones_transport\n' ;;
+        *) return 1 ;;
+    esac
+}
+
+transport_stream() {
+    case "$1" in
+        line) printf 'id14_sr_transport_output\n' ;;
+        headphones) printf 'id14_sr_headphones_transport_output\n' ;;
+        *) return 1 ;;
+    esac
+}
+
+id_file() { printf '%s/physical-id-%s\n' "$STATE_DIR" "$1"; }
+pending_file() { printf '%s/metadata-pending-%s\n' "$STATE_DIR" "$1"; }
+owner_value() { printf 'id14-sr-v2-%s\n' "$1"; }
+
+node_id() {
+    pw-dump | jq -er --arg name "$1" '
+        [.[] | select(
+            .type == "PipeWire:Interface:Node" and
+            .info.props["node.name"] == $name
+        )] | first | .id // empty
+    '
+}
+
+current_default_name() {
+    wpctl inspect @DEFAULT_SINK@ | awk -F'"' '
+        /node.name =/ { print $2; found = 1; exit }
+        END { if (!found) exit 1 }
+    '
+}
+
+owned_config() { [ -f "$CONFIG" ] && [ "$(head -n 1 "$CONFIG")" = "$MARKER" ]; }
+
+emit_modules() {
+    local output=$1 channels main stream transport transport_out
+    channels=$(hardware_channels "$output")
+    main=$(filter_main "$output")
+    stream=$(filter_stream "$output")
+    transport=$(transport_main "$output")
+    transport_out=$(transport_stream "$output")
+    cat <<EOF
+    { name = libpipewire-module-loopback
+        args = {
+            node.description = "iD14 SR private $output transport"
+            audio.position = [ FL FR ]
+            capture.props = {
+                node.name = "$transport"
+                node.description = "iD14 SR private $output transport"
+                media.class = "Audio/Sink"
+                node.virtual = true
+                node.autoconnect = false
+            }
+            playback.props = {
+                node.name = "$transport_out"
+                node.description = "iD14 SR private $output transport output"
+                target.object = "$hardware_sink"
+                audio.position = [ $channels ]
+                node.passive = true
+                node.dont-reconnect = true
+                stream.dont-remix = true
+            }
+        }
+    }
+    { name = libpipewire-module-filter-chain
+        args = {
+            node.description = "iD14 AI High-Frequency Completion ($output)"
+            media.name = "iD14 AI High-Frequency Completion ($output)"
+            filter.graph = {
+                nodes = [ {
+                    type = ladspa
+                    name = sr
+                    plugin = libid14_sr_ladspa
+                    label = id14_sr_stereo
+                } ]
+                inputs = [ "sr:Input L" "sr:Input R" ]
+                outputs = [ "sr:Output L" "sr:Output R" ]
+            }
+            capture.props = {
+                node.name = "$main"
+                node.description = "iD14 AI High-Frequency Completion ($output)"
+                media.class = "Audio/Sink"
+                filter.smart = true
+                filter.smart.name = "id14-sr-$output"
+                filter.smart.targetable = false
+                filter.smart.target = { node.name = "$transport" }
+                audio.rate = 48000
+                audio.channels = 2
+                audio.position = [ FL FR ]
+                node.virtual = true
+            }
+            playback.props = {
+                node.name = "$stream"
+                node.description = "iD14 SR output to $output"
+                node.passive = true
+                stream.dont-remix = true
+                audio.rate = 48000
+                audio.channels = 2
+                audio.position = [ FL FR ]
+            }
+        }
+    }
+EOF
+}
+
+config_targets() {
+    local mode=$1 output channels main transport
+    owned_config || return 1
+    while IFS= read -r output; do
+        channels=$(hardware_channels "$output")
+        main=$(filter_main "$output")
+        transport=$(transport_main "$output")
+        grep -Fq "node.name = \"$main\"" "$CONFIG" || return 1
+        grep -Fq "filter.smart.target = { node.name = \"$transport\" }" "$CONFIG" || return 1
+        grep -Fq "audio.position = [ $channels ]" "$CONFIG" || return 1
+        grep -Fq "target.object = \"$hardware_sink\"" "$CONFIG" || return 1
+        grep -Fq "id14-sr-$output" "$CONFIG" || return 1
+    done < <(outputs_for_mode "$mode")
+}
+
+write_config() {
+    local mode=$1 temporary output
+    if [ -e "$CONFIG" ] && ! owned_config; then
+        printf 'id14-sr: refusing to overwrite unmanaged configuration: %s\n' "$CONFIG" >&2
+        return 1
+    fi
+    mkdir -p "$CONFIG_DIR" || return 1
+    temporary=$CONFIG.tmp.$$
+    {
+        printf '%s\ncontext.modules = [\n' "$MARKER"
+        while IFS= read -r output; do emit_modules "$output"; done < <(outputs_for_mode "$mode")
+        printf ']\n'
+    } >"$temporary" || return 1
+    mv "$temporary" "$CONFIG" || return 1
+    config_targets "$mode"
+}
+
+remove_owned_config() {
+    if owned_config; then
+        rm -f "$CONFIG"
+    elif [ -e "$CONFIG" ]; then
+        printf 'id14-sr: refusing to remove unmanaged configuration: %s\n' "$CONFIG" >&2
+        return 1
+    fi
+}
+
+metadata_for_id() { pw-metadata -n filters 2>/dev/null | grep -F "update: id:$1 " || true; }
+
+owned_metadata_present() {
+    local physical_id=$1 data key
+    data=$(metadata_for_id "$physical_id")
+    for key in "$OWNER_KEY" filter.smart filter.smart.name filter.smart.target filter.smart.after; do
+        grep -Fq "key:'$key'" <<<"$data" && return 0
+    done
+    return 1
+}
+
+metadata_owner_is_ours() {
+    local output=$1 physical_id=$2
+    metadata_for_id "$physical_id" |
+        grep -Fq "key:'$OWNER_KEY' value:'$(owner_value "$output")' type:'Spa:String'"
+}
+
+smart_metadata_matches() {
+    local output=$1 physical_id=$2 data transport
+    data=$(metadata_for_id "$physical_id")
+    transport=$(transport_main "$output")
+    grep -Fq "key:'$OWNER_KEY' value:'$(owner_value "$output")' type:'Spa:String'" <<<"$data" &&
+        grep -Fq "key:'filter.smart' value:'true' type:'Spa:Bool'" <<<"$data" &&
+        grep -Fq "key:'filter.smart.name' value:'id14-output-$output' type:'Spa:String'" <<<"$data" &&
+        grep -Fq "key:'filter.smart.target' value:'{ node.name = \"$transport\" }' type:'Spa:String'" <<<"$data" &&
+        grep -Fq "key:'filter.smart.after' value:'[ \"id14-sr-$output\" ]' type:'Spa:String'" <<<"$data"
+}
+
+claimable_metadata() {
+    local output=$1 physical=$2 physical_id=$3
+    if owned_metadata_present "$physical_id" && ! metadata_owner_is_ours "$output" "$physical_id"; then
+        printf 'id14-sr: refusing to replace filter metadata not owned by id14-sr on %s\n' "$physical" >&2
+        return 1
+    fi
+}
+
+apply_smart_metadata() {
+    local output=$1 physical=$2 physical_id=$3 transport
+    transport=$(transport_main "$output")
+    claimable_metadata "$output" "$physical" "$physical_id" || return 1
+    pw-metadata -n filters "$physical_id" "$OWNER_KEY" "$(owner_value "$output")" Spa:String >/dev/null || return 1
+    pw-metadata -n filters "$physical_id" filter.smart true Spa:Bool >/dev/null || return 1
+    pw-metadata -n filters "$physical_id" filter.smart.name "id14-output-$output" Spa:String >/dev/null || return 1
+    pw-metadata -n filters "$physical_id" filter.smart.target \
+        "{ node.name = \"$transport\" }" Spa:String >/dev/null || return 1
+    pw-metadata -n filters "$physical_id" filter.smart.after \
+        "[ \"id14-sr-$output\" ]" Spa:String >/dev/null || return 1
+    printf '%s\n' "$physical_id" >"$(id_file "$output")" || return 1
+    if ! smart_metadata_matches "$output" "$physical_id"; then
+        printf 'id14-sr: WirePlumber smart-filter metadata was not applied to %s\n' "$physical" >&2
+        return 1
+    fi
+}
+
+remove_smart_metadata() {
+    local output=$1 physical=$2 saved_id=${3:-} current_id='' key
+    current_id=$(node_id "$physical" 2>/dev/null || true)
+    if [ -z "$current_id" ]; then
+        if [ -n "$saved_id" ] && metadata_owner_is_ours "$output" "$saved_id"; then
+            printf 'pending-unavailable\n'
+        else
+            printf 'absent\n'
+        fi
+        return
+    fi
+    if ! owned_metadata_present "$current_id"; then
+        if [ -n "$saved_id" ] && [ "$current_id" != "$saved_id" ] &&
+            metadata_owner_is_ours "$output" "$saved_id"; then
+            printf 'id14-sr: warning: saved node id %s no longer identifies %s; stale metadata was not deleted\n' \
+                "$saved_id" "$physical" >&2
+            printf 'pending-identity-mismatch\n'
+        else
+            printf 'absent\n'
+        fi
+        return
+    fi
+    if ! metadata_owner_is_ours "$output" "$current_id" && [ -n "$saved_id" ] &&
+        [ "$current_id" != "$saved_id" ] && metadata_owner_is_ours "$output" "$saved_id"; then
+        printf 'id14-sr: warning: saved node id %s no longer identifies %s; stale metadata was not deleted\n' \
+            "$saved_id" "$physical" >&2
+        printf 'pending-identity-mismatch\n'
+        return
+    fi
+    if ! metadata_owner_is_ours "$output" "$current_id"; then
+        printf 'id14-sr: warning: filter metadata on %s is not owned by id14-sr; it was not deleted\n' \
+            "$physical" >&2
+        printf 'skipped-not-owned\n'
+        return
+    fi
+    for key in filter.smart filter.smart.name filter.smart.target filter.smart.after "$OWNER_KEY"; do
+        pw-metadata -n filters -d "$current_id" "$key" >/dev/null || return 1
+    done
+    if owned_metadata_present "$current_id"; then
+        printf 'id14-sr: owned filter metadata remains on %s\n' "$physical" >&2
+        return 1
+    fi
+    printf 'removed\n'
+}
+
+wait_for_node() {
+    local name=$1 expectation=$2
+    for _ in {1..50}; do
+        if node_id "$name" >/dev/null 2>&1; then
+            [ "$expectation" = present ] && return 0
+        else
+            [ "$expectation" = absent ] && return 0
+        fi
+        sleep 0.1
+    done
+    return 1
+}
+
+output_nodes_present() {
+    local output=$1
+    node_id "$(filter_main "$output")" >/dev/null 2>&1 &&
+        node_id "$(filter_stream "$output")" >/dev/null 2>&1 &&
+        node_id "$(transport_main "$output")" >/dev/null 2>&1 &&
+        node_id "$(transport_stream "$output")" >/dev/null 2>&1
+}
+
+active_output_ok() {
+    local output=$1 physical physical_id
+    physical=$(sink_for_output "$output")
+    physical_id=$(node_id "$physical" 2>/dev/null) || return 1
+    output_nodes_present "$output" && smart_metadata_matches "$output" "$physical_id"
+}
+
+runtime_present() {
+    local output name
+    systemctl --user is-active --quiet "$SERVICE" && return 0
+    [ -f "$MODE_FILE" ] && return 0
+    owned_config && return 0
+    for output in line headphones; do
+        for name in "$(filter_main "$output")" "$(filter_stream "$output")" \
+            "$(transport_main "$output")" "$(transport_stream "$output")"; do
+            node_id "$name" >/dev/null 2>&1 && return 0
+        done
+    done
+    return 1
+}
+
+pending_present() { [ -f "$(pending_file line)" ] || [ -f "$(pending_file headphones)" ]; }
+effect_present() { runtime_present || pending_present || [ -f "$STATE_DIR/physical-id" ]; }
+
+sr_bound_streams() {
+    local output=$1 target
+    target=$(filter_main "$output")
+    pw-dump | jq -r --arg target "$target" '
+        . as $objects
+        | [$objects[] | select(.type == "PipeWire:Interface:Node" and .info.props["node.name"] == $target)]
+        | first | .id as $target_id
+        | [$objects[] | select(.type == "PipeWire:Interface:Link" and .info["input-node-id"] == $target_id)
+          | .info["output-node-id"]] | unique[] as $source_id
+        | $objects[] | select(.type == "PipeWire:Interface:Node" and .id == $source_id)
+        | .info.props["media.name"] // .info.props["node.name"] // ($source_id | tostring)
+    ' 2>/dev/null || true
+}
+
+saved_id_for_output() {
+    local output=$1 file pending saved=''
+    file=$(id_file "$output")
+    pending=$(pending_file "$output")
+    if [ -f "$file" ]; then saved=$(<"$file")
+    elif [ -f "$pending" ]; then saved=$(<"$pending")
+    elif [ "$output" = line ] && [ -f "$STATE_DIR/physical-id" ]; then saved=$(<"$STATE_DIR/physical-id")
+    fi
+    printf '%s\n' "$saved"
+}
+
+record_cleanup_result() {
+    local output=$1 saved_id=$2 result=$3 pending
+    pending=$(pending_file "$output")
+    case "$result" in
+        pending-*) mkdir -p "$STATE_DIR" && printf '%s\n' "$saved_id" >"$pending" ;;
+        *) rm -f "$pending" ;;
+    esac
+}
+
+disable() {
+    local output physical saved_id result bound cleanup_error=0 service_error=0
+    local line_cleanup=absent headphones_cleanup=absent name
+    if ! effect_present; then printf 'off: already inactive; no changes\n'; return; fi
+    for output in line headphones; do
+        physical=$(sink_for_output "$output")
+        saved_id=$(saved_id_for_output "$output")
+        bound=$(sr_bound_streams "$output" | paste -sd, -)
+        if ! result=$(remove_smart_metadata "$output" "$physical" "$saved_id"); then
+            result=error; cleanup_error=1
+        fi
+        record_cleanup_result "$output" "$saved_id" "$result" || cleanup_error=1
+        if [ "$output" = line ]; then line_cleanup=$result; else headphones_cleanup=$result; fi
+        if ! node_id "$physical" >/dev/null 2>&1 && [ -n "$bound" ]; then
+            printf 'id14-sr: warning: %s sink unavailable; SR-bound streams cannot be returned: %s\n' \
+                "$output" "$bound" >&2
+        fi
+    done
+    if ! systemctl --user disable --now "$SERVICE" >/dev/null 2>&1; then
+        printf 'id14-sr: systemd could not disable/stop %s\n' "$SERVICE" >&2; service_error=1
+    fi
+    remove_owned_config || cleanup_error=1
+    rm -f "$MODE_FILE" "$STATE_DIR/physical-id" "$STATE_DIR/physical-id-line" \
+        "$STATE_DIR/physical-id-headphones" "$STATE_DIR/prior-default" "$STATE_DIR/pinned-targets" || cleanup_error=1
+    for output in line headphones; do
+        for name in "$(filter_main "$output")" "$(filter_stream "$output")" \
+            "$(transport_main "$output")" "$(transport_stream "$output")"; do
+            if ! wait_for_node "$name" absent; then
+                printf 'id14-sr: node remains after off: %s\n' "$name" >&2; cleanup_error=1
+            fi
+        done
+    done
+    if systemctl --user is-active --quiet "$SERVICE"; then
+        printf 'id14-sr: service remains active after off: %s\n' "$SERVICE" >&2; service_error=1
+    fi
+    [ "$service_error" -eq 0 ] && [ "$cleanup_error" -eq 0 ] || return 1
+    printf 'off: line_metadata=%s headphones_metadata=%s service=inactive\n' \
+        "$line_cleanup" "$headphones_cleanup"
+}
+
+rollback_activation() {
+    local output physical saved_id result name rollback_error=0
+    for output in line headphones; do
+        physical=$(sink_for_output "$output")
+        saved_id=$(saved_id_for_output "$output")
+        if ! result=$(remove_smart_metadata "$output" "$physical" "$saved_id"); then
+            rollback_error=1; continue
+        fi
+        record_cleanup_result "$output" "$saved_id" "$result" || rollback_error=1
+    done
+    if ! systemctl --user disable --now "$SERVICE" >/dev/null 2>&1; then
+        printf 'id14-sr: rollback could not disable/stop %s\n' "$SERVICE" >&2; rollback_error=1
+    fi
+    remove_owned_config || rollback_error=1
+    rm -f "$MODE_FILE" "$STATE_DIR/physical-id" "$STATE_DIR/physical-id-line" \
+        "$STATE_DIR/physical-id-headphones" || rollback_error=1
+    for output in line headphones; do
+        for name in "$(filter_main "$output")" "$(filter_stream "$output")" \
+            "$(transport_main "$output")" "$(transport_stream "$output")"; do
+            wait_for_node "$name" absent || rollback_error=1
+        done
+    done
+    [ "$rollback_error" -eq 0 ]
+}
+
+activation_failed() {
+    local reason=$1
+    if rollback_activation; then die "$reason; activation rolled back"
+    else die "$reason; rollback was incomplete"
+    fi
+}
+
+reconcile() {
+    local mode output physical physical_id node
+    [ -f "$MODE_FILE" ] || { printf 'id14-sr: cannot reconcile without enabled state\n' >&2; return 1; }
+    mode=$(<"$MODE_FILE")
+    config_targets "$mode" || { printf 'id14-sr: enabled configuration does not match state\n' >&2; return 1; }
+    while IFS= read -r output; do
+        physical=$(sink_for_output "$output")
+        wait_for_node "$physical" present || {
+            printf 'id14-sr: iD14 %s sink did not reappear during reconcile\n' "$output" >&2; return 1;
+        }
+        for node in "$(filter_main "$output")" "$(filter_stream "$output")" \
+            "$(transport_main "$output")" "$(transport_stream "$output")"; do
+            wait_for_node "$node" present || {
+                printf 'id14-sr: node did not appear during reconcile: %s\n' "$node" >&2; return 1;
+            }
+        done
+        physical_id=$(node_id "$physical") || return 1
+        apply_smart_metadata "$output" "$physical" "$physical_id" || return 1
+    done < <(outputs_for_mode "$mode")
+    printf 'reconciled: active_outputs=%s\n' "$(outputs_for_mode "$mode" | paste -sd, -)"
+}
+
+all_selected_outputs_ok() {
+    local mode=$1 output
+    while IFS= read -r output; do active_output_ok "$output" || return 1; done < <(outputs_for_mode "$mode")
+}
+
+enable() {
+    local mode output physical physical_id hardware_id default_before default_after recovered=0
+    mode=$(normalize_mode "${1:-all}")
+    hardware_id=$(node_id "$hardware_sink") || die 'iD14 hardware sink is unavailable'
+    [ -r "$PLUGIN" ] || die "plugin is unavailable: $PLUGIN"
+    [ -r "$UNIT" ] || die "service unit is unavailable: $UNIT"
+    while IFS= read -r output; do
+        physical=$(sink_for_output "$output")
+        physical_id=$(node_id "$physical") || die "iD14 $output sink is unavailable"
+        claimable_metadata "$output" "$physical" "$physical_id" || exit 1
+    done < <(outputs_for_mode "$mode")
+    if systemctl --user is-active --quiet "$SERVICE" && [ -f "$MODE_FILE" ] &&
+        [ "$(<"$MODE_FILE")" = "$mode" ] && config_targets "$mode"; then
+        if ! all_selected_outputs_ok "$mode"; then
+            reconcile || activation_failed 'metadata/node recovery failed'; recovered=1
+        fi
+        if [ "$recovered" -eq 1 ]; then
+            printf 'on: requested=%s active_outputs=%s (metadata recovered)\n' \
+                "$mode" "$(outputs_for_mode "$mode" | paste -sd, -)"
+        else
+            printf 'on: requested=%s active_outputs=%s (already active)\n' \
+                "$mode" "$(outputs_for_mode "$mode" | paste -sd, -)"
+        fi
+        return
+    fi
+    if effect_present; then
+        disable || die 'could not clean the previous effect state'
+        pending_present && die 'stale filter metadata cleanup is pending'
+    fi
+    default_before=$(current_default_name 2>/dev/null || true)
+    write_config "$mode" || activation_failed 'could not write filter configuration'
+    mkdir -p "$STATE_DIR" || activation_failed 'could not create state directory'
+    printf '%s\n' "$mode" >"$MODE_FILE" || activation_failed 'could not write enabled state'
+    systemctl --user daemon-reload || activation_failed 'systemd daemon-reload failed'
+    systemctl --user enable --now "$SERVICE" || activation_failed 'smart filter service failed'
+    [ "${ID14_SR_TEST_FAIL_STAGE:-}" != transport ] || activation_failed \
+        'simulated transport verification failure'
+    while IFS= read -r output; do
+        output_nodes_present "$output" || activation_failed "nodes missing for $output"
+        active_output_ok "$output" || activation_failed "metadata/graph verification failed for $output"
+    done < <(outputs_for_mode "$mode")
+    [ "${ID14_SR_TEST_FAIL_STAGE:-}" != metadata ] || activation_failed \
+        'simulated metadata verification failure'
+    default_after=$(current_default_name 2>/dev/null || true)
+    [ "$default_after" = "$default_before" ] || activation_failed \
+        "default changed unexpectedly: before=$default_before after=$default_after"
+    printf 'on: requested=%s active_outputs=%s hardware_id=%s default=%s service=active\n' \
+        "$mode" "$(outputs_for_mode "$mode" | paste -sd, -)" "$hardware_id" "${default_after:-none}"
+}
+
+status() {
+    local mode=none output active='' degraded='' pending='' service=inactive state=off default
+    local physical physical_id main_id stream_id transport_id transport_stream_id
+    [ -f "$MODE_FILE" ] && mode=$(<"$MODE_FILE")
+    systemctl --user is-active --quiet "$SERVICE" && service=active
+    if [ "$mode" != none ]; then
+        while IFS= read -r output; do
+            if active_output_ok "$output"; then active=${active:+$active,}$output
+            else degraded=${degraded:+$degraded,}$output
+            fi
+        done < <(outputs_for_mode "$mode")
+    fi
+    for output in line headphones; do
+        [ -f "$(pending_file "$output")" ] && pending=${pending:+$pending,}$output
+    done
+    if [ "$service" = active ] && [ -n "$active" ] && [ -z "$degraded" ] && config_targets "$mode"; then
+        state=on
+    elif runtime_present; then state=degraded
+    fi
+    default=$(current_default_name 2>/dev/null || printf none)
+    printf 'state=%s requested=%s service=%s active_outputs=%s degraded_outputs=%s pending_outputs=%s default=%s plugin=%s\n' \
+        "$state" "$mode" "$service" "${active:-none}" "${degraded:-none}" "${pending:-none}" \
+        "$default" "$PLUGIN"
+    for output in line headphones; do
+        physical=$(sink_for_output "$output")
+        physical_id=$(node_id "$physical" 2>/dev/null || printf none)
+        main_id=$(node_id "$(filter_main "$output")" 2>/dev/null || printf none)
+        stream_id=$(node_id "$(filter_stream "$output")" 2>/dev/null || printf none)
+        transport_id=$(node_id "$(transport_main "$output")" 2>/dev/null || printf none)
+        transport_stream_id=$(node_id "$(transport_stream "$output")" 2>/dev/null || printf none)
+        printf '%s: physical_id=%s main_id=%s stream_id=%s transport_id=%s transport_stream_id=%s\n' \
+            "$output" "$physical_id" "$main_id" "$stream_id" "$transport_id" "$transport_stream_id"
+    done
+}
+
+for command in pw-dump wpctl pw-metadata jq systemctl; do need "$command"; done
+case "${1:-status}" in
+    on) enable "${2:-all}" ;;
+    off) disable ;;
+    status) status ;;
+    reconcile) reconcile ;;
+    *) die 'usage: id14-sr on [all|line|headphones] | off | status' ;;
+esac

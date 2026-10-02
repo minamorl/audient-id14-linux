@@ -1,0 +1,142 @@
+{
+  "corpus": "MusicNet 1.0",
+  "license": "CC BY 4.0",
+  "train_recordings": 300,
+  "calibration_ids": [
+    "2283",
+    "2285",
+    "1813",
+    "2160",
+    "2284",
+    "1793",
+    "1822",
+    "1824",
+    "1835",
+    "1916"
+  ],
+  "validation_ids": [
+    "2288",
+    "1807",
+    "2159",
+    "2289",
+    "2431",
+    "1918",
+    "1919",
+    "1923",
+    "1931",
+    "1932"
+  ],
+  "test_ids": [
+    "1759",
+    "1819",
+    "2106",
+    "2191",
+    "2298",
+    "2303",
+    "2382",
+    "2416",
+    "2556",
+    "2628"
+  ],
+  "train_frames": 1347300,
+  "train_active_frames": 19260,
+  "steps": 5000,
+  "batch": 512,
+  "selected_step": 500,
+  "calibrated_gain": 2.0,
+  "device": "cpu",
+  "validation": {
+    "all": {
+      "frames": 44910,
+      "model_mse": 0.0027752385645902714,
+      "zero_mse": 0.002775032955347949,
+      "improvement_percent": -0.007409254074852711
+    },
+    "active": {
+      "frames": 4807,
+      "model_mse": 0.019117762309665623,
+      "zero_mse": 0.019116095207962272,
+      "improvement_percent": -0.008720932205119603
+    },
+    "inactive": {
+      "frames": 40103,
+      "model_mse": 0.0008163199888583507,
+      "zero_mse": 0.0008162895633743553,
+      "improvement_percent": -0.0037272905792917754
+    }
+  },
+  "heldout": {
+    "all": {
+      "frames": 277668,
+      "model_mse": 0.0008821092914255179,
+      "zero_mse": 0.0008809550425027651,
+      "improvement_percent": -0.13102245484328812
+    },
+    "active": {
+      "frames": 6695,
+      "model_mse": 0.028034946153316944,
+      "zero_mse": 0.02802298594948136,
+      "improvement_percent": -0.04267997656333122
+    },
+    "inactive": {
+      "frames": 270973,
+      "model_mse": 0.00021123712781378123,
+      "zero_mse": 0.00021034986441409312,
+      "improvement_percent": -0.421803647061747
+    },
+    "by_recording": [
+      {
+        "id": "1759",
+        "frames": 36496,
+        "improvement_percent": -9.890770487913292
+      },
+      {
+        "id": "1819",
+        "frames": 33273,
+        "improvement_percent": -0.11820895595626713
+      },
+      {
+        "id": "2106",
+        "frames": 42494,
+        "improvement_percent": -7.011570562291403
+      },
+      {
+        "id": "2191",
+        "frames": 19280,
+        "improvement_percent": -314.7067015885922
+      },
+      {
+        "id": "2298",
+        "frames": 28782,
+        "improvement_percent": -0.16006452598622545
+      },
+      {
+        "id": "2303",
+        "frames": 17370,
+        "improvement_percent": -0.49491688910057174
+      },
+      {
+        "id": "2382",
+        "frames": 22121,
+        "improvement_percent": -0.2996036371232025
+      },
+      {
+        "id": "2416",
+        "frames": 26083,
+        "improvement_percent": -0.015272653831388538
+      },
+      {
+        "id": "2556",
+        "frames": 28395,
+        "improvement_percent": -0.21879592471396592
+      },
+      {
+        "id": "2628",
+        "frames": 23374,
+        "improvement_percent": -0.005239839336068641
+      }
+    ]
+  },
+  "checkpoint_sha256": "146d9afa71e0d9648ee7e9e90846eb877693ab7ec32e00fa3ad07daaaccb9087",
+  "checkpoint_bytes": 477628
+}

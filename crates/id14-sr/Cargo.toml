@@ -1,0 +1,18 @@
+[package]
+name = "id14-sr"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "48 kHz stereo streaming high-frequency completion for playback"
+
+[dependencies]
+rustfft = "6.4.1"
+hound = "3.5.1"
+
+[[bin]]
+name = "sr-bench"
+path = "src/bin/bench.rs"
+
+[[bin]]
+name = "sr-render"
+path = "src/bin/render.rs"

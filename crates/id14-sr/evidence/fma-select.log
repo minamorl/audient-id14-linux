@@ -1,0 +1,3 @@
+verified fma_metadata.zip sha1=f0df49ffe5f2a6008d7dc83c6915b31835dfe733
+verified fma_small.zip sha1=ade154f733639d52e35e32f5593efe5be76c6d70
+selected 947 splits {'training': 716, 'test': 51, 'validation': 180} genres {'Folk': 114, 'Rock': 108, 'International': 51, 'Experimental': 102, 'Hip-Hop': 212, 'Electronic': 216, 'Pop': 36, 'Instrumental': 108} artists 196
