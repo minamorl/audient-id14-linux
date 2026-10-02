@@ -43,6 +43,7 @@ EOF
 cat >"$fixture/bin/zenity" <<'EOF'
 #!/usr/bin/env bash
 [[ $* == *'--print-partial'* ]] || exit 2
+[[ $* == *'--max-value=200'* ]] || exit 2
 if [ -e "$HOME/zenity-cancel" ]; then
     printf '30\n'
     exit 1
@@ -67,10 +68,13 @@ printf '100\n' >"$state/mix"
 [ "$(<"$state/mix")" = manual:0 ]
 [ "$("$cli" mix step +25)" = 25 ]
 [ "$("$cli" mix step -999)" = 0 ]
-[ "$("$cli" mix step +999)" = 100 ]
-"$cli" mix bar | jq -e '.class == "off" and .mode == "manual" and .percentage == 100 and .text == "SR 100%"' >/dev/null
-if "$cli" mix set 101 >"$fixture/invalid.out" 2>&1; then exit 1; fi
-grep -Fq 'mix must be auto or an integer from 0 to 100' "$fixture/invalid.out"
+[ "$("$cli" mix step +999)" = 200 ]
+"$cli" mix bar | jq -e '.class == "off" and .mode == "manual" and .percentage == 200 and .text == "SR 200%"' >/dev/null
+[ "$("$cli" mix step -100)" = 100 ]
+[ "$("$cli" mix set 101)" = 101 ]
+[ "$("$cli" mix set 200)" = 200 ]
+if "$cli" mix set 201 >"$fixture/invalid.out" 2>&1; then exit 1; fi
+grep -Fq 'mix must be auto or an integer from 0 to 200' "$fixture/invalid.out"
 printf 'OFF_MIX_SET_STEP_BAR_OK\n'
 
 printf 'all\n' >"$state/output"
@@ -83,6 +87,12 @@ grep -Fq 'set-param 21 Props { params = [ "sr:Mix" 40.0 ] }' "$HOME/pw-cli.log"
 [ "$("$cli" mix step +10)" = 50 ]
 [ "$(<"$state/mix")" = manual:50 ]
 [ "$(grep -Fc 'control = { Mix = 50 }' "$config")" = 2 ]
+[ "$("$cli" mix set 150)" = 150 ]
+[ "$(<"$state/mix")" = manual:150 ]
+[ "$(grep -Fc 'control = { Mix = 150 }' "$config")" = 2 ]
+grep -Fq 'set-param 20 Props { params = [ "sr:Mix" 150.0 ] }' "$HOME/pw-cli.log"
+grep -Fq 'set-param 21 Props { params = [ "sr:Mix" 150.0 ] }' "$HOME/pw-cli.log"
+[ "$("$cli" mix set 50)" = 50 ]
 touch "$HOME/fail-headphones"
 if "$cli" mix set 80 >"$fixture/failed.out" 2>&1; then exit 1; fi
 grep -Fq 'could not set live mix on headphones' "$fixture/failed.out" || {

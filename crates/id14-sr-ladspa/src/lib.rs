@@ -159,7 +159,7 @@ impl Adapter {
             return;
         }
         let manual_target = if requested_percent.is_finite() && requested_percent >= 0.0 {
-            Some((requested_percent / 100.0).clamp(0.0, 1.0))
+            Some((requested_percent / 100.0).clamp(0.0, 2.0))
         } else {
             None
         };
@@ -340,7 +340,7 @@ static PORT_HINTS: [LadspaPortRangeHint; PORT_COUNT] = [
         // -1 is conservative automatic mode, including before CLI state exists.
         hint_descriptor: 0x1 | 0x2 | 0x40,
         lower_bound: -1.0,
-        upper_bound: 100.0,
+        upper_bound: 200.0,
     },
 ];
 
@@ -508,7 +508,7 @@ mod tests {
         assert_eq!(DESCRIPTOR.port_count, 5);
         assert_eq!(PORT_DESCRIPTORS[MIX], CONTROL_INPUT);
         assert_eq!(PORT_HINTS[MIX].lower_bound, -1.0);
-        assert_eq!(PORT_HINTS[MIX].upper_bound, 100.0);
+        assert_eq!(PORT_HINTS[MIX].upper_bound, 200.0);
     }
 
     #[test]
@@ -569,8 +569,10 @@ mod tests {
         let mut bypass = Adapter::new(SAMPLE_RATE);
         let mut twenty = Adapter::new(SAMPLE_RATE);
         let mut hundred = Adapter::new(SAMPLE_RATE);
+        let mut two_hundred = Adapter::new(SAMPLE_RATE);
         let mut difference_twenty = 0.0_f64;
         let mut difference_hundred = 0.0_f64;
+        let mut difference_two_hundred = 0.0_f64;
         let mut fullband_ratio = 0.0_f32;
         for chunk in 0..23 {
             let signal: [f32; CHUNK_FRAMES] = std::array::from_fn(|frame| {
@@ -596,20 +598,32 @@ mod tests {
             let mut twenty_r = [0.0; CHUNK_FRAMES];
             let mut hundred_l = [0.0; CHUNK_FRAMES];
             let mut hundred_r = [0.0; CHUNK_FRAMES];
+            let mut two_hundred_l = [0.0; CHUNK_FRAMES];
+            let mut two_hundred_r = [0.0; CHUNK_FRAMES];
             automatic.process(&signal, &signal, &mut auto_l, &mut auto_r);
             bypass.process_with_user_mix(&signal, &signal, &mut zero_l, &mut zero_r, 0.0);
             twenty.process_with_user_mix(&signal, &signal, &mut twenty_l, &mut twenty_r, 20.0);
             hundred.process_with_user_mix(&signal, &signal, &mut hundred_l, &mut hundred_r, 100.0);
+            two_hundred.process_with_user_mix(
+                &signal,
+                &signal,
+                &mut two_hundred_l,
+                &mut two_hundred_r,
+                200.0,
+            );
             if chunk >= 12 {
                 for frame in 0..CHUNK_FRAMES {
                     difference_twenty += (twenty_l[frame] - zero_l[frame]).abs() as f64;
                     difference_hundred += (hundred_l[frame] - zero_l[frame]).abs() as f64;
+                    difference_two_hundred +=
+                        (two_hundred_l[frame] - hundred_l[frame]).abs() as f64;
                     assert!((auto_l[frame] - zero_l[frame]).abs() < 1e-5);
+                    assert!(two_hundred_l[frame].abs() <= 1.0);
                 }
             }
         }
         println!(
-            "fullband_ratio={fullband_ratio:.6} diff_20={difference_twenty:.6} diff_100={difference_hundred:.6}"
+            "fullband_ratio={fullband_ratio:.6} diff_20={difference_twenty:.6} diff_100={difference_hundred:.6} diff_200_vs_100={difference_two_hundred:.6}"
         );
         assert!(automatic.completion_mix() < 0.01);
         assert!(difference_twenty > 0.01, "diff at 20%: {difference_twenty}");
@@ -617,5 +631,28 @@ mod tests {
             difference_hundred > difference_twenty * 2.0,
             "20%={difference_twenty}, 100%={difference_hundred}"
         );
+        assert!(
+            difference_two_hundred > 0.01,
+            "200% must change fullband output beyond 100%: {difference_two_hundred}"
+        );
+    }
+
+    #[test]
+    fn above_hundred_never_emits_a_sample_beyond_full_scale() {
+        let mut adapter = Adapter::new(SAMPLE_RATE);
+        for chunk in 0..24 {
+            let signal: [f32; CHUNK_FRAMES] = std::array::from_fn(|frame| {
+                let index = chunk * CHUNK_FRAMES + frame;
+                (2.0 * PI * 3_000.0 * index as f32 / SAMPLE_RATE as f32).sin() * 0.9
+                    + (2.0 * PI * 16_000.0 * index as f32 / SAMPLE_RATE as f32).sin() * 0.4
+            });
+            let mut left = [0.0; CHUNK_FRAMES];
+            let mut right = [0.0; CHUNK_FRAMES];
+            adapter.process_with_user_mix(&signal, &signal, &mut left, &mut right, 200.0);
+            assert!(left
+                .iter()
+                .chain(right.iter())
+                .all(|sample| sample.abs() <= 1.0));
+        }
     }
 }

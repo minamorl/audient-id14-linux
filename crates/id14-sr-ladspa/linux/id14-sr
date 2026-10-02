@@ -104,7 +104,7 @@ current_default_name() {
 
 owned_config() { [ -f "$CONFIG" ] && [ "$(head -n 1 "$CONFIG")" = "$MARKER" ]; }
 
-valid_mix() { [[ $1 =~ ^(100|[0-9]|[1-9][0-9])$ ]]; }
+valid_mix() { [[ $1 =~ ^(200|1[0-9][0-9]|[0-9]|[1-9][0-9])$ ]]; }
 
 read_mix() {
     local value=auto
@@ -629,7 +629,7 @@ restore_mix() {
 set_mix() {
     local value=$1 operation=${2:-set} old base mode output failure_output temporary saved
     if [ "$operation" = set ]; then
-        [ "$value" = auto ] || valid_mix "$value" || die 'mix must be auto or an integer from 0 to 100'
+        [ "$value" = auto ] || valid_mix "$value" || die 'mix must be auto or an integer from 0 to 200'
     else
         [[ $value =~ ^[+-]?(0|[1-9][0-9]{0,2})$ ]] ||
             die 'step must be an integer from -999 to 999'
@@ -644,7 +644,7 @@ set_mix() {
         [ "$base" != auto ] || base=0
         value=$(( base + value ))
         (( value < 0 )) && value=0
-        (( value > 100 )) && value=100
+        (( value > 200 )) && value=200
     fi
     if [ -f "$MODE_FILE" ]; then
         mode=$(<"$MODE_FILE")
@@ -721,7 +721,7 @@ mix_slider() {
     original=$initial
     [ "$initial" != auto ] || initial=0
     set +e
-    zenity --scale --min-value=0 --max-value=100 --step=1 --print-partial \
+    zenity --scale --min-value=0 --max-value=200 --step=1 --print-partial \
         --value="$initial" --title='iD14 SR mix' |
         while IFS= read -r value; do
             valid_mix "$value" || continue
@@ -746,7 +746,7 @@ case "${1:-status}" in
     mix)
         case "${2:-get}" in
             get) read_mix ;;
-            set) [ "$#" -eq 3 ] || die 'usage: id14-sr mix set 0..100|auto'; set_mix "$3" ;;
+            set) [ "$#" -eq 3 ] || die 'usage: id14-sr mix set 0..200|auto'; set_mix "$3" ;;
             auto) [ "$#" -eq 2 ] || die 'usage: id14-sr mix auto'; set_mix auto ;;
             step) [ "$#" -eq 3 ] || die 'usage: id14-sr mix step +/-N'; set_mix "$3" step ;;
             bar) mix_bar ;;

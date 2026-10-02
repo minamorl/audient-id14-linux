@@ -20,6 +20,7 @@ const INPUT: usize = POOLED * CONTEXT;
 const HIDDEN: usize = 256;
 const BINS: usize = HIGH_END - HIGH_START;
 const OUT: usize = BINS;
+const LIMITER_RELEASE_PER_CHUNK: f32 = 0.1;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Bandwidth {
@@ -144,6 +145,8 @@ pub struct StreamingSr {
     feature_history: [[f32; INPUT]; CHANNELS],
     overlap: [[f32; WINDOW]; CHANNELS],
     window: [f32; WINDOW],
+    peak_guard_chunks: usize,
+    limiter_gain: f32,
 }
 
 impl Default for StreamingSr {
@@ -174,6 +177,8 @@ impl StreamingSr {
             feature_history: [[0.0; INPUT]; CHANNELS],
             overlap: [[0.0; WINDOW]; CHANNELS],
             window,
+            peak_guard_chunks: 0,
+            limiter_gain: 1.0,
         }
     }
 
@@ -196,7 +201,8 @@ impl StreamingSr {
     /// Process one chunk with a continuously variable completion mix.
     ///
     /// A mix of `0.0` is the fixed-delay bypass and `1.0` is equivalent to
-    /// `process(..., true, Bandwidth::BandLimited)`. Values outside that range
+    /// `process(..., true, Bandwidth::BandLimited)`. Values up to `2.0`
+    /// extrapolate the completed high band. Values outside `0.0..=2.0`
     /// and non-finite values are clamped to a safe bypass/completion range.
     pub fn process_with_mix(
         &mut self,
@@ -208,10 +214,13 @@ impl StreamingSr {
             return Err(ProcessError::WrongChunkSize);
         }
         let completion_mix = if completion_mix.is_finite() {
-            completion_mix.clamp(0.0, 1.0)
+            completion_mix.clamp(0.0, 2.0)
         } else {
             0.0
         };
+        if completion_mix > 1.0 {
+            self.peak_guard_chunks = (WINDOW - CHUNK_FRAMES) / CHUNK_FRAMES;
+        }
         for channel in 0..CHANNELS {
             self.history[channel].copy_within(CHUNK_FRAMES..WINDOW, 0);
             for frame in 0..CHUNK_FRAMES {
@@ -230,11 +239,39 @@ impl StreamingSr {
                 self.overlap[channel][i] +=
                     self.spectrum[i].re * self.window[i] / (WINDOW as f32 * 1.5);
             }
+        }
+        // The current output chunk is already buffered. One gain for both
+        // channels preserves the waveform and stereo balance without flat tops.
+        let protect_peak =
+            completion_mix > 1.0 || self.peak_guard_chunks > 0 || self.limiter_gain < 1.0;
+        if protect_peak {
+            let peak = self
+                .overlap
+                .iter()
+                .flat_map(|channel| &channel[..CHUNK_FRAMES])
+                .fold(0.0_f32, |peak, sample| peak.max(sample.abs()));
+            let safe_gain = if peak > 1.0 {
+                (1.0 - f32::EPSILON) / peak
+            } else {
+                1.0
+            };
+            self.limiter_gain =
+                safe_gain.min((self.limiter_gain + LIMITER_RELEASE_PER_CHUNK).min(1.0));
+        }
+        for channel in 0..CHANNELS {
             for frame in 0..CHUNK_FRAMES {
-                output[frame * CHANNELS + channel] = self.overlap[channel][frame];
+                let sample = self.overlap[channel][frame];
+                output[frame * CHANNELS + channel] = if protect_peak {
+                    sample * self.limiter_gain
+                } else {
+                    sample
+                };
             }
             self.overlap[channel].copy_within(CHUNK_FRAMES..WINDOW, 0);
             self.overlap[channel][WINDOW - CHUNK_FRAMES..].fill(0.0);
+        }
+        if completion_mix <= 1.0 {
+            self.peak_guard_chunks = self.peak_guard_chunks.saturating_sub(1);
         }
         Ok(())
     }
@@ -503,5 +540,68 @@ mod tests {
             assert_eq!(a, b);
             assert_eq!(c, d);
         }
+    }
+
+    #[test]
+    fn peak_guard_covers_the_overlap_tail_after_leaving_boosted_mix() {
+        let mut engine = StreamingSr::new();
+        let mut output = [0.0; CHUNK_FRAMES * CHANNELS];
+        for chunk in 0..8 {
+            let input: [f32; CHUNK_FRAMES * CHANNELS] = std::array::from_fn(|index| {
+                let frame = chunk * CHUNK_FRAMES + index / CHANNELS;
+                (2.0 * PI * 3_000.0 * frame as f32 / SAMPLE_RATE as f32).sin() * 8.0
+            });
+            engine.process_with_mix(&input, &mut output, 2.0).unwrap();
+            assert!(output.iter().all(|sample| sample.abs() <= 1.0));
+        }
+        for _ in 0..3 {
+            engine
+                .process_with_mix(&[0.0; CHUNK_FRAMES * CHANNELS], &mut output, 0.0)
+                .unwrap();
+            assert!(output.iter().all(|sample| sample.abs() <= 1.0));
+        }
+    }
+
+    #[test]
+    fn boosted_high_level_transient_is_limited_without_flat_topping() {
+        let mut engine = StreamingSr::new();
+        let mut output = [0.0; CHUNK_FRAMES * CHANNELS];
+        let mut gain_reduction_seen = false;
+        let mut loud_samples = 0;
+        let mut flat_triples = 0;
+        let mut peak = 0.0_f32;
+        for chunk in 0..12 {
+            let input: [f32; CHUNK_FRAMES * CHANNELS] = std::array::from_fn(|index| {
+                if chunk == 1 {
+                    (2.0 * PI * 3_000.0 * (index / CHANNELS) as f32 / SAMPLE_RATE as f32).sin()
+                        * 8.0
+                } else {
+                    0.0
+                }
+            });
+            engine.process_with_mix(&input, &mut output, 2.0).unwrap();
+            gain_reduction_seen |= engine.limiter_gain < 0.99;
+            assert!(output.iter().all(|sample| sample.abs() <= 1.0));
+            let left = output.iter().step_by(CHANNELS).copied().collect::<Vec<_>>();
+            for sample in &left {
+                peak = peak.max(sample.abs());
+                loud_samples += usize::from(sample.abs() > 0.8);
+            }
+            flat_triples += left
+                .windows(3)
+                .filter(|samples| {
+                    samples.iter().all(|sample| sample.abs() > 0.8)
+                        && (samples[0] - samples[1]).abs() < 1e-6
+                        && (samples[1] - samples[2]).abs() < 1e-6
+                })
+                .count();
+        }
+        println!(
+            "transient_peak={peak:.9} loud_samples={loud_samples} flat_triples={flat_triples} gain_reduction_seen={gain_reduction_seen}"
+        );
+        assert!(gain_reduction_seen);
+        assert!(loud_samples > 10, "transient must exercise the limiter");
+        assert!(peak > 0.9 && peak < 1.0, "peak={peak}");
+        assert_eq!(flat_triples, 0, "limiter must not flatten the transient");
     }
 }

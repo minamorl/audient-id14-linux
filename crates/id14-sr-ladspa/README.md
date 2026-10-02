@@ -66,19 +66,25 @@ id14-sr off
 
 The playback mix is adjustable while `on` without stopping the filter or
 changing the Line/Headphones routes. The default `auto` uses the existing
-conservative bandwidth detector. A manual integer percentage from 0 to 100
+conservative bandwidth detector. A manual integer percentage from 0 to 200
 directly controls restoration even on full-band material: `0` reaches the
 engine's fixed-delay bypass after a short ramp (and starts in bypass if set
-before `on`); `100` is full restoration. Changes ramp over about 53 ms. The
+before `on`); `100` is full restoration, and `101`–`200` extrapolates the
+completed high band for a stronger effect. Above `100`, a shared stereo gain
+limits each buffered chunk to full scale without clipping sample peaks. Gain
+releases gradually, including the overlap tail after reducing the mix;
+steady `0`–`100` retains its previous DSP behavior. Changes
+ramp at 10 percentage points per 256-frame chunk. The
 setting survives `off`, `on`, and service restarts. On upgrade, an absent mix
 file or a numeric file from the earlier detector-scaled implementation stays
 `auto` until a new manual value is set.
 
 ```sh
-id14-sr mix get          # prints auto or one integer, 0..100
+id14-sr mix get          # prints auto or one integer, 0..200
 id14-sr mix set 35       # applies to every enabled iD14 output
+id14-sr mix set 150      # stronger restoration, including full-band music
 id14-sr mix auto         # restores conservative bandwidth detection
-id14-sr mix step +5      # clamps at 100; -5 clamps at 0
+id14-sr mix step +5      # clamps at 200; -5 clamps at 0
 id14-sr mix bar          # Waybar JSON: text, tooltip, class, percentage, mode
 id14-sr mix slider       # optional Zenity slider, applies while dragging
 ```
