@@ -564,7 +564,7 @@ mod tests {
     }
 
     #[test]
-    fn manual_mix_restores_fullband_input_even_when_detector_bypasses() {
+    fn manual_mix_protects_recorded_fullband_highs() {
         let mut automatic = Adapter::new(SAMPLE_RATE);
         let mut bypass = Adapter::new(SAMPLE_RATE);
         let mut twenty = Adapter::new(SAMPLE_RATE);
@@ -618,6 +618,12 @@ mod tests {
                     difference_two_hundred +=
                         (two_hundred_l[frame] - hundred_l[frame]).abs() as f64;
                     assert!((auto_l[frame] - zero_l[frame]).abs() < 1e-5);
+                    assert!((twenty_l[frame] - zero_l[frame]).abs() < 1e-4);
+                    assert!((hundred_l[frame] - zero_l[frame]).abs() < 1e-4);
+                    assert!((two_hundred_l[frame] - zero_l[frame]).abs() < 1e-4);
+                    assert!((twenty_l[frame] - twenty_r[frame]).abs() < 1e-6);
+                    assert!((hundred_l[frame] - hundred_r[frame]).abs() < 1e-6);
+                    assert!((two_hundred_l[frame] - two_hundred_r[frame]).abs() < 1e-6);
                     assert!(two_hundred_l[frame].abs() <= 1.0);
                 }
             }
@@ -626,15 +632,81 @@ mod tests {
             "fullband_ratio={fullband_ratio:.6} diff_20={difference_twenty:.6} diff_100={difference_hundred:.6} diff_200_vs_100={difference_two_hundred:.6}"
         );
         assert!(automatic.completion_mix() < 0.01);
-        assert!(difference_twenty > 0.01, "diff at 20%: {difference_twenty}");
         assert!(
-            difference_hundred > difference_twenty * 2.0,
-            "20%={difference_twenty}, 100%={difference_hundred}"
+            difference_twenty < 0.001,
+            "diff at 20%: {difference_twenty}"
         );
+        assert!(
+            difference_hundred < 0.001,
+            "diff at 100%: {difference_hundred}"
+        );
+        assert!(
+            difference_two_hundred < 0.001,
+            "diff at 200%: {difference_two_hundred}"
+        );
+        assert!(hundred.user_mix >= 0.99);
+        assert!(two_hundred.user_mix >= 1.99);
+    }
+
+    #[test]
+    fn manual_mix_remains_effective_on_bandlimited_input() {
+        let mut bypass = Adapter::new(SAMPLE_RATE);
+        let mut twenty = Adapter::new(SAMPLE_RATE);
+        let mut hundred = Adapter::new(SAMPLE_RATE);
+        let mut two_hundred = Adapter::new(SAMPLE_RATE);
+        let mut difference_twenty = 0.0_f64;
+        let mut difference_hundred = 0.0_f64;
+        let mut difference_two_hundred = 0.0_f64;
+        for chunk in 0..23 {
+            let signal: [f32; CHUNK_FRAMES] = std::array::from_fn(|frame| {
+                let index = chunk * CHUNK_FRAMES + frame;
+                (2.0 * PI * 2_000.0 * index as f32 / SAMPLE_RATE as f32).sin() * 0.25
+                    + (2.0 * PI * 4_000.0 * index as f32 / SAMPLE_RATE as f32).sin() * 0.2
+                    + (2.0 * PI * 6_000.0 * index as f32 / SAMPLE_RATE as f32).sin() * 0.15
+                    + (2.0 * PI * 9_000.0 * index as f32 / SAMPLE_RATE as f32).sin() * 0.1
+                    + (2.0 * PI * 11_000.0 * index as f32 / SAMPLE_RATE as f32).sin() * 0.05
+            });
+            let mut zero_l = [0.0; CHUNK_FRAMES];
+            let mut zero_r = [0.0; CHUNK_FRAMES];
+            let mut twenty_l = [0.0; CHUNK_FRAMES];
+            let mut twenty_r = [0.0; CHUNK_FRAMES];
+            let mut hundred_l = [0.0; CHUNK_FRAMES];
+            let mut hundred_r = [0.0; CHUNK_FRAMES];
+            let mut two_hundred_l = [0.0; CHUNK_FRAMES];
+            let mut two_hundred_r = [0.0; CHUNK_FRAMES];
+            bypass.process_with_user_mix(&signal, &signal, &mut zero_l, &mut zero_r, 0.0);
+            twenty.process_with_user_mix(&signal, &signal, &mut twenty_l, &mut twenty_r, 20.0);
+            hundred.process_with_user_mix(&signal, &signal, &mut hundred_l, &mut hundred_r, 100.0);
+            two_hundred.process_with_user_mix(
+                &signal,
+                &signal,
+                &mut two_hundred_l,
+                &mut two_hundred_r,
+                200.0,
+            );
+            if chunk >= 12 {
+                for frame in 0..CHUNK_FRAMES {
+                    difference_twenty += (twenty_l[frame] - zero_l[frame]).abs() as f64;
+                    difference_hundred += (hundred_l[frame] - zero_l[frame]).abs() as f64;
+                    difference_two_hundred +=
+                        (two_hundred_l[frame] - hundred_l[frame]).abs() as f64;
+                    assert!((hundred_l[frame] - hundred_r[frame]).abs() < 1e-6);
+                    assert!(two_hundred_l[frame].abs() <= 1.0);
+                    assert!(two_hundred_r[frame].abs() <= 1.0);
+                }
+            }
+        }
+        println!("bandlimited diff_20={difference_twenty:.6} diff_100={difference_hundred:.6} diff_200_vs_100={difference_two_hundred:.6}");
+        assert!(
+            difference_twenty > 0.01,
+            "20% should restore missing highband"
+        );
+        assert!(difference_hundred > difference_twenty * 2.0);
         assert!(
             difference_two_hundred > 0.01,
-            "200% must change fullband output beyond 100%: {difference_two_hundred}"
+            "200% should exceed 100% restoration"
         );
+        assert!(two_hundred.user_mix >= 1.99);
     }
 
     #[test]

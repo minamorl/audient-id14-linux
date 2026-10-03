@@ -67,14 +67,16 @@ id14-sr off
 The playback mix is adjustable while `on` without stopping the filter or
 changing the Line/Headphones routes. The default `auto` uses the existing
 conservative bandwidth detector. A manual integer percentage from 0 to 200
-directly controls restoration even on full-band material: `0` reaches the
-engine's fixed-delay bypass after a short ramp (and starts in bypass if set
-before `on`); `100` is full restoration, and `101`–`200` extrapolates the
-completed high band for a stronger effect. Above `100`, a shared stereo gain
-limits each buffered chunk to full scale without clipping sample peaks. Gain
-releases gradually, including the overlap tail after reducing the mix;
-steady `0`–`100` retains its previous DSP behavior. Changes
-ramp at 10 percentage points per 256-frame chunk. The
+requests restoration strength: `0` reaches the engine's fixed-delay bypass
+after a short ramp (and starts in bypass if set before `on`); `100` requests
+normal restoration, and `101`–`200` requests a stronger effect on material
+with missing high frequencies. The engine protects recorded high frequencies
+even under a manual setting, so the audible effect can be much smaller on
+full-band music. It preserves existing highband samples and suppresses new
+highband energy when the source already contains it. At every active mix,
+a shared stereo gain limits buffered peaks to full scale, including the
+overlap tail after reducing mix. Steady `0` preserves its fixed-delay source
+output. Changes ramp at 10 percentage points per 256-frame chunk. The
 setting survives `off`, `on`, and service restarts. On upgrade, an absent mix
 file or a numeric file from the earlier detector-scaled implementation stays
 `auto` until a new manual value is set.
@@ -82,7 +84,7 @@ file or a numeric file from the earlier detector-scaled implementation stays
 ```sh
 id14-sr mix get          # prints auto or one integer, 0..200
 id14-sr mix set 35       # applies to every enabled iD14 output
-id14-sr mix set 150      # stronger restoration, including full-band music
+id14-sr mix set 150      # stronger restoration when high frequencies are missing
 id14-sr mix auto         # restores conservative bandwidth detection
 id14-sr mix step +5      # clamps at 200; -5 clamps at 0
 id14-sr mix bar          # Waybar JSON: text, tooltip, class, percentage, mode
@@ -92,7 +94,9 @@ id14-sr mix slider       # optional Zenity slider, applies while dragging
 For UI clients, `mix get` is the literal `auto` or an integer line. `status`
 includes `mix=auto` or `mix=N`. `mix bar` returns one JSON object with `mode`
 (`auto` or `manual`), `class` (`on`, `off`, or `degraded`), and `percentage`
-(`0` in auto mode, otherwise `N`), alongside `text` and `tooltip`.
+(`0` in auto mode, otherwise `N`), alongside `text` and `tooltip`. The displayed
+percentage is the requested setting, not a measurement of effective restoration;
+existing source high frequencies may reduce the audible effect.
 
 For Hyprland Waybar, an example custom module is:
 

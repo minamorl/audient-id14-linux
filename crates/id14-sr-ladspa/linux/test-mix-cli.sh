@@ -69,7 +69,7 @@ printf '100\n' >"$state/mix"
 [ "$("$cli" mix step +25)" = 25 ]
 [ "$("$cli" mix step -999)" = 0 ]
 [ "$("$cli" mix step +999)" = 200 ]
-"$cli" mix bar | jq -e '.class == "off" and .mode == "manual" and .percentage == 200 and .text == "SR 200%"' >/dev/null
+"$cli" mix bar | jq -e '.class == "off" and .mode == "manual" and .percentage == 200 and .text == "SR 200%" and (.tooltip | contains("requested manual mix 200%") and contains("existing high band protected"))' >/dev/null
 [ "$("$cli" mix step -100)" = 100 ]
 [ "$("$cli" mix set 101)" = 101 ]
 [ "$("$cli" mix set 200)" = 200 ]

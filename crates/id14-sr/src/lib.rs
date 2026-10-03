@@ -147,6 +147,9 @@ pub struct StreamingSr {
     window: [f32; WINDOW],
     peak_guard_chunks: usize,
     limiter_gain: f32,
+    source_presence: [f32; CHANNELS],
+    first_spectrum: [Complex32; WINDOW],
+    stereo_reference: [[Complex32; HIGH_END - HIGH_START]; CHANNELS],
 }
 
 impl Default for StreamingSr {
@@ -179,6 +182,9 @@ impl StreamingSr {
             window,
             peak_guard_chunks: 0,
             limiter_gain: 1.0,
+            source_presence: [0.0; CHANNELS],
+            first_spectrum: [Complex32::new(0.0, 0.0); WINDOW],
+            stereo_reference: [[Complex32::new(0.0, 0.0); HIGH_END - HIGH_START]; CHANNELS],
         }
     }
 
@@ -218,7 +224,7 @@ impl StreamingSr {
         } else {
             0.0
         };
-        if completion_mix > 1.0 {
+        if completion_mix > 0.0 {
             self.peak_guard_chunks = (WINDOW - CHUNK_FRAMES) / CHUNK_FRAMES;
         }
         for channel in 0..CHANNELS {
@@ -232,6 +238,19 @@ impl StreamingSr {
             }
             self.forward
                 .process_with_scratch(&mut self.spectrum, &mut self.forward_scratch);
+            for (index, bin) in (HIGH_START..HIGH_END).enumerate() {
+                let source = (bin / 2).max(1);
+                self.stereo_reference[channel][index] = if bin % 2 == 1 {
+                    (self.spectrum[source] + self.spectrum[source + 1]) * 0.5
+                } else {
+                    self.spectrum[source]
+                };
+            }
+            if channel == 0 {
+                self.first_spectrum.copy_from_slice(&self.spectrum);
+                continue;
+            }
+
             self.complete_high_band(channel, completion_mix);
             self.inverse
                 .process_with_scratch(&mut self.spectrum, &mut self.inverse_scratch);
@@ -242,8 +261,15 @@ impl StreamingSr {
         }
         // The current output chunk is already buffered. One gain for both
         // channels preserves the waveform and stereo balance without flat tops.
+        self.spectrum.copy_from_slice(&self.first_spectrum);
+        self.complete_high_band(0, completion_mix);
+        self.inverse
+            .process_with_scratch(&mut self.spectrum, &mut self.inverse_scratch);
+        for i in 0..WINDOW {
+            self.overlap[0][i] += self.spectrum[i].re * self.window[i] / (WINDOW as f32 * 1.5);
+        }
         let protect_peak =
-            completion_mix > 1.0 || self.peak_guard_chunks > 0 || self.limiter_gain < 1.0;
+            completion_mix > 0.0 || self.peak_guard_chunks > 0 || self.limiter_gain < 1.0;
         if protect_peak {
             let peak = self
                 .overlap
@@ -270,7 +296,7 @@ impl StreamingSr {
             self.overlap[channel].copy_within(CHUNK_FRAMES..WINDOW, 0);
             self.overlap[channel][WINDOW - CHUNK_FRAMES..].fill(0.0);
         }
-        if completion_mix <= 1.0 {
+        if completion_mix == 0.0 {
             self.peak_guard_chunks = self.peak_guard_chunks.saturating_sub(1);
         }
         Ok(())
@@ -290,6 +316,30 @@ impl StreamingSr {
             let second = (self.spectrum[2 + 2 * pooled].norm() / scale).ln_1p();
             self.feature_history[channel][INPUT - POOLED + pooled] = 0.5 * (first + second);
         }
+        // Update source presence even at 0% so enabling completion after a
+        // bypass period starts with the current source's highband state.
+        let near_power: f32 = (HIGH_START..342)
+            .map(|bin| self.spectrum[bin].norm_sqr())
+            .sum();
+        let far_power: f32 = (342..HIGH_END)
+            .map(|bin| self.spectrum[bin].norm_sqr())
+            .sum();
+        let low_power: f32 = (1..HIGH_START)
+            .map(|bin| self.spectrum[bin].norm_sqr())
+            .sum();
+        let near = (near_power / 85.0).sqrt();
+        let far = (far_power / 85.0).sqrt();
+        let low = (low_power / 256.0).sqrt();
+        let far_near = far / (near + 1e-6);
+        let high_low = ((near_power + far_power) / 170.0).sqrt() / (low + 1e-6);
+        let detected = ((far_near - 0.06) / 0.06).clamp(0.0, 1.0)
+            * ((high_low - 0.00001) / 0.00003).clamp(0.0, 1.0);
+        let smoothing = if detected > self.source_presence[channel] {
+            0.75
+        } else {
+            0.10
+        };
+        self.source_presence[channel] += smoothing * (detected - self.source_presence[channel]);
         if completion_mix <= 0.0 || original_scale < 0.0001 {
             return;
         }
@@ -314,6 +364,7 @@ impl StreamingSr {
             1.0
         };
         let gain = energy_gain.min(peak_gain);
+        let effective_mix = completion_mix * (1.0 - self.source_presence[channel]);
         for (index, bin) in (HIGH_START..HIGH_END).enumerate() {
             let source = (bin / 2).max(1);
             let reference = if bin % 2 == 1 {
@@ -322,12 +373,24 @@ impl StreamingSr {
                 self.spectrum[source]
             };
             let basis = if reference.norm() > 1e-6 {
-                Complex32::from_polar(1.0, reference.arg() * 2.0)
+                let carrier = self.stereo_reference[0][index] + self.stereo_reference[1][index];
+                let carrier_angle = if carrier.norm() > 1e-6 {
+                    carrier.arg()
+                } else {
+                    0.0
+                };
+                // Shared carrier contributes one phase turn; each channel
+                // contributes its own offset once. This preserves the low
+                // band's left/right phase difference instead of doubling it.
+                Complex32::from_polar(1.0, reference.arg() + carrier_angle)
             } else {
                 Complex32::new(1.0, 0.0)
             };
             let generated = basis * (magnitudes[index] * gain);
-            let value = self.spectrum[bin] * (1.0 - completion_mix) + generated * completion_mix;
+            // Keep recorded high-band content. Only synthesize the magnitude
+            // that is missing relative to the model's prediction.
+            let missing_magnitude = (generated.norm() - self.spectrum[bin].norm()).max(0.0);
+            let value = self.spectrum[bin] + basis * (missing_magnitude * effective_mix);
             self.spectrum[bin] = value;
             self.spectrum[WINDOW - bin] = value.conj();
         }
@@ -603,5 +666,123 @@ mod tests {
         assert!(loud_samples > 10, "transient must exercise the limiter");
         assert!(peak > 0.9 && peak < 1.0, "peak={peak}");
         assert_eq!(flat_triples, 0, "limiter must not flatten the transient");
+    }
+}
+
+#[cfg(test)]
+mod source_safety_regression_tests {
+    use super::StreamingSr;
+    use std::f32::consts::PI;
+
+    const FRAMES: usize = 256;
+    const STEREO: usize = 2;
+    const DELAY: usize = 768;
+    const RATE: f32 = 48_000.0;
+
+    fn tone(hz: f32, frame: usize, phase: f32) -> f32 {
+        (2.0 * PI * hz * frame as f32 / RATE + phase).sin()
+    }
+
+    #[test]
+    fn fullband_after_long_zero_mix_preserves_aligned_source_at_transition() {
+        let mut engine = StreamingSr::new();
+        let mut input_trace = Vec::new();
+        let mut output_trace = Vec::new();
+        for chunk in 0..48 {
+            let input: [f32; FRAMES * STEREO] = std::array::from_fn(|sample| {
+                let frame = chunk * FRAMES + sample / STEREO;
+                let channel = sample % STEREO;
+                let phase = if channel == 0 { 0.0 } else { 0.37 };
+                0.2 * tone(3_000.0, frame, phase) + 0.035 * tone(16_000.0, frame, phase + 0.21)
+            });
+            let mut output = [0.0; FRAMES * STEREO];
+            let mix = if chunk < 32 { 0.0 } else { 1.0 };
+            engine.process_with_mix(&input, &mut output, mix).unwrap();
+            input_trace.extend_from_slice(&input);
+            output_trace.extend_from_slice(&output);
+        }
+        let mut zero_error = 0.0_f32;
+        let mut transition_error = 0.0_f32;
+        for frame in 6 * FRAMES..41 * FRAMES {
+            for channel in 0..STEREO {
+                let actual = output_trace[frame * STEREO + channel];
+                let source = input_trace[(frame - DELAY) * STEREO + channel];
+                let error = (actual - source).abs();
+                if frame < 32 * FRAMES {
+                    zero_error = zero_error.max(error);
+                } else {
+                    transition_error = transition_error.max(error);
+                }
+            }
+        }
+        assert!(zero_error < 1e-5, "fixed-delay 0% error: {zero_error}");
+        assert!(
+            transition_error < 1e-3,
+            "recorded high band changed at 0% to 100%: {transition_error}"
+        );
+    }
+
+    #[test]
+    fn bandlimited_stereo_completion_is_swap_symmetric_and_mono_stays_mono() {
+        let mut stereo = StreamingSr::new();
+        let mut swapped = StreamingSr::new();
+        let mut mono = StreamingSr::new();
+        let mut source = Vec::new();
+        let mut completed = Vec::new();
+        let mut max_swap_error = 0.0_f32;
+        let mut max_mono_error = 0.0_f32;
+        for chunk in 0..32 {
+            let input: [f32; FRAMES * STEREO] = std::array::from_fn(|sample| {
+                let frame = chunk * FRAMES + sample / STEREO;
+                if sample % STEREO == 0 {
+                    0.19 * tone(3_000.0, frame, 0.0)
+                        + 0.11 * tone(7_500.0, frame, 0.3)
+                        + 0.06 * tone(9_000.0, frame, 0.7)
+                } else {
+                    0.17 * tone(3_000.0, frame, 0.55)
+                        + 0.09 * tone(7_500.0, frame, 1.1)
+                        + 0.05 * tone(9_000.0, frame, 0.2)
+                }
+            });
+            let reversed: [f32; FRAMES * STEREO] = std::array::from_fn(|sample| input[sample ^ 1]);
+            let identical: [f32; FRAMES * STEREO] =
+                std::array::from_fn(|sample| input[sample & !1]);
+            let mut out = [0.0; FRAMES * STEREO];
+            let mut out_reversed = [0.0; FRAMES * STEREO];
+            let mut out_identical = [0.0; FRAMES * STEREO];
+            stereo.process_with_mix(&input, &mut out, 1.0).unwrap();
+            swapped
+                .process_with_mix(&reversed, &mut out_reversed, 1.0)
+                .unwrap();
+            mono.process_with_mix(&identical, &mut out_identical, 1.0)
+                .unwrap();
+            if chunk >= 6 {
+                for frame in 0..FRAMES {
+                    max_swap_error = max_swap_error
+                        .max((out[2 * frame] - out_reversed[2 * frame + 1]).abs())
+                        .max((out[2 * frame + 1] - out_reversed[2 * frame]).abs());
+                    max_mono_error = max_mono_error
+                        .max((out_identical[2 * frame] - out_identical[2 * frame + 1]).abs());
+                }
+            }
+            source.extend_from_slice(&input);
+            completed.extend_from_slice(&out);
+        }
+        let completion_change: f32 = (6 * FRAMES..32 * FRAMES)
+            .flat_map(|frame| (0..STEREO).map(move |channel| (frame, channel)))
+            .map(|(frame, channel)| {
+                (completed[frame * STEREO + channel] - source[(frame - DELAY) * STEREO + channel])
+                    .abs()
+            })
+            .sum();
+        assert!(
+            max_swap_error < 1e-5,
+            "channel-swap error: {max_swap_error}"
+        );
+        assert!(max_mono_error < 1e-6, "mono mismatch: {max_mono_error}");
+        assert!(
+            completion_change > 0.01,
+            "bandlimited completion inactive: {completion_change}"
+        );
     }
 }

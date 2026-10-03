@@ -706,7 +706,7 @@ mix_bar() {
         text='SR auto'; tooltip="iD14 SR: $state, automatic bandwidth detection"
         percentage=0; mode=auto
     else
-        text="SR $value%"; tooltip="iD14 SR: $state, manual mix $value%"
+        text="SR $value%"; tooltip="iD14 SR: $state, requested manual mix $value% (existing high band protected)"
         percentage=$value; mode=manual
     fi
     jq -nc --arg text "$text" --arg tooltip "$tooltip" --arg state "$state" \
