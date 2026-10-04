@@ -3,7 +3,7 @@ set -euo pipefail
 
 root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)
 cli=$root/crates/id14-sr-ladspa/linux/id14-sr
-fixture=$(mktemp -d "$root/.mix-test.XXXXXX")
+fixture=$(mktemp -d "$root/crates/id14-sr-ladspa/linux/.mix-test.XXXXXX")
 trap 'rm -rf "$fixture"' EXIT
 mkdir -p "$fixture/home" "$fixture/bin"
 export HOME=$fixture/home
