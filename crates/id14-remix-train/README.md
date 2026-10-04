@@ -17,12 +17,12 @@ four gains independently randomized from -6 to +6 dB.
 
 ## Data and legal boundary
 
-[`sources.json`](sources.json) records the primary official pages, licenses,
-archive hash where published, and intended use. MoisesDB is the preferred
-real-recorded training corpus and Slakh2100 is optional synthetic augmentation.
-MUSDB18-HQ is the held-out evaluator. Its current Zenodo record exposes the
-archive but explicitly declares a license agreement; this repository does not
-accept that agreement for the owner. Place owner-obtained corpora outside git.
+[`sources.json`](sources.json) records the primary official record, license,
+archive checksum, and intended use. The owner accepted the MUSDB18-HQ
+educational/non-commercial terms on 2026-10-05. Its train split is the only
+training corpus for this run and its test split is the held-out evaluator. The
+audio is not redistributed and every trained model remains private-use only.
+MoisesDB is explicitly excluded.
 
 HTDemucs and any other third-party separator may only produce an offline teacher
 or reference. Such weights are never loaded by `export.py`; `remix.onnx` contains
@@ -39,17 +39,54 @@ python3 -m venv .venv
 
 # One resumable variant. latest.pt is atomically replaced every 100 steps.
 .venv/bin/python -m remix_train.train \
-  --moises /path/to/moisesdb_v0.1 \
+  --musdb "$HOME/datasets/musdb18hq" \
   --size 131k --lookahead 2 --output runs
 
-# All six variants (131K/444K x Q=0/2/4), sequentially.
+# All six variants, with 131k-q2 first.
 PATH="$PWD/.venv/bin:$PATH" scripts/run_matrix.sh \
-  --moises /path/to/moisesdb_v0.1 runs
+  --musdb "$HOME/datasets/musdb18hq" runs
 ```
 
 Re-running the same command resumes `runs/SIZE-qQ/latest.pt`. Use `--fresh` only
 to intentionally discard the resume point. Each run keeps its exact discovered
 track manifest and append-only JSONL training log.
+
+## Mac background operation
+
+From a dedicated Mac worktree containing this directory, create the environment
+and verify MPS before training:
+
+```sh
+python3 -m venv .venv
+.venv/bin/pip install -e '.[test]'
+.venv/bin/python -c 'import torch; print(torch.__version__); print(torch.backends.mps.is_built(), torch.backends.mps.is_available())'
+```
+
+Start the resumable matrix under macOS power assertions. The outer shell PID is
+recorded in `runs/matrix.pid`, the active trainer PID in `runs/training.pid`,
+combined launcher output goes to `runs/matrix.log`, and each variant appends
+structured progress to `runs/SIZE-qQ/train.jsonl`.
+
+```sh
+mkdir -p runs
+nohup sh -c 'trap '\''kill "$child" 2>/dev/null; wait "$child" 2>/dev/null'\'' TERM INT; \
+  /usr/bin/caffeinate -dimsu scripts/run_matrix.sh --musdb "$HOME/datasets/musdb18hq" runs & \
+  child=$!; wait "$child"' >runs/matrix.log 2>&1 </dev/null &
+echo "$!" >runs/matrix.pid
+```
+
+Confirm the process and first loss records:
+
+```sh
+pid=$(cat runs/matrix.pid)
+kill -0 "$pid" && ps -p "$pid" -o pid=,ppid=,etime=,command=
+tail -n 5 runs/131k-q2/train.jsonl
+```
+
+Stop cleanly with `kill -TERM "$(cat runs/training.pid)"`. The trainer finishes
+its current step, atomically writes `latest.pt`, records a `stopped` event, and
+exits with code 143 so the matrix does not start the next variant. Re-running
+the start command resumes existing checkpoints; it does not erase logs.
 
 ## Export and verification
 
@@ -59,7 +96,7 @@ track manifest and append-only JSONL training log.
 .venv/bin/python -m remix_train.contract models/q2/remix.onnx
 .venv/bin/python -m remix_train.benchmark models/q2/remix.onnx
 .venv/bin/python -m remix_train.evaluate models/q2/remix.onnx \
-  --musdb /path/to/MUSDB18-HQ --output runs/131k-q2/musdb-test.json
+  --musdb "$HOME/datasets/musdb18hq" --output runs/131k-q2/musdb-test.json
 ```
 
 Render the requested voice +3 dB / other -3 dB filter form, then compare with

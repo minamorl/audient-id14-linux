@@ -6,6 +6,7 @@ import argparse
 import json
 import os
 import random
+import signal
 import time
 from pathlib import Path
 
@@ -44,7 +45,8 @@ def train(args: argparse.Namespace) -> None:
         tracks += discover_moises(root)
     for root in args.slakh:
         tracks += [track for track in discover_slakh(root) if track.split == "train"]
-    # MUSDB train may be used after the owner completes its access agreement.
+    # Owner consent for private educational/non-commercial MUSDB18-HQ use was
+    # recorded on 2026-10-05; only its train split enters optimization.
     for root in args.musdb:
         tracks += [track for track in discover_musdb(root) if track.split == "train"]
     run = args.output / f"{args.size}-q{args.lookahead}"
@@ -63,6 +65,30 @@ def train(args: argparse.Namespace) -> None:
         scheduler.load_state_dict(saved["scheduler"])
         start_step = int(saved["step"])
     log = (run / "train.jsonl").open("a", buffering=1)
+    stop_requested = False
+
+    def request_stop(_signum, _frame):
+        nonlocal stop_requested
+        stop_requested = True
+
+    signal.signal(signal.SIGTERM, request_stop)
+    signal.signal(signal.SIGINT, request_stop)
+
+    def save_checkpoint(step: int) -> None:
+        temporary = run / "latest.pt.tmp"
+        torch.save(
+            {
+                "model": model.state_dict(),
+                "optimizer": optimizer.state_dict(),
+                "scheduler": scheduler.state_dict(),
+                "step": step,
+                "size": args.size,
+                "lookahead": args.lookahead,
+            },
+            temporary,
+        )
+        os.replace(temporary, checkpoint)
+
     for step in range(start_step + 1, args.steps + 1):
         before = time.perf_counter()
         mixture, sources = sampler.sample(args.batch)
@@ -98,20 +124,13 @@ def train(args: argparse.Namespace) -> None:
         }
         print(json.dumps(row), flush=True)
         print(json.dumps(row), file=log)
-        if step % args.save_every == 0 or step == args.steps:
-            temporary = run / "latest.pt.tmp"
-            torch.save(
-                {
-                    "model": model.state_dict(),
-                    "optimizer": optimizer.state_dict(),
-                    "scheduler": scheduler.state_dict(),
-                    "step": step,
-                    "size": args.size,
-                    "lookahead": args.lookahead,
-                },
-                temporary,
-            )
-            os.replace(temporary, checkpoint)
+        if step % args.save_every == 0 or step == args.steps or stop_requested:
+            save_checkpoint(step)
+        if stop_requested:
+            stopped = {"event": "stopped", "step": step, "checkpoint": str(checkpoint)}
+            print(json.dumps(stopped), flush=True)
+            print(json.dumps(stopped), file=log)
+            raise SystemExit(143)
 
 
 def parser() -> argparse.ArgumentParser:
