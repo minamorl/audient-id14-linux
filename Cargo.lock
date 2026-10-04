@@ -137,6 +137,10 @@ name = "id14-protocol"
 version = "0.1.0"
 
 [[package]]
+name = "id14-remix-train"
+version = "0.1.0"
+
+[[package]]
 name = "id14-sr"
 version = "0.1.0"
 dependencies = [

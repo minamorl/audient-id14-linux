@@ -1,0 +1,30 @@
+{
+  "recorded_training_candidate": {
+    "name": "MoisesDB",
+    "official": "https://github.com/moises-ai/moises-db",
+    "download_page": "https://music.ai/research/",
+    "license": "CC BY-NC-SA 4.0",
+    "archive_sha256": "4cde33ce416ac7c868cffcb60eb31f5c741ab7ae5601cbb9d99ed498b72c48c1",
+    "use": "private non-commercial training; do not redistribute source audio"
+  },
+  "synthetic_training_candidate": {
+    "name": "Slakh2100",
+    "official": "http://www.slakh.com/",
+    "source_repository": "https://github.com/ethman/slakh-generation",
+    "license": "CC BY 4.0",
+    "use": "supplement only; not real-recorded audio and therefore insufficient alone for the pin"
+  },
+  "evaluation": {
+    "name": "MUSDB18-HQ",
+    "official_record": "https://zenodo.org/records/3338373",
+    "official_tools": "https://github.com/sigsep/sigsep-mus-db",
+    "license": "other-nc; academic/non-commercial restrictions vary by included track",
+    "access": "the current Zenodo record exposes a direct file but declares a LICENSE AGREEMENT; this pipeline never accepts it for the owner",
+    "use": "official test split for frame-wise SDR after owner-supplied download"
+  },
+  "third_party_teacher_boundary": {
+    "allowed": "offline pseudo-label creation and B_mild reference only",
+    "forbidden": "third-party weights, graphs, or code embedded in remix.onnx",
+    "shipped_model": "only weights produced by this trainer"
+  }
+}

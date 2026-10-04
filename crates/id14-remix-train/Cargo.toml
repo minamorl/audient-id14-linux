@@ -1,0 +1,11 @@
+[package]
+name = "id14-remix-train"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Training and contract checks for the private remix-v1 separator"
+
+# The trainer is Python. This empty crate keeps workspace tooling and ownership explicit.
+[lib]
+path = "src/lib.rs"
+

@@ -5,4 +5,5 @@ members = [
     "crates/id14ctl",
     "crates/id14-sr",
     "crates/id14-sr-ladspa",
+    "crates/id14-remix-train",
 ]
