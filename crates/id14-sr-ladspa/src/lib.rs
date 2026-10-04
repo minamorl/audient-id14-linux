@@ -119,6 +119,7 @@ pub struct Adapter {
 }
 
 mod bass_guard;
+mod denormal_scope;
 
 impl Adapter {
     pub fn new(sample_rate: usize) -> Self {
@@ -152,6 +153,7 @@ impl Adapter {
         out_r: &mut [f32],
         requested_percent: f32,
     ) {
+        let _denormal_scope = denormal_scope::Scope::enter();
         let frames = left
             .len()
             .min(right.len())
