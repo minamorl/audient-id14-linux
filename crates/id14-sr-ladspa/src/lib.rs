@@ -115,7 +115,10 @@ pub struct Adapter {
     user_mix: f32,
     user_mix_initialized: bool,
     auto_last_chunk: bool,
+    bass_guard: bass_guard::BassGuard,
 }
+
+mod bass_guard;
 
 impl Adapter {
     pub fn new(sample_rate: usize) -> Self {
@@ -130,6 +133,7 @@ impl Adapter {
             user_mix: 0.0,
             user_mix_initialized: false,
             auto_last_chunk: true,
+            bass_guard: bass_guard::BassGuard::new(),
         }
     }
 
@@ -172,6 +176,14 @@ impl Adapter {
                 out_l[frame] = 0.0;
                 out_r[frame] = 0.0;
             }
+
+            let guarded = self.bass_guard.process(
+                [left[frame], right[frame]],
+                [out_l[frame], out_r[frame]],
+                self.user_mix.clamp(0.0, 1.0),
+            );
+            out_l[frame] = guarded[0];
+            out_r[frame] = guarded[1];
 
             self.input[self.input_frames * CHANNELS] = left[frame];
             self.input[self.input_frames * CHANNELS + 1] = right[frame];
