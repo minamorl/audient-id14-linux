@@ -548,6 +548,7 @@ enable() {
         while IFS= read -r output; do
             apply_mix_to_output "$output" "$(read_mix)" || die "could not restore mix on $output"
         done < <(outputs_for_mode "$mode")
+        systemctl --user enable "$SERVICE" || die 'could not enable SR for the next login'
         if [ "$recovered" -eq 1 ]; then
             printf 'on: requested=%s active_outputs=%s (metadata recovered)\n' \
                 "$mode" "$(outputs_for_mode "$mode" | paste -sd, -)"
