@@ -3,9 +3,11 @@ use crate::{
     dsp::{LATENCY, RATE},
     engine::{Controls, Engine, Status},
     model,
+    state::{Publisher, Telemetry},
 };
 use std::ffi::{c_char, c_int, c_ulong, c_void};
 use std::path::PathBuf;
+use std::sync::Arc;
 
 const PORTS: usize = 11;
 type Handle = *mut c_void;
@@ -102,25 +104,35 @@ struct Instance {
     rate: usize,
     path: Option<PathBuf>,
     has_run: bool,
+    telemetry: Arc<Telemetry>,
+    _publication: Publisher,
 }
-fn make_engine(rate: usize, path: Option<PathBuf>) -> Engine {
-    Engine::new(move || {
-        if rate != RATE {
-            return Err(Status::UnsupportedRate);
-        }
-        let path = path.ok_or(Status::ModelMissing)?;
-        Ok(Box::new(model::OnnxModel::load(&path)?))
-    })
+fn make_engine(rate: usize, path: Option<PathBuf>, telemetry: Arc<Telemetry>) -> Engine {
+    Engine::with_telemetry(
+        move || {
+            if rate != RATE {
+                return Err(Status::UnsupportedRate);
+            }
+            let path = path.ok_or(Status::ModelMissing)?;
+            Ok(Box::new(model::OnnxModel::load(&path)?))
+        },
+        telemetry,
+    )
 }
 unsafe extern "C" fn instantiate(_: *const Descriptor, rate: c_ulong) -> Handle {
     std::panic::catch_unwind(|| {
         let path = model::default_path();
+        let telemetry = Arc::new(Telemetry::new());
+        let engine = make_engine(rate as usize, path.clone(), telemetry.clone());
+        let publication = Publisher::start(telemetry.clone(), path.clone());
         Box::into_raw(Box::new(Instance {
-            engine: make_engine(rate as usize, path.clone()),
+            engine,
             ports: [std::ptr::null_mut(); PORTS],
             rate: rate as usize,
             path,
             has_run: false,
+            telemetry,
+            _publication: publication,
         })) as Handle
     })
     .unwrap_or(std::ptr::null_mut())
@@ -135,7 +147,12 @@ unsafe extern "C" fn connect(handle: Handle, port: c_ulong, data: *mut f32) {
 unsafe extern "C" fn activate(handle: Handle) {
     if let Some(instance) = (handle as *mut Instance).as_mut() {
         if instance.has_run {
-            instance.engine = make_engine(instance.rate, instance.path.clone());
+            instance.engine.stop_worker();
+            instance.engine = make_engine(
+                instance.rate,
+                instance.path.clone(),
+                instance.telemetry.clone(),
+            );
         }
         instance.has_run = false;
     }

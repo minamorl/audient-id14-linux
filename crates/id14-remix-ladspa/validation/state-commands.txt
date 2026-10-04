@@ -1,0 +1,18 @@
+$ bash crates/id14-remix-ladspa/tools/with_cargo.sh test --workspace > crates/id14-remix-ladspa/validation/state-workspace-test.log 2>&1
+EXIT=0
+
+$ bash crates/id14-remix-ladspa/tools/with_cargo.sh build --release -p id14-remix-ladspa > crates/id14-remix-ladspa/validation/state-release-build.log 2>&1
+EXIT=0
+
+$ PYTHONDONTWRITEBYTECODE=1 bash crates/id14-remix-ladspa/tools/with_python.sh crates/id14-remix-ladspa/tools/verify_state_so.py --so "$PWD/crates/id14-remix-ladspa/.build/target/release/libid14_remix_ladspa.so" > crates/id14-remix-ladspa/validation/state-so-output.txt 2>&1
+EXIT=0
+
+$ XDG_RUNTIME_DIR="$PWD/crates/id14-remix-ladspa/.build/regression-runtime" PYTHONDONTWRITEBYTECODE=1 bash crates/id14-remix-ladspa/tools/with_python.sh crates/id14-remix-ladspa/tools/verify_so.py --so "$PWD/crates/id14-remix-ladspa/.build/target/release/libid14_remix_ladspa.so" --output "$PWD/crates/id14-remix-ladspa/validation/state-regression-results.json" > crates/id14-remix-ladspa/validation/state-regression-output.txt 2>&1
+EXIT=0
+
+$ bash crates/id14-remix-ladspa/tools/with_cargo.sh fmt -p id14-remix-ladspa
+EXIT=101
+error: no such command: `fmt`
+
+$ XDG_CACHE_HOME="$PWD/crates/id14-remix-ladspa/.build/cache" TMPDIR="$PWD/crates/id14-remix-ladspa/.build/tmp" nix --option eval-cache false shell nixpkgs#rustfmt -c rustfmt --edition 2021 crates/id14-remix-ladspa/src/state.rs crates/id14-remix-ladspa/src/engine.rs crates/id14-remix-ladspa/src/ladspa.rs
+EXIT=0

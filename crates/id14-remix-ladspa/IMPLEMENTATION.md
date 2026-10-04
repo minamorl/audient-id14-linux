@@ -117,3 +117,31 @@ audio callback, and is not a user control. Re-activate to create a fresh worker.
 These checks cover the playback runtime. Training, CLI/bar, PipeWire graph setup,
 shipping a trained model, listening quality, and a 30-minute iD14 hardware/xrun
 run belong to their respective integration lanes and are not claimed here.
+# remix-state-v1 publication
+
+Each LADSPA instance owns a separate `id14-remix-state` worker. It writes
+`$XDG_RUNTIME_DIR/id14-sr/remix-state/<pid>-<instance>.json` via an exclusively
+created temporary file in the same directory followed by rename. Cleanup joins
+the publication worker, which removes its own file. Reactivation retains the
+instance number, filename and overload counter.
+
+The audio callback only updates a packed atomic status/counter. It performs no
+publication allocation, filesystem operation, lock or worker wakeup syscall.
+The publisher samples the latest status every 10 ms, coalescing shorter changes;
+overload entries are counted even if the corresponding status was shorter than
+the polling interval. `overloads` counts transitions into Overloaded, not audio
+samples or elapsed blocks. The unchanged-state heartbeat is no more frequent
+than once per second. `updated_unix_ms` is UTC Unix time of the write attempt.
+
+The publication worker is independent of inference so stalled/stopped inference
+does not prevent Overloaded from becoming visible. Missing/empty runtime env or
+filesystem errors are silent and do not affect the audio path. An unsuccessful
+write does not replace the last complete JSON; the next state change or heartbeat
+attempts a current snapshot. The `model` field is the configured model path (also
+when missing), or null when no path could be selected. For non-UTF-8 paths the
+published text uses replacement characters.
+
+`tools/verify_state_so.py` checks the actual shared object, including state changes,
+heartbeat, stopped inference, multiple instances, cleanup and bit-identical audio
+with absent/unusable/unwritable runtime directories. Follow-up evidence is in
+`validation/state-*.log`, `validation/state-*.txt` and `validation/state-REPORT.md`.

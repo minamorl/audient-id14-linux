@@ -17,6 +17,8 @@
 - https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.remez.html — reproducible minimax FIR design and response evaluation.
 - https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.resample_poly.html — independent 32x true-peak verification.
 - https://docs.rs/uuid/latest/uuid/struct.Uuid.html#method.now_v7 — UUIDv7 diagnostic correlation IDs.
+- https://doc.rust-lang.org/std/fs/fn.rename.html — same-directory replacement of the published state file on Unix.
+- https://doc.rust-lang.org/std/fs/struct.OpenOptions.html#method.create_new — atomic exclusive creation of the worker-owned temporary file.
 
 Read during this implementation run. These are external primary API sources, explicitly
 authorized by the caller. No existing target code or tests were read.

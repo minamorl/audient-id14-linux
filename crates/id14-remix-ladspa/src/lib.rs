@@ -6,5 +6,6 @@ mod guard_coefficients;
 pub mod ladspa;
 pub mod model;
 pub mod queue;
+mod state;
 #[cfg(test)]
 mod verification;

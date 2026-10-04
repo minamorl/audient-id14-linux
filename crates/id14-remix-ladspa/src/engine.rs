@@ -1,6 +1,7 @@
 use crate::dsp::*;
 use crate::queue::{channel, Consumer, Producer};
-use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+use crate::state::Telemetry;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::thread::{self, JoinHandle};
 use std::time::Duration;
@@ -28,13 +29,30 @@ pub enum Status {
     UnsupportedRate = 8,
 }
 impl Status {
-    fn from_u32(x: u32) -> Self {
+    pub(crate) fn from_u32(x: u32) -> Self {
         match x {
             0 => Self::Loading,
             1 => Self::Active,
+            2 => Self::Off,
+            3 => Self::ZeroAmounts,
             4 => Self::ModelMissing,
+            6 => Self::Overloaded,
+            7 => Self::PeakProtected,
             8 => Self::UnsupportedRate,
             _ => Self::ModelInvalid,
+        }
+    }
+    pub(crate) fn name(self) -> &'static str {
+        match self {
+            Self::Loading => "Loading",
+            Self::Active => "Active",
+            Self::Off => "Off",
+            Self::ZeroAmounts => "ZeroAmounts",
+            Self::ModelMissing => "ModelMissing",
+            Self::ModelInvalid => "ModelInvalid",
+            Self::Overloaded => "Overloaded",
+            Self::PeakProtected => "PeakProtected",
+            Self::UnsupportedRate => "UnsupportedRate",
         }
     }
 }
@@ -91,7 +109,7 @@ struct Spectrum {
 struct Shared {
     stop: AtomicBool,
     paused: AtomicBool,
-    state: AtomicU32,
+    telemetry: Arc<Telemetry>,
 }
 
 pub struct Engine {
@@ -127,12 +145,23 @@ impl Engine {
     where
         F: FnOnce() -> Result<Box<dyn SeparationModel>, Status> + Send + 'static,
     {
+        Self::with_telemetry(loader, Arc::new(Telemetry::new()))
+    }
+
+    pub(crate) fn with_telemetry<F>(loader: F, telemetry: Arc<Telemetry>) -> Self
+    where
+        F: FnOnce() -> Result<Box<dyn SeparationModel>, Status> + Send + 'static,
+    {
+        telemetry.update(Status::Loading);
+        telemetry
+            .model
+            .store(Status::Loading as u32, Ordering::Release);
         let (tx, mut jobs) = channel::<Features, 8>();
         let (mut results, rx) = channel::<Mask, 16>();
         let shared = Arc::new(Shared {
             stop: AtomicBool::new(false),
             paused: AtomicBool::new(false),
-            state: AtomicU32::new(Status::Loading as u32),
+            telemetry,
         });
         let state = shared.clone();
         let worker = thread::Builder::new()
@@ -142,17 +171,21 @@ impl Engine {
                     Ok(m) if m.lookahead() <= MAX_LOOKAHEAD => m,
                     Ok(_) => {
                         state
-                            .state
+                            .telemetry
+                            .model
                             .store(Status::ModelInvalid as u32, Ordering::Release);
                         return;
                     }
                     Err(e) => {
-                        state.state.store(e as u32, Ordering::Release);
+                        state.telemetry.model.store(e as u32, Ordering::Release);
                         return;
                     }
                 };
                 let q = model.lookahead() as u64;
-                state.state.store(Status::Active as u32, Ordering::Release);
+                state
+                    .telemetry
+                    .model
+                    .store(Status::Active as u32, Ordering::Release);
                 let mut previous = None;
                 let mut since_reset = 0_u64;
                 while !state.stop.load(Ordering::Acquire) {
@@ -175,7 +208,8 @@ impl Engine {
                         Ok(m) if valid_mask(&m) => m,
                         _ => {
                             state
-                                .state
+                                .telemetry
+                                .model
                                 .store(Status::ModelInvalid as u32, Ordering::Release);
                             break;
                         }
@@ -193,7 +227,8 @@ impl Engine {
             .ok();
         if worker.is_none() {
             shared
-                .state
+                .telemetry
+                .model
                 .store(Status::ModelInvalid as u32, Ordering::Release);
         }
         let kernel = std::array::from_fn(|phase| {
@@ -253,7 +288,7 @@ impl Engine {
         self.status
     }
     pub fn model_status(&self) -> Status {
-        Status::from_u32(self.shared.state.load(Ordering::Acquire))
+        Status::from_u32(self.shared.telemetry.model.load(Ordering::Acquire))
     }
     pub fn latency_frames(&self) -> usize {
         LATENCY
@@ -446,6 +481,7 @@ impl Engine {
         } else {
             Status::Active
         };
+        self.shared.telemetry.update(self.status);
         self.clock += 1;
         output
     }
