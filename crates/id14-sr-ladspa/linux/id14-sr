@@ -3,6 +3,16 @@ set -euo pipefail
 
 SERVICE=id14-sr-filter.service
 PLUGIN=${ID14_SR_PLUGIN:-"$HOME/.local/lib/ladspa/libid14_sr_ladspa.so"}
+
+id14_remix() {
+    python3 "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/id14-remix.py" "$@"
+}
+
+apply_remix_to_output() {
+    local remix_node
+    remix_node=$(node_id "$(filter_main "$1")") || return 1
+    id14_remix apply "$remix_node"
+}
 UNIT=$HOME/.config/systemd/user/$SERVICE
 CONFIG_DIR=$HOME/.config/pipewire/filter-chain.conf.d
 CONFIG=$CONFIG_DIR/90-id14-sr.conf
@@ -137,6 +147,7 @@ apply_mix_to_output() {
 }
 
 emit_modules() {
+    id14_remix check || return 1
     local output=$1 mix=$2 channels main stream transport transport_out
     channels=$(hardware_channels "$output")
     main=$(filter_main "$output")
@@ -171,15 +182,7 @@ emit_modules() {
             node.description = "iD14 AI High-Frequency Completion ($output)"
             media.name = "iD14 AI High-Frequency Completion ($output)"
             filter.graph = {
-                nodes = [ {
-                    type = ladspa
-                    name = sr
-                    plugin = libid14_sr_ladspa
-                    label = id14_sr_stereo
-                    control = { Mix = $mix }
-                } ]
-                inputs = [ "sr:Input L" "sr:Input R" ]
-                outputs = [ "sr:Output L" "sr:Output R" ]
+$(id14_remix graph "$mix")
             }
             capture.props = {
                 node.name = "$main"
@@ -519,6 +522,7 @@ reconcile() {
         physical_id=$(node_id "$physical") || return 1
         apply_smart_metadata "$output" "$physical" "$physical_id" || return 1
         apply_mix_to_output "$output" "$(read_mix)" || return 1
+        apply_remix_to_output "$output" || return 1
     done < <(outputs_for_mode "$mode")
     printf 'reconciled: active_outputs=%s\n' "$(outputs_for_mode "$mode" | paste -sd, -)"
 }
@@ -740,6 +744,7 @@ mix_slider() {
 
 for command in pw-dump wpctl pw-metadata jq systemctl; do need "$command"; done
 case "${1:-status}" in
+    remix) shift; id14_remix remix "$@" ;;
     on) enable "${2:-all}" ;;
     off) disable ;;
     status) status ;;

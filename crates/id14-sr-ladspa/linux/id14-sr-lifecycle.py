@@ -253,6 +253,27 @@ def probe(plugin):
         raise ValueError("unexpected LADSPA Mix range")
 
 
+def remix_install_destinations(plugin, home):
+    import json
+    import os
+    import runpy
+    import sys
+
+    helper_path = Path(__file__).with_name("id14-remix.py")
+    # A legacy SR-only package does not ship the optional remix helper.
+    if not helper_path.is_file():
+        if (os.environ.get("ID14_REMIX_PLUGIN_SOURCE") or os.environ.get("ID14_REMIX_MODEL")
+                or plugin.with_name("libid14_remix_ladspa.so").exists()):
+            raise RuntimeError("remix helper missing from package")
+        return []
+    helper = runpy.run_path(str(helper_path))
+    try:
+        return helper["installation_files"](plugin, home)
+    except (ValueError, OSError, RuntimeError) as exc:
+        print(json.dumps(helper["error"](str(exc))), file=sys.stderr)
+        raise SystemExit(1) from None
+
+
 def install(arguments):
     if len(arguments) > 1:
         raise ValueError("usage: install-user.sh [PLUGIN.so]")
@@ -272,8 +293,10 @@ def install(arguments):
     home, state, base = paths()
     cli = home / ".local/bin/id14-sr"
     installed_plugin = home / ".local/lib/ladspa/libid14_sr_ladspa.so"
+    remix_destinations = remix_install_destinations(plugin, home)
     units = home / ".config/systemd/user"
     destinations = [
+        *remix_destinations,
         (source / "id14-sr", cli, 0o755),
         (plugin, installed_plugin, 0o755),
         (source / FILTER, units / FILTER, 0o644),
