@@ -289,7 +289,7 @@ static void run(void *handle, unsigned long count) {
 }
 static const int ports[] = {9, 9, 10, 10, 5};
 static const char *names[] = {"Input L", "Input R", "Output L", "Output R", "Mix"};
-static const struct hint hints[] = {{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {3,0,200}};
+static const struct hint hints[] = {{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0x43,-1,200}};
 static const struct descriptor descriptor = {1, "id14_sr_stereo", 0,
     "fixture", "fixture", "fixture", 5, ports, names, hints,
     NULL, instantiate, connect, NULL, run, NULL, NULL, NULL, free};
@@ -420,7 +420,9 @@ const void *ladspa_descriptor(unsigned long i) { return i ? 0 : &descriptor; }
         cfile = self.root / 'plugin.c'
         original = cfile.read_text()
         variants = [original.replace('id14_sr_stereo', 'wrong_label'),
-                    original.replace('{3,0,200}', '{3,0,100}'),
+                    original.replace('{0x43,-1,200}', '{0x43,-1,100}'),
+                    original.replace('{0x43,-1,200}', '{0x43,0,200}'),
+                    original.replace('{0x43,-1,200}', '{3,-1,200}'),
                     original.replace('{9, 9, 10, 10, 5}', '{9, 9, 10, 10, 9}')]
         for contents in variants:
             with self.subTest(contents=contents):

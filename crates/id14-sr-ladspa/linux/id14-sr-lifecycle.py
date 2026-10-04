@@ -248,7 +248,8 @@ def probe(plugin):
     if [value.port_names[i] for i in range(5)] != [b"Input L", b"Input R", b"Output L", b"Output R", b"Mix"]:
         raise ValueError("unexpected LADSPA port names")
     hint = value.hints[4]
-    if hint.descriptor & 3 != 3 or hint.lower != 0 or hint.upper != 200:
+    # -1 selects auto; DEFAULT_MINIMUM makes that the host's initial value.
+    if hint.descriptor != 0x43 or hint.lower != -1 or hint.upper != 200:
         raise ValueError("unexpected LADSPA Mix range")
 
 
