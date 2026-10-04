@@ -1,5 +1,7 @@
 # Linux PipeWire phase-2 evidence
 
+> Update: Since 2026-10-04, installation defaults to ON; the installation behavior and service states below are the historical record, not the current default.
+
 Date: 2026-10-02 JST
 Target: operator-supplied `<linux-host>`, NixOS, PipeWire 1.6.8, Audient iD14 MKII
 

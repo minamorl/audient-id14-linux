@@ -112,7 +112,34 @@ near-zero calibrated output.
 The sibling [`id14-sr-ladspa`](../id14-sr-ladspa/README.md) crate adapts this
 fixed-size engine to arbitrary PipeWire/LADSPA host blocks, detects existing
 full-band material, and provides the idempotent `id14-sr on|off|status`
-command for Line and Headphones output. It is intentionally installed off.
+command for Line and Headphones output, plus `mix get|set N|auto|step +/-N|bar|slider`.
+Installation turns SR on and enables it for subsequent logins, retaining the
+saved output selection (or using `all`) and mix (`auto` or `0`–`200`). These
+settings survive reboot, login, and reinstallation; a failed or interrupted
+installation restores the previous installed files and operating state.
+USB reconnection restores the selected outputs and mix automatically through
+the device-bound restore service, with a wait of at most 20 seconds and no
+idle polling. A WirePlumber restart also restarts and reconciles the filter.
+`off` clears routing and output selection but retains mix; reinstalling after
+`off` turns SR on for both outputs.
+
+The LADSPA adapter protects bass by passing the difference between completion
+and the delayed original through four first-order 300 Hz high-pass stages,
+then adding it back to the original separately for each channel. Below about
+300 Hz, output follows the delayed original without collapsing stereo to
+mono. Protection strength is the mix percentage divided by 100 and clamped
+to `0`–`1` (maximum at `100` and above); `auto` follows the detector, and mix
+`0` matches engine bypass.
+While protection is active, a shared stereo gain limits peaks to full scale.
+It adds no delay beyond the total 1024 frames (21.33 ms at 48 kHz).
+
+On x86_64, the callback enables DAZ/FTZ and restores the caller's settings to
+avoid increased processing time during sustained silence; other CPUs receive
+no such change. Rates other than 48 kHz pass through without completion.
+Physical sink volume above 100% can amplify audio past full scale after SR,
+and the 1024-frame delay is not declared to PipeWire. The installed filter
+unit assumes NixOS's `/run/current-system/sw/bin/pipewire`. These safeguards
+are not evidence of a measured listening-quality improvement.
 
 ## Primary documentation consulted
 

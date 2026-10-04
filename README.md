@@ -21,8 +21,12 @@ driver. What is missing is a way to drive the device's *control* features
   `--dry-run` mode that prints the bytes it would send without touching the
   USB bus). See [Usage](#usage).
 - `id14-sr` / `id14-sr-ladspa` — an experimental self-trained high-frequency
-  completion engine and an opt-in PipeWire/WirePlumber Smart Filter. It
-  defaults off; see [its Linux usage](crates/id14-sr-ladspa/README.md).
+  completion engine and a PipeWire/WirePlumber Smart Filter. Installation
+  turns SR on and enables it for subsequent logins, preserving the saved mix
+  and output selection (or selecting both outputs if none is saved).
+  Use `id14-sr off` to stop processing; the mix is retained. See
+  [its Linux usage](crates/id14-sr-ladspa/README.md) for installation, USB
+  reconnection recovery, bass protection, and limitations.
 
 The tool is designed to coexist with `snd-usb-audio`; it does not replace the
 audio driver and does not require unloading it. See

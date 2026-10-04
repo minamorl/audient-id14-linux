@@ -9,7 +9,12 @@ The plugin accepts arbitrary planar host block sizes. It buffers them into
 256-frame interleaved model chunks without allocation, blocking, file I/O or
 logging in the audio callback. The adapter contributes 256 frames (5.33 ms)
 on top of the model's 768 frames (16 ms), for 21.33 ms fixed DSP/adapter
-delay at 48 kHz. At unsupported sample rates it safely passes audio through.
+delay at 48 kHz (1024 frames total). At sample rates other than 48 kHz it
+passes audio through without completion.
+
+On x86_64, each callback enables DAZ/FTZ for its duration and restores the
+caller's settings afterward, avoiding increased processing time during
+sustained silence. This mechanism does nothing on other CPUs.
 
 ## Full-band protection
 
@@ -23,6 +28,27 @@ detector can still misclassify naturally dark or codec-limited recordings;
 the phase-1 heldout metrics are objective spectral metrics, not a subjective
 quality claim.
 
+## Bass protection and limits
+
+Output below about 300 Hz follows the original delayed by 1024 frames. The
+adapter takes the difference between completion and the delayed original,
+passes it through four first-order 300 Hz high-pass stages, and adds it back
+to that original. Left and right are processed separately, without a mono
+fold-down. Protection strength is the mix percentage divided by 100 and
+clamped to `0`–`1`: it reaches
+its maximum at `100` and stays there for higher mix values; in `auto`, it
+follows the detector. Mix `0` matches the engine's bypass output.
+
+While protection is active, a shared gain for both channels keeps peaks
+within full scale. Bass protection adds no delay: total DSP/adapter delay
+remains 1024 frames (21.33 ms at 48 kHz). This describes the safeguard, not a
+measured improvement in listening quality.
+
+Physical sink volume above 100% amplifies the signal after SR and can still
+exceed full scale at the DAC. The 1024-frame delay is not declared to
+PipeWire. The installed filter unit's `ExecStart` assumes the NixOS path
+`/run/current-system/sw/bin/pipewire`.
+
 ## Linux build and install
 
 Build on the target Linux host so the shared object uses its ABI:
@@ -32,9 +58,24 @@ cargo build --release -p id14-sr-ladspa
 crates/id14-sr-ladspa/linux/install-user.sh
 ```
 
-Installation copies the command and plugin under `~/.local` plus a dedicated,
-disabled user service under `~/.config/systemd/user`; it leaves the feature
-off. The command uses `libpipewire-module-filter-chain` plus WirePlumber Smart
+The installer accepts an optional plugin path:
+`crates/id14-sr-ladspa/linux/install-user.sh [PLUGIN.so]`. Before changing
+anything, it validates the LADSPA contract: label `id14_sr_stereo`, audio
+ports `Input L`, `Input R`, `Output L`, `Output R`, and control port `Mix`
+with range `-1` (automatic) to `200`.
+
+Installation backs up the previous CLI, plugin, and units, then places the
+CLI at `~/.local/bin/id14-sr`, the plugin under `~/.local/lib/ladspa/`,
+`id14-sr-filter.service` and `id14-sr-restore.service` under
+`~/.config/systemd/user/`, and the helper at
+`~/.local/lib/id14-sr/lifecycle.py`. It turns SR **ON** and enables it for
+subsequent logins, preserving the saved output selection (or using `all` if
+none exists) and mix. An active filter is restarted with the new plugin;
+the observed hardware changeover briefly bypassed SR for about one second.
+A failed or interrupted installation restores the previous files and
+operating state and exits nonzero.
+
+The command uses `libpipewire-module-filter-chain` plus WirePlumber Smart
 Filter metadata. Both existing and new native PipeWire or Pulse streams whose
 actual target is either iD14 Line/Headphones sink are transparently
 linked through the plugin, including streams with an explicit physical target.
@@ -59,6 +100,7 @@ AUX2/3 and Headphones reaches raw AUX0/1.
 ```sh
 id14-sr status
 id14-sr on              # Line and Headphones (normal mode)
+id14-sr on all          # explicit selection of both outputs
 id14-sr on line         # compatibility: Line only
 id14-sr on headphones   # compatibility: Headphones only
 id14-sr off
@@ -77,7 +119,8 @@ highband energy when the source already contains it. At every active mix,
 a shared stereo gain limits buffered peaks to full scale, including the
 overlap tail after reducing mix. Steady `0` preserves its fixed-delay source
 output. Changes ramp at 10 percentage points per 256-frame chunk. The
-setting survives `off`, `on`, and service restarts. On upgrade, an absent mix
+setting survives `off`, `on`, service restarts, reboot, login, reinstallation,
+and failed installation. On upgrade, an absent mix
 file or a numeric file from the earlier detector-scaled implementation stays
 `auto` until a new manual value is set.
 
@@ -130,10 +173,17 @@ enables/starts `id14-sr-filter.service`; its default `all` mode creates two
 independent filter/transport pairs. `ExecStartPost` waits for every requested
 UCM sink and reapplies the dynamic Smart Filter metadata after either the
 filter service or WirePlumber is restarted. `status` lists active and degraded
-outputs separately, and a repeated `on` repairs missing metadata. If any step
+outputs separately, and a repeated `on` repairs missing routes, reapplies
+the saved mix, and re-enables the unit for subsequent logins. If any step
 after the first managed write fails, ON stops/disables the service and removes
-the managed nodes, configuration, state, and owned metadata before returning
+the managed nodes, configuration, routing state, and owned metadata before returning
 failure.
+
+The enabled SR setting, selected outputs, and mix survive reboot and login.
+After USB reconnection, `id14-sr-restore.service`, bound to the iD14 systemd
+device unit, restores processing with the same output selection and mix.
+It waits at most 20 seconds; no polling runs while idle. Restarting
+WirePlumber also restarts the filter unit and reconciles the routes.
 
 `off` removes only the five keys marked by `id14-sr.owner`, preserving other
 applications' metadata on the same nodes. It confirms each output node name
@@ -142,8 +192,9 @@ output is absent, service/config cleanup proceeds and a small per-output
 `metadata-pending-*` state is retained; run `id14-sr off` again after the
 device returns (or after WirePlumber has recreated its metadata) to finish cleanup.
 Calling `off` while already off with no pending cleanup changes neither the
-default nor active streams. A fresh installation starts disabled and
-unprocessed.
+default nor active streams. `off` stops the unit and clears routing and
+the saved output selection, but keeps mix. Reinstalling after `off` therefore
+turns SR on in `all` mode with the retained mix.
 
 ## Recovery
 
@@ -164,9 +215,10 @@ wpctl status
 
 The managed fragment is
 `~/.config/pipewire/filter-chain.conf.d/90-id14-sr.conf`; `off` removes it and
-the ordinary state under `~/.local/state/id14-sr/`. An unplugged OFF may leave
-only a per-output `metadata-pending-*` file as described above. The installed user unit is
-disabled and inactive until the next `on`.
+the routing and output-selection state under `~/.local/state/id14-sr/`,
+while retaining the mix. An unplugged OFF may also leave a per-output
+`metadata-pending-*` file as described above. After an explicit `off`, the
+filter unit stays stopped until `on` or a successful reinstallation.
 
 ## Primary specifications consulted
 
