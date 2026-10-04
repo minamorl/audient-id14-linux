@@ -1,0 +1,15 @@
+$ bash crates/id14-remix-ladspa/tools/with_cargo.sh test --workspace > crates/id14-remix-ladspa/validation/workspace-test.log 2>&1
+EXIT=0
+
+$ bash crates/id14-remix-ladspa/tools/with_cargo.sh build --release -p id14-remix-ladspa
+EXIT=0
+
+$ bash crates/id14-remix-ladspa/tools/with_python.sh crates/id14-remix-ladspa/tools/verify_so.py --so "$PWD/crates/id14-remix-ladspa/.build/target/release/libid14_remix_ladspa.so" --legacy-so "$PWD/crates/id14-remix-ladspa/.build/legacy.so"
+EXIT=0
+
+$ systemd-run --user --wait --pipe --collect --property=MemoryDenyWriteExecute=yes --property="WorkingDirectory=$PWD" /run/current-system/sw/bin/bash crates/id14-remix-ladspa/tools/with_python.sh crates/id14-remix-ladspa/tools/verify_so.py --so "$PWD/crates/id14-remix-ladspa/.build/target/release/libid14_remix_ladspa.so" --output "$PWD/crates/id14-remix-ladspa/validation/mdwx-results.json"
+EXIT=0
+
+Raw outputs are adjacent files: workspace-test.log, release-build.txt,
+so-output.txt and mdwx-output.txt. Nix/Cargo environment settings are in the
+with_cargo.sh and with_python.sh wrappers; builds/caches stay in the new crate.

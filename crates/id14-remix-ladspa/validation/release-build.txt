@@ -1,0 +1,4 @@
+$ bash crates/id14-remix-ladspa/tools/with_cargo.sh build --release -p id14-remix-ladspa
+   Compiling id14-remix-ladspa v0.1.0 (/home/minamorl/repos/.worktrees/audient-id14-linux/remix-runtime/crates/id14-remix-ladspa)
+    Finished `release` profile [optimized] target(s) in 2.90s
+EXIT=0

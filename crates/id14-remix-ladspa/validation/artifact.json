@@ -1,0 +1,10 @@
+{
+  "report_assembled_at_utc": "2026-10-04T23:26:21.962862+00:00",
+  "artifact": "/home/minamorl/repos/.worktrees/audient-id14-linux/remix-runtime/crates/id14-remix-ladspa/.build/target/release/libid14_remix_ladspa.so",
+  "artifact_sha256": "0dddc6aae1940c71a05c28ac2b3cb4f971dc5af467361ddf7e0f7ebb9d031e0b",
+  "spec": "audient-id14-realtime-sr@0.13",
+  "workspace_test_exit": 0,
+  "release_build_exit": 0,
+  "so_host_exit": 0,
+  "memory_deny_write_execute_host_exit": 0
+}
