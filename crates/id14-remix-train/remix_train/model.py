@@ -68,7 +68,7 @@ class RemixNet(nn.Module):
         self.bottleneck = ConvBlock(4 * c)
         # TDF transformation at the 129-bin bottleneck, shared over channels.
         self.tdf = nn.Linear(129, 129)
-        self.gru = nn.GRUCell(4 * c, h)
+        self.gru = nn.GRU(4 * c, h, batch_first=True)
         self.state_projection = nn.Linear(h, 4 * c)
         self.dec1 = nn.Conv1d(6 * c, 2 * c, 3, padding=1)
         self.dec1_block = ConvBlock(2 * c)
@@ -87,23 +87,62 @@ class RemixNet(nn.Module):
         mags = torch.stack((left, right), dim=1)
         return torch.log1p(10.0 * mags)
 
-    def forward(self, x: Tensor, state: Tensor) -> tuple[Tensor, Tensor]:
-        if state.ndim != 2 or state.shape[1] != self.state_size:
-            raise ValueError(
-                f"state must have [batch,{self.state_size}], got {tuple(state.shape)}"
-            )
+    def _frame_path(self, x: Tensor) -> tuple[Tensor, Tensor, Tensor]:
+        """Run the non-recurrent U-Net encoder on independent frames."""
         e0 = self.enc0(F.silu(self.input(self._features(x))))
         e1 = self.enc1(F.silu(self.down1(e0)))
         z = self.bottleneck(F.silu(self.down2(e1)))
-        z = z + F.silu(self.tdf(z))
-        state_out = self.gru(z.mean(dim=2), state)
-        z = z + self.state_projection(state_out).unsqueeze(2)
+        return e0, e1, z + F.silu(self.tdf(z))
+
+    def _decode(self, e0: Tensor, e1: Tensor, z: Tensor, state: Tensor) -> Tensor:
+        z = z + self.state_projection(state).unsqueeze(2)
         up1 = F.interpolate(z, size=e1.shape[2], mode="linear", align_corners=False)
         up1 = self.dec1_block(F.silu(self.dec1(torch.cat((up1, e1), dim=1))))
         up0 = F.interpolate(up1, size=e0.shape[2], mode="linear", align_corners=False)
         up0 = self.dec0_block(F.silu(self.dec0(torch.cat((up0, e0), dim=1))))
-        mask = torch.softmax(self.output(up0), dim=1)
-        return mask, state_out
+        return torch.softmax(self.output(up0), dim=1)
+
+    def forward_sequence(self, x: Tensor, state: Tensor) -> tuple[Tensor, Tensor]:
+        """Run a contiguous sequence as one batched U-Net and one GRU call.
+
+        `x` is `[batch,time,4,513]`; masks are `[batch,time,4,513]`.
+        The convolutions are frequency-only and independent across time, so
+        folding time into the batch is exactly the streaming computation. The
+        GRU is the model's sole causal temporal operation.
+        """
+        if x.ndim != 4 or x.shape[2] != 4 or x.shape[3] != BINS:
+            raise ValueError(f"x must have [batch,time,4,{BINS}], got {tuple(x.shape)}")
+        if state.ndim != 2 or state.shape[1] != self.state_size:
+            raise ValueError(
+                f"state must have [batch,{self.state_size}], got {tuple(state.shape)}"
+            )
+        batch, frames = x.shape[:2]
+        flat = x.reshape(batch * frames, 4, BINS)
+        e0, e1, z = self._frame_path(flat)
+        recurrent = z.mean(dim=2).reshape(batch, frames, -1)
+        states, state_out = self.gru(recurrent, state.unsqueeze(0))
+        masks = self._decode(e0, e1, z, states.reshape(batch * frames, -1))
+        return masks.reshape(batch, frames, STEMS, BINS), state_out.squeeze(0)
+
+    def forward(self, x: Tensor, state: Tensor) -> tuple[Tensor, Tensor]:
+        if x.ndim != 3 or x.shape[1] != 4 or x.shape[2] != BINS:
+            raise ValueError(f"x must have [batch,4,{BINS}], got {tuple(x.shape)}")
+        masks, state_out = self.forward_sequence(x.unsqueeze(1), state)
+        return masks[:, 0], state_out
+
+    def load_state_dict(self, state_dict, strict: bool = True, assign: bool = False):
+        """Accept the GRUCell keys used by checkpoints created before batching."""
+        converted = dict(state_dict)
+        old_to_new = {
+            "gru.weight_ih": "gru.weight_ih_l0",
+            "gru.weight_hh": "gru.weight_hh_l0",
+            "gru.bias_ih": "gru.bias_ih_l0",
+            "gru.bias_hh": "gru.bias_hh_l0",
+        }
+        for old, new in old_to_new.items():
+            if old in converted and new not in converted:
+                converted[new] = converted.pop(old)
+        return super().load_state_dict(converted, strict=strict, assign=assign)
 
     def parameter_count(self) -> int:
         return sum(parameter.numel() for parameter in self.parameters())

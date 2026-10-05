@@ -6,5 +6,6 @@
 /runs/
 /data/
 /models/*.onnx
+/:memory:.ses
 __pycache__/
 *.pyc

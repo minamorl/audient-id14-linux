@@ -27,12 +27,43 @@ def remix_loss(predicted, mixture, sources, gains):
     return (error / scale).mean()
 
 
-def pack_real_x(frame):
-    """Pack [B,2,F,2] real/imag without complex MPS tensors."""
+def pack_real_sequence(sequence):
+    """Pack `[B,2,T,F,2]` real/imag as ABI frames `[B,T,4,F]`."""
     return torch.stack(
-        (frame[:, 0, :, 0], frame[:, 0, :, 1], frame[:, 1, :, 0], frame[:, 1, :, 1]),
-        dim=1,
+        (
+            sequence[:, 0, :, :, 0],
+            sequence[:, 0, :, :, 1],
+            sequence[:, 1, :, :, 0],
+            sequence[:, 1, :, :, 1],
+        ),
+        dim=2,
     )
+
+
+def aligned_training_tensors(masks, mixture, sources, lookahead):
+    frames = masks.shape[1] - lookahead
+    aligned_masks = masks[:, lookahead:]
+    aligned_mixture = mixture[:, :, :frames].permute(0, 2, 1, 3, 4)
+    aligned_sources = sources[:, :, :, :frames].permute(0, 3, 1, 2, 4, 5)
+    return aligned_masks, aligned_mixture, aligned_sources
+
+
+def sampled_frame_sdr(masks, mixture, sources):
+    estimate = mixture.unsqueeze(2) * masks.unsqueeze(3).unsqueeze(-1)
+    signal = sources.square().sum(dim=(3, 4, 5))
+    error = (sources - estimate).square().sum(dim=(3, 4, 5))
+    values = 10.0 * torch.log10(signal / error.clamp_min(1e-12))
+    result = {}
+    for index, name in enumerate(("vocals", "drums", "bass", "other")):
+        stem = values[:, :, index]
+        valid = torch.isfinite(stem) & (signal[:, :, index] > 1e-8)
+        selected = stem[valid]
+        result[name] = {
+            "frames": int(selected.numel()),
+            "mean_db": float(selected.mean()) if selected.numel() else None,
+            "median_db": float(selected.median()) if selected.numel() else None,
+        }
+    return result
 
 
 def train(args: argparse.Namespace) -> None:
@@ -53,6 +84,10 @@ def train(args: argparse.Namespace) -> None:
     run.mkdir(parents=True, exist_ok=True)
     write_manifest(run / "manifest.json", tracks)
     sampler = SequenceSampler(tracks, args.frames, args.seed)
+    monitor_batch = None
+    if args.artifact_every > 0:
+        monitor_sampler = SequenceSampler(tracks, args.frames, args.seed + 1)
+        monitor_batch = monitor_sampler.sample(min(args.batch, 2))
     model = RemixNet(args.size).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, args.steps)
@@ -89,6 +124,50 @@ def train(args: argparse.Namespace) -> None:
         )
         os.replace(temporary, checkpoint)
 
+    def write_artifacts(step: int, row: dict) -> None:
+        from .contract import check
+        from .export import export
+
+        assert monitor_batch is not None
+        monitor_mixture = torch.view_as_real(monitor_batch[0]).to(device)
+        monitor_sources = torch.view_as_real(monitor_batch[1]).to(device)
+        monitor_state = torch.zeros(
+            monitor_mixture.shape[0], model.state_size, device=device
+        )
+        with torch.no_grad():
+            monitor_masks, _ = model.forward_sequence(
+                pack_real_sequence(monitor_mixture), monitor_state
+            )
+            monitor_masks, monitor_mixture, monitor_sources = aligned_training_tensors(
+                monitor_masks, monitor_mixture, monitor_sources, args.lookahead
+            )
+        onnx_path = run / f"remix-{step}.onnx"
+        evaluation_path = run / f"evaluation-{step}.json"
+        export(checkpoint, onnx_path, args.size, args.lookahead)
+        report = {
+            "step": step,
+            "model": str(onnx_path),
+            "split": "fixed training-corpus monitor batch; not final MUSDB18-HQ test",
+            "monitor_seed": args.seed + 1,
+            "monitor_batch": monitor_mixture.shape[0],
+            "training": row,
+            "frame_sdr": sampled_frame_sdr(
+                monitor_masks, monitor_mixture, monitor_sources
+            ),
+            "contract": check(onnx_path),
+        }
+        temporary = evaluation_path.with_suffix(".json.tmp")
+        temporary.write_text(json.dumps(report, indent=2) + "\n")
+        os.replace(temporary, evaluation_path)
+        event = {
+            "event": "artifacts",
+            "step": step,
+            "onnx": str(onnx_path),
+            "evaluation": str(evaluation_path),
+        }
+        print(json.dumps(event), flush=True)
+        print(json.dumps(event), file=log)
+
     for step in range(start_step + 1, args.steps + 1):
         before = time.perf_counter()
         mixture, sources = sampler.sample(args.batch)
@@ -97,17 +176,19 @@ def train(args: argparse.Namespace) -> None:
         mixture = torch.view_as_real(mixture).to(device)
         sources = torch.view_as_real(sources).to(device)
         state = torch.zeros(args.batch, model.state_size, device=device)
-        losses = []
-        for frame in range(args.frames):
-            mask, state = model(pack_real_x(mixture[:, :, frame]), state)
-            if frame >= args.lookahead:
-                target = frame - args.lookahead
-                db = torch.empty(args.batch, 4, device=device).uniform_(-6.0, 6.0)
-                gains = torch.pow(10.0, db / 20.0)
-                losses.append(
-                    remix_loss(mask, mixture[:, :, target], sources[:, :, :, target], gains)
-                )
-        loss = torch.stack(losses).mean()
+        masks, _ = model.forward_sequence(pack_real_sequence(mixture), state)
+        aligned_masks, aligned_mixture, aligned_sources = aligned_training_tensors(
+            masks, mixture, sources, args.lookahead
+        )
+        examples = args.batch * aligned_masks.shape[1]
+        db = torch.empty(examples, 4, device=device).uniform_(-6.0, 6.0)
+        gains = torch.pow(10.0, db / 20.0)
+        loss = remix_loss(
+            aligned_masks.reshape(examples, 4, 513),
+            aligned_mixture.reshape(examples, 2, 513, 2),
+            aligned_sources.reshape(examples, 4, 2, 513, 2),
+            gains,
+        )
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
@@ -124,8 +205,13 @@ def train(args: argparse.Namespace) -> None:
         }
         print(json.dumps(row), flush=True)
         print(json.dumps(row), file=log)
-        if step % args.save_every == 0 or step == args.steps or stop_requested:
+        artifact_due = args.artifact_every > 0 and (
+            step % args.artifact_every == 0 or step == args.steps
+        )
+        if step % args.save_every == 0 or step == args.steps or stop_requested or artifact_due:
             save_checkpoint(step)
+        if artifact_due:
+            write_artifacts(step, row)
         if stop_requested:
             stopped = {"event": "stopped", "step": step, "checkpoint": str(checkpoint)}
             print(json.dumps(stopped), flush=True)
@@ -145,6 +231,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--batch", type=int, default=8)
     result.add_argument("--steps", type=int, default=20_000)
     result.add_argument("--save-every", type=int, default=100)
+    result.add_argument("--artifact-every", type=int, default=2000)
     result.add_argument("--lr", type=float, default=3e-4)
     result.add_argument("--seed", type=int, default=1407)
     result.add_argument("--device", default="mps" if torch.backends.mps.is_available() else "cpu")

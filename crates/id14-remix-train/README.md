@@ -15,6 +15,13 @@ Training level is randomized uniformly from -40 to 0 dBFS. The sole objective is
 the normalized complex error of the required filter-form remix with each of the
 four gains independently randomized from -6 to +6 dB.
 
+Training calls `forward_sequence` once per contiguous context. Frequency U-Net
+layers fold time into the batch and the causal GRU consumes the whole time axis
+in one `nn.GRU` call. The exported `forward` remains one-frame streaming and is
+numerically checked against repeated sequence output. Checkpoints written before
+this optimization retain the same parameter shapes and are mapped from the old
+GRUCell key names when loaded.
+
 ## Data and legal boundary
 
 [`sources.json`](sources.json) records the primary official record, license,
@@ -50,6 +57,30 @@ PATH="$PWD/.venv/bin:$PATH" scripts/run_matrix.sh \
 Re-running the same command resumes `runs/SIZE-qQ/latest.pt`. Use `--fresh` only
 to intentionally discard the resume point. Each run keeps its exact discovered
 track manifest and append-only JSONL training log.
+
+Every 2,000 steps, and at the final step, training atomically saves a checkpoint,
+exports `runs/SIZE-qQ/remix-STEP.onnx`, and writes
+`runs/SIZE-qQ/evaluation-STEP.json`. The JSON contains a fixed monitor batch's
+training-corpus frame SDR and executable ONNX contract results; it is explicitly
+not the final MUSDB18-HQ test score. The fixed seed makes successive checkpoints
+comparable. Set `--artifact-every N` to change the
+interval or `--artifact-every 0` to disable intermediate artifacts.
+
+The Linux one-thread CPU forward/backward benchmark recommends
+`--frames 32 --batch 2` for CPU fallback: it measured 1.20x over the frame loop,
+while large flattened CPU batches lost cache efficiency. For the 128 GB M4 Max
+MPS training,
+keep the default `--frames 64 --batch 8` initially so the GPU sees 512 frames per
+call; the Mac measurement is the final authority and can reduce batch first if
+memory pressure appears. `--frames 128` is not recommended: CPU per-frame time
+rose from 3.21 ms at 64 frames to 4.00 ms at 128 frames for batch 2.
+
+Reproduce the CPU comparison with:
+
+```sh
+.venv/bin/python -m remix_train.benchmark_training \
+  --size 131k --batches 1 2 4 8 --frames 32 64 --iterations 3 --threads 1
+```
 
 ## Mac background operation
 
