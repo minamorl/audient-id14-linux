@@ -1,6 +1,7 @@
 /.venv/
 /.uv-cache/
 /.pytest_cache/
+/.test-tmp/
 /*.egg-info/
 /src/*.egg-info/
 /runs/

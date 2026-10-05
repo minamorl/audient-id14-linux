@@ -17,6 +17,24 @@ from .data import SequenceSampler, discover_moises, discover_musdb, discover_sla
 from .model import RemixNet
 
 
+def synchronize(device: torch.device) -> None:
+    if device.type == "mps":
+        torch.mps.synchronize()
+    elif device.type == "cuda":
+        torch.cuda.synchronize(device)
+
+
+def audio_cache_dir(args: argparse.Namespace) -> Path | None:
+    if args.no_audio_cache:
+        return None
+    if args.cache_dir is not None:
+        return args.cache_dir
+    if args.musdb:
+        root = args.musdb[0]
+        return root.with_name(f"{root.name}-48k-cache")
+    return None
+
+
 def remix_loss(predicted, mixture, sources, gains):
     coefficient = ((gains - 1.0).unsqueeze(-1) * predicted).sum(dim=1)
     estimate = mixture * (1.0 + coefficient[:, None, :, None])
@@ -83,10 +101,16 @@ def train(args: argparse.Namespace) -> None:
     run = args.output / f"{args.size}-q{args.lookahead}"
     run.mkdir(parents=True, exist_ok=True)
     write_manifest(run / "manifest.json", tracks)
-    sampler = SequenceSampler(tracks, args.frames, args.seed)
+    log = (run / "train.jsonl").open("a", buffering=1)
+    cache_dir = audio_cache_dir(args)
+    sampler = SequenceSampler(tracks, args.frames, args.seed, cache_dir)
+    if sampler.cache_stats is not None:
+        cache_event = {"event": "audio_cache", **sampler.cache_stats}
+        print(json.dumps(cache_event), flush=True)
+        print(json.dumps(cache_event), file=log)
     monitor_batch = None
     if args.artifact_every > 0:
-        monitor_sampler = SequenceSampler(tracks, args.frames, args.seed + 1)
+        monitor_sampler = SequenceSampler(tracks, args.frames, args.seed + 1, cache_dir)
         monitor_batch = monitor_sampler.sample(min(args.batch, 2))
     model = RemixNet(args.size).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=1e-4)
@@ -99,7 +123,6 @@ def train(args: argparse.Namespace) -> None:
         optimizer.load_state_dict(saved["optimizer"])
         scheduler.load_state_dict(saved["scheduler"])
         start_step = int(saved["step"])
-    log = (run / "train.jsonl").open("a", buffering=1)
     stop_requested = False
 
     def request_stop(_signum, _frame):
@@ -171,11 +194,14 @@ def train(args: argparse.Namespace) -> None:
     for step in range(start_step + 1, args.steps + 1):
         before = time.perf_counter()
         mixture, sources = sampler.sample(args.batch)
+        sampled = time.perf_counter()
         # MPS does not support complex tensors. Keep an explicit final
         # real/imag axis so the same training loop runs on Apple Silicon.
         mixture = torch.view_as_real(mixture).to(device)
         sources = torch.view_as_real(sources).to(device)
         state = torch.zeros(args.batch, model.state_size, device=device)
+        synchronize(device)
+        transferred = time.perf_counter()
         masks, _ = model.forward_sequence(pack_real_sequence(mixture), state)
         aligned_masks, aligned_mixture, aligned_sources = aligned_training_tensors(
             masks, mixture, sources, args.lookahead
@@ -189,16 +215,27 @@ def train(args: argparse.Namespace) -> None:
             aligned_sources.reshape(examples, 4, 2, 513, 2),
             gains,
         )
+        synchronize(device)
+        forwarded = time.perf_counter()
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
+        synchronize(device)
+        backwarded = time.perf_counter()
         optimizer.step()
         scheduler.step()
+        synchronize(device)
+        optimized = time.perf_counter()
         row = {
             "step": step,
             "loss": float(loss.detach()),
             "lr": scheduler.get_last_lr()[0],
-            "seconds": time.perf_counter() - before,
+            "seconds": optimized - before,
+            "sample_seconds": sampled - before,
+            "transfer_seconds": transferred - sampled,
+            "forward_seconds": forwarded - transferred,
+            "backward_seconds": backwarded - forwarded,
+            "optimizer_seconds": optimized - backwarded,
             "size": args.size,
             "lookahead": args.lookahead,
             "parameters": model.parameter_count(),
@@ -225,6 +262,9 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--slakh", type=Path, action="append", default=[])
     result.add_argument("--musdb", type=Path, action="append", default=[])
     result.add_argument("--output", type=Path, default=Path("runs"))
+    cache = result.add_mutually_exclusive_group()
+    cache.add_argument("--cache-dir", type=Path)
+    cache.add_argument("--no-audio-cache", action="store_true")
     result.add_argument("--size", choices=("131k", "444k"), required=True)
     result.add_argument("--lookahead", type=int, choices=(0, 2, 4), required=True)
     result.add_argument("--frames", type=int, default=64)

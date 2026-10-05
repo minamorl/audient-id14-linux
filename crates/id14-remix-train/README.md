@@ -58,6 +58,21 @@ Re-running the same command resumes `runs/SIZE-qQ/latest.pt`. Use `--fresh` only
 to intentionally discard the resume point. Each run keeps its exact discovered
 track manifest and append-only JSONL training log.
 
+Before the first optimization step, each discovered training song is decoded and
+resampled to 48 kHz once, then atomically installed as a float16 `.npy` array in
+`$HOME/datasets/musdb18hq-48k-cache/` by default. Each array has
+`[mixture,vocals,drums,bass,other] x stereo x samples`; subsequent sampling uses
+read-only mmap and converts only the selected context to float32. A process killed
+during construction leaves the final filename untouched, and the next start
+rebuilds any missing or invalid final file. Use `--cache-dir PATH` to relocate it,
+or `--no-audio-cache` only for diagnosis. `train.jsonl` records an `audio_cache`
+event with built/reused counts, bytes, and construction time.
+
+Each optimization record breaks `seconds` into `sample_seconds`,
+`transfer_seconds`, `forward_seconds`, `backward_seconds`, and
+`optimizer_seconds`. CUDA/MPS are synchronized at phase boundaries so these are
+wall-clock phase measurements rather than asynchronous enqueue times.
+
 Every 2,000 steps, and at the final step, training atomically saves a checkpoint,
 exports `runs/SIZE-qQ/remix-STEP.onnx`, and writes
 `runs/SIZE-qQ/evaluation-STEP.json`. The JSON contains a fixed monitor batch's

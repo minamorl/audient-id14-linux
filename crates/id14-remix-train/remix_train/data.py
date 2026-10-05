@@ -2,8 +2,12 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
+import os
 import random
+import re
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
@@ -25,6 +29,13 @@ class Track:
     stems: tuple[tuple[Path, ...], ...]
     split: str
     corpus: str
+
+
+@dataclass(frozen=True)
+class CachedTrack:
+    track: Track
+    path: Path
+    samples: int
 
 
 def _audio_files(path: Path) -> list[Path]:
@@ -189,31 +200,188 @@ def load_track(track: Track) -> tuple[Tensor, Tensor]:
     return mixture[:, :length], stems[:, :, :length]
 
 
+def _track_sources(track: Track) -> list[Path]:
+    sources = [path for group in track.stems for path in group]
+    if track.mixture is not None:
+        sources.insert(0, track.mixture)
+    return sources
+
+
+def _cache_path(track: Track, cache_dir: Path) -> Path:
+    source_fingerprint = []
+    for path in _track_sources(track):
+        stat = path.stat()
+        source_fingerprint.append(
+            {
+                "path": str(path.resolve()),
+                "size": stat.st_size,
+                "mtime_ns": stat.st_mtime_ns,
+            }
+        )
+    identity = json.dumps(
+        {
+            "version": 1,
+            "sample_rate": SAMPLE_RATE,
+            "dtype": "float16",
+            "corpus": track.corpus,
+            "split": track.split,
+            "sources": source_fingerprint,
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode()
+    digest = hashlib.sha256(identity).hexdigest()[:16]
+    slug = re.sub(r"[^A-Za-z0-9._-]+", "-", track.name).strip("-.") or "track"
+    return cache_dir / f"{slug}-{digest}.npy"
+
+
+def _valid_cache(path: Path) -> tuple[bool, int]:
+    try:
+        mapped = np.load(path, mmap_mode="r", allow_pickle=False)
+        valid = (
+            mapped.dtype == np.float16
+            and mapped.ndim == 3
+            and mapped.shape[:2] == (5, 2)
+        )
+        samples = int(mapped.shape[2]) if valid else 0
+        del mapped
+        return valid, samples
+    except (EOFError, OSError, ValueError):
+        return False, 0
+
+
+def _atomic_json(path: Path, value: object) -> None:
+    temporary = path.with_name(f".{path.name}.tmp-{os.getpid()}")
+    try:
+        temporary.write_text(json.dumps(value, indent=2) + "\n")
+        with temporary.open("rb") as handle:
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def build_audio_cache(
+    tracks: list[Track], cache_dir: Path
+) -> tuple[dict[Track, CachedTrack], dict[str, int | float | str]]:
+    """Create atomic float16 48 kHz `.npy` files suitable for read-only mmap."""
+    started = time.perf_counter()
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    cached = {}
+    built = 0
+    reused = 0
+    for track in tracks:
+        final = _cache_path(track, cache_dir)
+        valid, samples = _valid_cache(final)
+        if not valid:
+            mixture, stems = load_track(track)
+            samples = int(mixture.shape[1])
+            temporary = final.with_name(f".{final.name}.tmp-{os.getpid()}")
+            try:
+                mapped = np.lib.format.open_memmap(
+                    temporary,
+                    mode="w+",
+                    dtype=np.float16,
+                    shape=(5, 2, samples),
+                )
+                mapped[0] = mixture.numpy()
+                mapped[1:] = stems.numpy()
+                mapped.flush()
+                del mapped
+                with temporary.open("rb") as handle:
+                    os.fsync(handle.fileno())
+                os.replace(temporary, final)
+            finally:
+                temporary.unlink(missing_ok=True)
+            valid, checked_samples = _valid_cache(final)
+            if not valid or checked_samples != samples:
+                raise RuntimeError(f"failed to validate audio cache for {track.name}")
+            built += 1
+        else:
+            reused += 1
+        cached[track] = CachedTrack(track, final, samples)
+    manifest = {
+        "version": 1,
+        "sample_rate": SAMPLE_RATE,
+        "dtype": "float16",
+        "tracks": [
+            {
+                "name": item.track.name,
+                "corpus": item.track.corpus,
+                "split": item.track.split,
+                "path": item.path.name,
+                "samples": item.samples,
+            }
+            for item in cached.values()
+        ],
+    }
+    _atomic_json(cache_dir / "manifest.json", manifest)
+    stats: dict[str, int | float | str] = {
+        "cache_dir": str(cache_dir),
+        "tracks": len(cached),
+        "built": built,
+        "reused": reused,
+        "bytes": sum(item.path.stat().st_size for item in cached.values()),
+        "seconds": time.perf_counter() - started,
+    }
+    return cached, stats
+
+
 class SequenceSampler:
-    def __init__(self, tracks: list[Track], frames: int, seed: int = 1407):
+    def __init__(
+        self,
+        tracks: list[Track],
+        frames: int,
+        seed: int = 1407,
+        cache_dir: Path | None = None,
+    ):
         if not tracks:
             raise ValueError("no training tracks discovered")
         self.tracks = tracks
         self.frames = frames
         self.random = random.Random(seed)
-        self.cache: dict[Path | str, tuple[Tensor, Tensor]] = {}
+        self.memory_cache: dict[Path | str, tuple[Tensor, Tensor]] = {}
+        self.cached_tracks: dict[Track, CachedTrack] = {}
+        self.mapped_tracks: dict[Track, np.memmap] = {}
+        self.cache_stats: dict[str, int | float | str] | None = None
+        if cache_dir is not None:
+            self.cached_tracks, self.cache_stats = build_audio_cache(tracks, cache_dir)
+
+    def _load_segment(self, track: Track, start: int, stop: int) -> tuple[Tensor, Tensor]:
+        if self.cached_tracks:
+            if track not in self.mapped_tracks:
+                self.mapped_tracks[track] = np.load(
+                    self.cached_tracks[track].path,
+                    mmap_mode="r",
+                    allow_pickle=False,
+                )
+            mapped = self.mapped_tracks[track]
+            # Converting only the selected float16 view to float32 keeps the full song on disk.
+            segment = np.asarray(mapped[:, :, start:stop], dtype=np.float32)
+            tensor = torch.from_numpy(segment)
+            return tensor[0], tensor[1:]
+        key = track.mixture or track.name
+        if key not in self.memory_cache:
+            self.memory_cache[key] = load_track(track)
+            if len(self.memory_cache) > 8:
+                self.memory_cache.pop(next(iter(self.memory_cache)))
+        mixture, sources = self.memory_cache[key]
+        return mixture[:, start:stop], sources[:, :, start:stop]
 
     def sample(self, batch: int) -> tuple[Tensor, Tensor]:
         mixtures, stems = [], []
         samples = 1024 + (self.frames - 1) * 512
         for _ in range(batch):
             track = self.random.choice(self.tracks)
-            key = track.mixture or track.name
-            if key not in self.cache:
-                self.cache[key] = load_track(track)
-                if len(self.cache) > 8:
-                    self.cache.pop(next(iter(self.cache)))
-            mixture, sources = self.cache[key]
-            if mixture.shape[1] < samples:
+            length = (
+                self.cached_tracks[track].samples
+                if self.cached_tracks
+                else self._track_length(track)
+            )
+            if length < samples:
                 raise ValueError(f"{track.name}: shorter than {samples} samples")
-            start = self.random.randrange(0, mixture.shape[1] - samples + 1)
-            mix_clip = mixture[:, start : start + samples]
-            source_clip = sources[:, :, start : start + samples]
+            start = self.random.randrange(0, length - samples + 1)
+            mix_clip, source_clip = self._load_segment(track, start, start + samples)
             target_peak = 10.0 ** self.random.uniform(-2.0, 0.0)  # -40..0 dBFS
             scale = target_peak / float(mix_clip.abs().max().clamp_min(1e-5))
             mixtures.append(stft(mix_clip * scale))
@@ -222,6 +390,14 @@ class SequenceSampler:
             )
         # mixture [B,2,T,F], stems [B,4,2,T,F]
         return torch.stack(mixtures), torch.stack(stems)
+
+    def _track_length(self, track: Track) -> int:
+        key = track.mixture or track.name
+        if key not in self.memory_cache:
+            self.memory_cache[key] = load_track(track)
+            if len(self.memory_cache) > 8:
+                self.memory_cache.pop(next(iter(self.memory_cache)))
+        return int(self.memory_cache[key][0].shape[1])
 
 
 def write_manifest(path: Path, tracks: Iterable[Track]) -> None:
