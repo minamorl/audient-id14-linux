@@ -13,7 +13,7 @@ with tempfile.TemporaryDirectory(prefix=".remix-regression-", dir=here) as tempo
     base = Path(temporary)
     for name in ("bin", "home", "runtime", "state", "config", "data"):
         (base / name).mkdir()
-    for name in ("pw-dump", "pw-cli", "wpctl", "pw-metadata", "systemctl"):
+    for name in ("pw-dump", "pw-cli", "wpctl", "pw-metadata", "systemctl", "nix"):
         path = base / "bin" / name
         path.write_text("#!/bin/sh\nexit 91\n")
         path.chmod(0o755)

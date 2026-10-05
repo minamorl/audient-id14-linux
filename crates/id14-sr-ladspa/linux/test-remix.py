@@ -52,6 +52,8 @@ with (root / 'calls.jsonl').open('a') as stream:
 sys.exit(1 if (root / 'fail-cli').exists() else 0)
 PY
 ''')
+        # Always shadow nix; preparation tests explicitly supply a fake build.
+        self.script("nix", 'exit 91\n')
         for name in ("wpctl", "pw-metadata", "systemctl", "jq"):
             self.script(name, 'exit 0\n')
 
@@ -273,6 +275,7 @@ const Descriptor *ladspa_descriptor(unsigned long i) { return i == 0 ? &descript
 
     def test_installer_destinations_and_model_opt_in(self):
         library = self.build_plugin()
+        self.fake_nix(self.build_ort_library())
         model = self.root / "model.onnx"
         model.write_bytes(b"model-fixture")
         self.env["ID14_REMIX_PLUGIN_SOURCE"] = str(library)
@@ -288,6 +291,176 @@ print(json.dumps([[str(s),str(d),m] for s,d,m in files]))
         self.assertEqual(Path(files[-1][1]), self.home / ".local/share/id14-sr/remix.onnx")
         self.env.pop("ID14_REMIX_MODEL")
         self.assertNotIn("remix.onnx", self.run_command(args).stdout)
+
+    def build_ort_library(self, version="1.27.0"):
+        directory = self.root / ("ort-" + version) / "lib"
+        directory.mkdir(parents=True, exist_ok=True)
+        source = directory / "fixture.c"
+        library = directory / "libonnxruntime.so"
+        source.write_text('''
+struct OrtApiBase { const void *(*get_api)(unsigned int); const char *(*get_version)(void); };
+static const char *get_version(void) { return VERSION; }
+static const struct OrtApiBase base = {0, get_version};
+const struct OrtApiBase *OrtGetApiBase(void) { return &base; }
+'''.replace("VERSION", json.dumps(version)))
+        self.run_command(["cc", "-shared", "-fPIC", str(source), "-o", str(library)])
+        return directory.parent
+
+    def test_ort_version_from_native_api(self):
+        for version, expected in (("1.27.0", 0), ("1.27.3", 0), ("1.26.9", 1), ("1.28.0", 1), ("1.270.0", 1)):
+            with self.subTest(version=version):
+                output = self.build_ort_library(version)
+                result = self.run_command([sys.executable, str(HELPER), "_probe_ort", str(output / "lib/libonnxruntime.so")], expected)
+                if expected == 0:
+                    self.assertEqual(result.stdout.strip(), version)
+                else:
+                    self.assertIn("1.27.x required", json.loads(result.stderr)["message"])
+
+    def fake_nix(self, output):
+        self.env["REMIX_TEST_ORT_OUTPUT"] = str(output)
+        # Model the indirect GC root registration: its key is the out-link path,
+        # and a plain rename cannot update that registration.
+        self.script("nix", '''exec python3 - "$@" <<'PY'
+import json, os, pathlib, sys
+base = pathlib.Path(os.environ['REMIX_TEST_ROOT'])
+args = sys.argv[1:]
+with (base / 'nix-calls.jsonl').open('a') as stream:
+    stream.write(json.dumps(args) + '\\n')
+if len(args) != 4 or args[0] != 'build' or args[2] != '--out-link':
+    sys.exit(90)
+if (base / 'nix-fail').exists():
+    sys.exit(92)
+out = pathlib.Path(args[3])
+if args[1] == 'nixpkgs#onnxruntime':
+    target = pathlib.Path(os.environ['REMIX_TEST_ORT_OUTPUT'])
+else:
+    if (base / 'nix-root-fail').exists():
+        sys.exit(93)
+    target = pathlib.Path(args[1])
+if (base / 'nix-no-link').exists():
+    sys.exit(0)
+out.unlink(missing_ok=True)
+out.symlink_to(target)
+with (base / 'gc-roots.jsonl').open('a') as stream:
+    stream.write(json.dumps(str(out)) + '\\n')
+PY
+''')
+
+    def ort_install_files(self, include_remix=True, expected=0, injection=""):
+        if include_remix:
+            self.env["ID14_REMIX_PLUGIN_SOURCE"] = str(self.build_plugin())
+        else:
+            self.env.pop("ID14_REMIX_PLUGIN_SOURCE", None)
+        code = '''import json, pathlib, runpy, sys
+module = runpy.run_path(sys.argv[1])
+''' + injection + '''
+try:
+    files = module['installation_files'](pathlib.Path(sys.argv[2]), pathlib.Path.home())
+    print(json.dumps([str(destination) for source, destination, mode in files]))
+except (ValueError, OSError, RuntimeError) as exc:
+    print(json.dumps(module['error'](str(exc))), file=sys.stderr)
+    sys.exit(1)
+'''
+        return self.run_command([sys.executable, "-c", code, str(HELPER), str(self.root / "libid14_sr_ladspa.so")], expected)
+
+    def ort_link(self):
+        return self.home / ".local/lib/id14-sr/onnxruntime"
+
+    def prior_ort_link(self):
+        previous = self.build_ort_library("1.27.1")
+        link = self.ort_link()
+        link.parent.mkdir(parents=True, exist_ok=True)
+        link.symlink_to(previous)
+        return link.lstat(), os.readlink(link)
+
+    def assert_prior_ort_unchanged(self, before):
+        stat, target = before
+        self.assertTrue(self.ort_link().is_symlink())
+        self.assertEqual(os.readlink(self.ort_link()), target)
+        self.assertEqual(self.ort_link().lstat().st_ino, stat.st_ino)
+        self.assertEqual(list(self.ort_link().parent.glob(".onnxruntime-stage-*")), [])
+
+    def test_nix_install_publishes_verified_library_and_retains_gc_root(self):
+        output = self.build_ort_library()
+        self.fake_nix(output)
+        self.prior_ort_link()
+        self.ort_install_files()
+        self.assertEqual(self.ort_link().resolve(), output)
+        calls = [json.loads(line) for line in (self.root / "nix-calls.jsonl").read_text().splitlines()]
+        self.assertEqual(calls[0][:3], ["build", "nixpkgs#onnxruntime", "--out-link"])
+        self.assertEqual(calls[1][:3], ["build", str(output), "--out-link"])
+        self.assertNotEqual(calls[0][3], str(self.ort_link()))
+        registered = [Path(json.loads(line)) for line in (self.root / "gc-roots.jsonl").read_text().splitlines()]
+        self.assertFalse(registered[0].exists())
+        self.assertTrue(any(path.is_symlink() and path.resolve() == output for path in registered))
+        roots = self.ort_link().parent / ".onnxruntime-roots"
+        before = sorted(roots.iterdir())
+        self.ort_install_files()
+        self.assertEqual(sorted(roots.iterdir()), before)
+        self.assertEqual(list(self.ort_link().parent.glob(".onnxruntime-stage-*")), [])
+
+    def test_nix_wrong_version_missing_library_or_failed_build_preserves_link(self):
+        before = self.prior_ort_link()
+        for version in ("1.26.9", "1.28.0"):
+            with self.subTest(version=version):
+                self.fake_nix(self.build_ort_library(version))
+                self.ort_install_files(expected=1)
+                self.assert_prior_ort_unchanged(before)
+        output = self.build_ort_library()
+        self.fake_nix(output)
+        (output / "lib/libonnxruntime.so").unlink()
+        self.ort_install_files(expected=1)
+        self.assert_prior_ort_unchanged(before)
+        self.build_ort_library()
+        for marker in ("nix-fail", "nix-root-fail", "nix-no-link"):
+            with self.subTest(failure=marker):
+                (self.root / marker).touch()
+                self.ort_install_files(expected=1)
+                self.assert_prior_ort_unchanged(before)
+                (self.root / marker).unlink()
+
+    def test_nix_fresh_failure_does_not_publish_link(self):
+        self.fake_nix(self.build_ort_library("1.26.9"))
+        self.ort_install_files(expected=1)
+        self.assertFalse(os.path.lexists(self.ort_link()))
+        self.assertEqual(list(self.ort_link().parent.glob(".onnxruntime-stage-*")), [])
+
+    def test_nix_atomic_publish_failure_preserves_previous_link(self):
+        self.fake_nix(self.build_ort_library())
+        before = self.prior_ort_link()
+        # Inject only the final rename; native probing and fake nix still run.
+        injection = '''
+def fail_replace(source, destination):
+    raise OSError('injected rename failure')
+module['prepare_ort_library'].__globals__['os'].replace = fail_replace
+'''
+        self.ort_install_files(expected=1, injection=injection)
+        self.assert_prior_ort_unchanged(before)
+
+    def test_nix_timeout_preserves_previous_link(self):
+        before = self.prior_ort_link()
+        injection = '''
+import subprocess
+original_run = subprocess.run
+def timeout_nix(args, **kwargs):
+    if pathlib.Path(args[0]).name == 'nix':
+        raise subprocess.TimeoutExpired(args, kwargs['timeout'])
+    return original_run(args, **kwargs)
+subprocess.run = timeout_nix
+'''
+        result = self.ort_install_files(expected=1, injection=injection)
+        self.assertIn("timed out", json.loads(result.stderr)["message"])
+        self.assert_prior_ort_unchanged(before)
+
+    def test_without_nix_or_without_remix_does_not_touch_link(self):
+        before = self.prior_ort_link()
+        self.fake_nix(self.build_ort_library())
+        self.ort_install_files(include_remix=False)
+        self.assertFalse((self.root / "nix-calls.jsonl").exists())
+        self.assert_prior_ort_unchanged(before)
+        self.ort_install_files(injection="module['prepare_ort_library'].__globals__['shutil'].which = lambda name: None\n")
+        self.assertFalse((self.root / "nix-calls.jsonl").exists())
+        self.assert_prior_ort_unchanged(before)
 
     def test_installer_preflight_failure_preserves_remix_files_and_settings(self):
         # Execute the actual install seam with a bad SR candidate. No source read.

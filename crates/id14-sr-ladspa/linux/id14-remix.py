@@ -8,11 +8,14 @@ from the runtime's atomic telemetry files, never from desired control values.
 import ctypes
 import datetime
 import fcntl
+import hashlib
 import json
 import math
 import os
 from pathlib import Path
+import re
 import secrets
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -130,8 +133,11 @@ def graph(mix):
                 outputs = [ "sr:Output L" "sr:Output R" ]'''
 
 
-def command(arguments):
-    result = subprocess.run(arguments, text=True, capture_output=True, timeout=10)
+def command(arguments, timeout=10):
+    try:
+        result = subprocess.run(arguments, text=True, capture_output=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        raise RuntimeError(f"{arguments[0]} timed out; saved settings retained") from None
     if result.returncode:
         raise RuntimeError(f"{arguments[0]} failed (exit {result.returncode}); saved settings retained")
     return result.stdout
@@ -282,12 +288,61 @@ def probe_plugin(path):
     raise ValueError("LADSPA label id14_remix_stereo missing")
 
 
+def probe_ort_library(path):
+    # OrtApiBase ABI: https://onnxruntime.ai/docs/api/c/struct_ort_api_base.html
+    class ApiBase(ctypes.Structure):
+        _fields_ = [("get_api", ctypes.c_void_p), ("get_version", ctypes.CFUNCTYPE(ctypes.c_char_p))]
+
+    library = ctypes.CDLL(str(Path(path).resolve()))
+    entry = library.OrtGetApiBase
+    entry.argtypes = []
+    entry.restype = ctypes.POINTER(ApiBase)
+    base = entry()
+    if not base or not base.contents.get_version:
+        raise ValueError("ONNX Runtime version API missing")
+    raw = base.contents.get_version()
+    version = raw.decode("utf-8") if raw else ""
+    if not re.fullmatch(r"1\.27\.\d+(?:[-+][A-Za-z0-9.-]+)?", version):
+        raise ValueError(f"ONNX Runtime 1.27.x required; found {version!r}")
+    return version
+
+
+def prepare_ort_library(home):
+    nix = shutil.which("nix")
+    if nix is None:
+        return
+    destination = home / ".local/lib/id14-sr/onnxruntime"
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    # Keep staging on the destination filesystem so publication is one rename.
+    with tempfile.TemporaryDirectory(prefix=".onnxruntime-stage-", dir=destination.parent) as temporary:
+        candidate = Path(temporary) / "result"
+        command([nix, "build", "nixpkgs#onnxruntime", "--out-link", str(candidate)], timeout=1800)
+        if not candidate.is_symlink():
+            raise ValueError("nix did not create an ONNX Runtime out-link")
+        target = candidate.resolve(strict=True)
+        # A faulty native library must not crash the installer process.
+        command([sys.executable, str(Path(__file__).resolve()), "_probe_ort",
+                 str(target / "lib/libonnxruntime.so")])
+        # Nix's indirect GC registration names the out-link, so moving that link
+        # alone loses GC protection. Root the verified store output at a stable,
+        # content-derived path as well. Keep older outputs rooted across failures
+        # in the later plugin transaction; repeated installs reuse the same root.
+        roots = destination.parent / ".onnxruntime-roots"
+        roots.mkdir(exist_ok=True)
+        root = roots / hashlib.sha256(os.fsencode(target)).hexdigest()
+        command([nix, "build", str(target), "--out-link", str(root)], timeout=1800)
+        if not root.is_symlink() or root.resolve(strict=True) != target:
+            raise ValueError("ONNX Runtime GC root does not match the verified output")
+        os.replace(candidate, destination)
+
+
 def installation_files(sr_plugin, home):
     helper = Path(__file__).resolve()
     files = [(helper, home / ".local/bin/id14-remix.py", 0o755)]
     supplied = os.environ.get("ID14_REMIX_PLUGIN_SOURCE")
     plugin = Path(supplied).expanduser().resolve() if supplied else sr_plugin.with_name("libid14_remix_ladspa.so")
-    if supplied or plugin.exists():
+    install_remix = bool(supplied) or plugin.exists()
+    if install_remix:
         if not plugin.is_file():
             raise ValueError("remix plugin source is not a file")
         # Isolate invalid native libraries from the install transaction process.
@@ -299,6 +354,8 @@ def installation_files(sr_plugin, home):
         if not model.is_file():
             raise ValueError("remix model source is not a file")
         files.append((model, home / ".local/share/id14-sr/remix.onnx", 0o644))
+    if install_remix:
+        prepare_ort_library(home)
     return files
 
 
@@ -308,6 +365,8 @@ def main(args):
             read_state()
     elif args[:1] == ["_probe"] and len(args) == 2:
         probe_plugin(args[1])
+    elif args[:1] == ["_probe_ort"] and len(args) == 2:
+        print(probe_ort_library(args[1]))
     elif args[:1] == ["graph"] and len(args) == 2:
         print(graph(args[1]))
     elif args[:1] == ["apply"] and len(args) == 2:
