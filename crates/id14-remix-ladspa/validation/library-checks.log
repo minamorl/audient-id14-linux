@@ -1,0 +1,42 @@
+CHECK=workspace
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+EXIT=0
+CHECK=build
+    Finished `release` profile [optimized] target(s) in 0.06s
+EXIT=0
+CHECK=discovery
+{"error":{"code":"ModelInvalid","details":"remix-v1 signature, metadata, operators or outputs are invalid","message":"Remix model unavailable","trace_id":"01a10ad4-5d6b-7654-9e05-9e538649cfa6"},"level":"warn","msg":"Remix model unavailable; continuing with neutral playback","trace_id":"01a10ad4-5d6b-7654-9e05-9e538649cfa6","ts":1791183052.1397605}
+{"check": "unavailable_native_runtime", "library": "/home/minamorl/repos/.worktrees/audient-id14-linux/remix-runtime/crates/id14-remix-ladspa/.build/library-discovery-4ug3ltpy/missing.so", "state": 5, "bit_mismatches": 0}
+RUNTIME_FAILURE_VERIFICATION_OK
+LIBRARY_DISCOVERY_VERIFICATION_OK
+EXIT=0
+CHECK=bench
+{"max_ms":0.0014399999999999999,"p50_ms":0.00019999999999999998,"p99_ms":0.00039999999999999996,"phase":"adapter_input_copy","samples":500}
+{"max_ms":0.695581,"p50_ms":0.670211,"p99_ms":0.6872309999999999,"phase":"adapter_session_run","samples":500}
+{"max_ms":0.00625,"p50_ms":0.00268,"p99_ms":0.0029000000000000002,"phase":"adapter_output_copy_validate","samples":500}
+{"max_ms":0.699531,"p50_ms":0.662811,"p99_ms":0.6806610000000001,"phase":"actual_worker_infer","samples":500}
+EXIT=0
+CHECK=so
+{"check": "true_peak", "dc": 0, "excess_linear": 0, "hz": 3000, "input_dbtp": -0.6303656851902566, "output_dbtp": -0.6303656851902566}
+{"check": "true_peak", "dc": 0.95, "excess_linear": 0, "hz": 6000, "input_dbtp": -0.2645840068909675, "output_dbtp": -0.2645840068909675}
+{"check": "silence", "nonzero_samples": 0}
+SO_VERIFICATION_OK
+EXIT=0
+CHECK=state
+{"bit_mismatches": 0, "check": "publication_failure_audio", "enabled": 1, "mode": "unset"}
+{"bit_mismatches": 0, "check": "publication_failure_audio", "enabled": 1, "mode": "not_directory"}
+{"bit_mismatches": 0, "check": "publication_failure_audio", "enabled": 1, "mode": "permission_denied"}
+STATE_SO_VERIFICATION_OK
+EXIT=0
+CHECK=realtime
+{"model": "/home/minamorl/repos/.worktrees/audient-id14-linux/remix-runtime/crates/id14-remix-ladspa/.build/remix-2000.onnx", "bytes": 544901, "sha256": "d22d567981f3d895d36a99a74d934462f79f03555ef74ec94ded855d4a5dd760"}
+{"blocks": 5625, "callback_wall_us_max": 1318.8820012146607, "callback_wall_us_p99": 915.965795866214, "check": "trained_model_realtime", "deadline_lateness_ms_max": 0.37268901360221207, "interval_ms_p50": 5.333316992619075, "interval_ms_p99": 5.374515042058192, "latency_frames": 3776, "overloaded_blocks": 0, "period_ms": 5.333333333333333, "seconds": 30.0, "states": {"1": 5625}, "warmup_blocks": 187, "warmup_states": {"1": 187}}
+{"check": "plugin_worker_infer", "samples": 2911, "p50_ms": 0.807271, "p99_ms": 1.073143, "max_ms": 2.767243}
+REALTIME_SO_VERIFICATION_OK
+EXIT=0
+CHECK=diff
+EXIT=0
+80d17737b6db37f8642699598a2570b9e5bce24ee4b5d9bcbd7d8441f44071bd  /home/minamorl/repos/.worktrees/audient-id14-linux/remix-runtime/crates/id14-remix-ladspa/.build/target/release/libid14_remix_ladspa.so

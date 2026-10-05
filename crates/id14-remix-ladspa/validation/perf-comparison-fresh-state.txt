@@ -1,0 +1,66 @@
+   Compiling id14-remix-ladspa v0.1.0 (/home/minamorl/repos/.worktrees/audient-id14-linux/remix-runtime/crates/id14-remix-ladspa)
+    Finished `release` profile [optimized] target(s) in 4.03s
+     Running `crates/id14-remix-ladspa/.build/target/release/examples/bench_worker crates/id14-remix-ladspa/.build/remix-2000.onnx 300 --tract-profile`
+{"load_stage":"actual_adapter_load_and_probe","ms":30.687711999999998}
+{"adapter_load_stages_ms":{"decode_validate":0.874889,"probe":1.2189189999999999,"runtime_init":7.947666000000001,"session_optimize_build":20.286458}}
+{"max_ms":0.00253,"p50_ms":0.00023999999999999998,"p99_ms":0.00157,"phase":"adapter_input_copy","samples":300}
+{"max_ms":0.828639,"p50_ms":0.721259,"p99_ms":0.775909,"phase":"adapter_session_run","samples":300}
+{"max_ms":0.011179999999999999,"p50_ms":0.0029100000000000003,"p99_ms":0.003909999999999999,"phase":"adapter_output_copy_validate","samples":300}
+{"max_ms":0.931829,"p50_ms":0.742349,"p99_ms":0.9142,"phase":"actual_worker_infer","samples":300}
+{"load_stage":"file_read","ms":0.73407}
+{"load_stage":"protobuf_decode","ms":1.164579}
+{"load_stage":"onnx_import","ms":0.47049}
+{"load_stage":"into_optimized","ms":32.44863}
+{"load_stage":"into_runnable","ms":0.07508000000000001}
+{"max_ms":0.02104,"p50_ms":0.00486,"p99_ms":0.02104,"phase":"input_alloc_copy","samples":50}
+{"max_ms":0.08574999999999999,"p50_ms":0.02112,"p99_ms":0.08574999999999999,"phase":"execution_state_new","samples":50}
+{"max_ms":21.059818,"p50_ms":17.07196,"p99_ms":21.059818,"phase":"profiled_execution","samples":50}
+{"max_ms":0.01134,"p50_ms":0.00423,"p99_ms":0.01134,"phase":"output_copy_validate","samples":50}
+{"mean_ms":0.005402399999999998,"operator_group":"Add"}
+{"mean_ms":0.01483778,"operator_group":"Concat"}
+{"mean_ms":0.06015067999999999,"operator_group":"GRU"}
+{"mean_ms":0.014654599999999997,"operator_group":"Gather"}
+{"mean_ms":14.596800300000002,"operator_group":"Im2col"}
+{"mean_ms":0.03065935999999999,"operator_group":"IntoShape"}
+{"mean_ms":0.0089258,"operator_group":"Ln"}
+{"mean_ms":0.009136400000000001,"operator_group":"Mul"}
+{"mean_ms":0.02448396,"operator_group":"OptAddByScalar"}
+{"mean_ms":0.019014999999999994,"operator_group":"OptAddUnicast"}
+{"mean_ms":0.7726742599999998,"operator_group":"OptMatMul"}
+{"mean_ms":0.015169799999999997,"operator_group":"OptMatMulPack"}
+{"mean_ms":0.02709018,"operator_group":"OptMulByScalar"}
+{"mean_ms":0.0306538,"operator_group":"OptMulUnicast"}
+{"mean_ms":0.008972180000000001,"operator_group":"OptSubByScalar"}
+{"mean_ms":0.0250862,"operator_group":"Reduce<MeanOfSquares>"}
+{"mean_ms":0.037865,"operator_group":"Reduce<Sum>"}
+{"mean_ms":1.0581726400000002,"operator_group":"Resize"}
+{"mean_ms":0.0020446,"operator_group":"Rsqrt"}
+{"mean_ms":0.04428478000000001,"operator_group":"Sigmoid"}
+{"mean_ms":0.30979592000000006,"operator_group":"Softmax"}
+{"mean_ms":0.00041720000000000006,"operator_group":"Source"}
+{"mean_ms":0.0015378000000000006,"operator_group":"Sqrt"}
+{"mean_ms":0.0013762,"operator_group":"Square"}
+{"mean_ms":2.785974119999999,"node":"/dec0/Conv.im2col :: Im2col"}
+{"mean_ms":2.6937655,"node":"/dec1/Conv.im2col :: Im2col"}
+{"mean_ms":0.8248996800000001,"node":"/enc0/net/net.2/Conv.im2col :: Im2col"}
+{"mean_ms":0.8220298599999998,"node":"/enc0/net/net.0/Conv.im2col :: Im2col"}
+{"mean_ms":0.81985394,"node":"/dec0_block/net/net.0/Conv.im2col :: Im2col"}
+{"mean_ms":0.8139157199999998,"node":"/dec0_block/net/net.2/Conv.im2col :: Im2col"}
+{"mean_ms":0.8132894799999998,"node":"/enc1/net/net.2/Conv.im2col :: Im2col"}
+{"mean_ms":0.81005028,"node":"/dec1_block/net/net.0/Conv.im2col :: Im2col"}
+{"mean_ms":0.8077803200000001,"node":"/bottleneck/net/net.2/Conv.im2col :: Im2col"}
+{"mean_ms":0.8069053400000002,"node":"/dec1_block/net/net.2/Conv.im2col :: Im2col"}
+{"mean_ms":0.8067936800000001,"node":"/enc1/net/net.0/Conv.im2col :: Im2col"}
+{"mean_ms":0.80472314,"node":"/bottleneck/net/net.0/Conv.im2col :: Im2col"}
+{"mean_ms":0.53415998,"node":"/Resize :: Resize"}
+{"mean_ms":0.5240126600000002,"node":"/Resize_1 :: Resize"}
+{"mean_ms":0.42063857999999976,"node":"/down1/Conv.im2col :: Im2col"}
+{"max_ms":21.018367,"p50_ms":16.7806,"p99_ms":20.550158,"phase":"reused_execution_state","samples":300}
+{"max_absolute_error":0.06360892951488495,"parity_hop":0}
+{"max_absolute_error":0.06015893816947937,"parity_hop":1}
+{"max_absolute_error":0.05778840184211731,"parity_hop":2}
+{"check":"ort_tract_mask_parity","hops":32,"max_absolute_error":0.06360892951488495}
+
+thread 'main' (2) panicked at crates/id14-remix-ladspa/examples/bench_worker.rs:196:5:
+assertion failed: error < 1e-4
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

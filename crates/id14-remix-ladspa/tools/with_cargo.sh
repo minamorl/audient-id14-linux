@@ -9,4 +9,9 @@ export CARGO_PROFILE_DEV_DEBUG=0
 mkdir -p "$remix_crate/.build/tmp"
 export TMPDIR="$remix_crate/.build/tmp"
 cd "$remix_crate/../.."
+if [[ -z "${ID14_ORT_LIBRARY:-}" ]]; then
+  # Runtime environment for cargo test/run only; the plugin embeds no library path.
+  remix_ort_store="$(nix --option eval-cache false build --no-link --print-out-paths nixpkgs#onnxruntime)"
+  export ID14_ORT_LIBRARY="$remix_ort_store/lib/libonnxruntime.so"
+fi
 exec nix --option eval-cache false shell nixpkgs#rustc nixpkgs#cargo -c cargo "$@"

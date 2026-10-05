@@ -1,0 +1,8 @@
+    Finished `release` profile [optimized] target(s) in 0.05s
+     Running `crates/id14-remix-ladspa/.build/target/release/examples/bench_worker /home/minamorl/repos/.worktrees/audient-id14-linux/remix-runtime/crates/id14-remix-ladspa/.build/remix-2000.onnx 500`
+{"load_stage":"actual_adapter_load_and_probe","ms":24.627261}
+{"adapter_load_stages_ms":{"decode_validate":0.914501,"probe":1.094611,"runtime_init":6.260797,"session_optimize_build":15.961621}}
+{"max_ms":0.0014399999999999999,"p50_ms":0.00019999999999999998,"p99_ms":0.00039999999999999996,"phase":"adapter_input_copy","samples":500}
+{"max_ms":0.695581,"p50_ms":0.670211,"p99_ms":0.6872309999999999,"phase":"adapter_session_run","samples":500}
+{"max_ms":0.00625,"p50_ms":0.00268,"p99_ms":0.0029000000000000002,"phase":"adapter_output_copy_validate","samples":500}
+{"max_ms":0.699531,"p50_ms":0.662811,"p99_ms":0.6806610000000001,"phase":"actual_worker_infer","samples":500}

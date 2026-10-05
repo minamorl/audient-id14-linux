@@ -1,0 +1,60 @@
+{"load_stage":"actual_adapter_load_and_probe","ms":35.112249}
+{"adapter_load_stages_ms":{"decode_validate":1.148879,"probe":1.067539,"runtime_init":7.506826,"session_optimize_build":21.749477}}
+{"max_ms":0.00198,"p50_ms":0.00023999999999999998,"p99_ms":0.00122,"phase":"adapter_input_copy","samples":1000}
+{"max_ms":1.098699,"p50_ms":0.697589,"p99_ms":0.96024,"phase":"adapter_session_run","samples":1000}
+{"max_ms":0.013720000000000001,"p50_ms":0.00279,"p99_ms":0.0049,"phase":"adapter_output_copy_validate","samples":1000}
+{"max_ms":0.899299,"p50_ms":0.6774800000000001,"p99_ms":0.7244489999999999,"phase":"actual_worker_infer","samples":1000}
+{"load_stage":"file_read","ms":1.102959}
+{"load_stage":"protobuf_decode","ms":1.944429}
+{"load_stage":"onnx_import","ms":0.78379}
+{"load_stage":"into_optimized","ms":33.916569}
+{"load_stage":"into_runnable","ms":0.07829}
+{"max_ms":0.026,"p50_ms":0.00322,"p99_ms":0.026,"phase":"input_alloc_copy","samples":50}
+{"max_ms":0.07278000000000001,"p50_ms":0.01744,"p99_ms":0.07278000000000001,"phase":"execution_state_new","samples":50}
+{"max_ms":18.985128,"p50_ms":16.03913,"p99_ms":18.985128,"phase":"profiled_execution","samples":50}
+{"max_ms":0.013770000000000001,"p50_ms":0.00381,"p99_ms":0.013770000000000001,"phase":"output_copy_validate","samples":50}
+{"mean_ms":0.0037334,"operator_group":"Add"}
+{"mean_ms":0.009509799999999999,"operator_group":"Concat"}
+{"mean_ms":0.039013360000000004,"operator_group":"GRU"}
+{"mean_ms":0.01148298,"operator_group":"Gather"}
+{"mean_ms":13.721805320000001,"operator_group":"Im2col"}
+{"mean_ms":0.021422600000000003,"operator_group":"IntoShape"}
+{"mean_ms":0.008373199999999996,"operator_group":"Ln"}
+{"mean_ms":0.0045332,"operator_group":"Mul"}
+{"mean_ms":0.0203178,"operator_group":"OptAddByScalar"}
+{"mean_ms":0.0143472,"operator_group":"OptAddUnicast"}
+{"mean_ms":0.67689604,"operator_group":"OptMatMul"}
+{"mean_ms":0.013409399999999998,"operator_group":"OptMatMulPack"}
+{"mean_ms":0.02297498,"operator_group":"OptMulByScalar"}
+{"mean_ms":0.028351360000000003,"operator_group":"OptMulUnicast"}
+{"mean_ms":0.007696799999999999,"operator_group":"OptSubByScalar"}
+{"mean_ms":0.022626800000000006,"operator_group":"Reduce<MeanOfSquares>"}
+{"mean_ms":0.03137634,"operator_group":"Reduce<Sum>"}
+{"mean_ms":1.03013602,"operator_group":"Resize"}
+{"mean_ms":0.0012976,"operator_group":"Rsqrt"}
+{"mean_ms":0.039991139999999994,"operator_group":"Sigmoid"}
+{"mean_ms":0.30756458000000003,"operator_group":"Softmax"}
+{"mean_ms":0.0004124000000000001,"operator_group":"Source"}
+{"mean_ms":0.0014114,"operator_group":"Sqrt"}
+{"mean_ms":0.00137918,"operator_group":"Square"}
+{"mean_ms":2.44869852,"node":"/dec1/Conv.im2col :: Im2col"}
+{"mean_ms":2.43660016,"node":"/dec0/Conv.im2col :: Im2col"}
+{"mean_ms":0.7994626400000001,"node":"/dec0_block/net/net.0/Conv.im2col :: Im2col"}
+{"mean_ms":0.79762194,"node":"/enc0/net/net.0/Conv.im2col :: Im2col"}
+{"mean_ms":0.7957777200000004,"node":"/enc0/net/net.2/Conv.im2col :: Im2col"}
+{"mean_ms":0.7948029399999997,"node":"/dec0_block/net/net.2/Conv.im2col :: Im2col"}
+{"mean_ms":0.78761868,"node":"/dec1_block/net/net.0/Conv.im2col :: Im2col"}
+{"mean_ms":0.7849539999999999,"node":"/enc1/net/net.0/Conv.im2col :: Im2col"}
+{"mean_ms":0.7828567200000001,"node":"/bottleneck/net/net.2/Conv.im2col :: Im2col"}
+{"mean_ms":0.7820686799999998,"node":"/enc1/net/net.2/Conv.im2col :: Im2col"}
+{"mean_ms":0.7790572,"node":"/dec1_block/net/net.2/Conv.im2col :: Im2col"}
+{"mean_ms":0.7787779400000003,"node":"/bottleneck/net/net.0/Conv.im2col :: Im2col"}
+{"mean_ms":0.51999352,"node":"/Resize :: Resize"}
+{"mean_ms":0.5101425,"node":"/Resize_1 :: Resize"}
+{"mean_ms":0.4043801599999999,"node":"/down1/Conv.im2col :: Im2col"}
+{"max_ms":18.795198,"p50_ms":15.757670000000001,"p99_ms":17.778039,"phase":"reused_execution_state","samples":1000}
+{"check":"ort_tract_mask_parity","hops":32,"max_absolute_error":0.06360892951488495}
+
+thread 'main' (2) panicked at crates/id14-remix-ladspa/examples/bench_worker.rs:196:5:
+assertion failed: error < 1e-4
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace

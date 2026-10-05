@@ -1,10 +1,10 @@
 use crate::dsp::*;
 use crate::queue::{channel, Consumer, Producer};
 use crate::state::Telemetry;
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 use std::sync::Arc;
 use std::thread::{self, JoinHandle};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 const RING: usize = 16384;
 const SPECTRA: usize = 8;
@@ -110,6 +110,8 @@ struct Shared {
     stop: AtomicBool,
     paused: AtomicBool,
     telemetry: Arc<Telemetry>,
+    inference_ns: [AtomicU64; 8192],
+    inference_count: AtomicUsize,
 }
 
 pub struct Engine {
@@ -162,6 +164,8 @@ impl Engine {
             stop: AtomicBool::new(false),
             paused: AtomicBool::new(false),
             telemetry,
+            inference_ns: std::array::from_fn(|_| AtomicU64::new(0)),
+            inference_count: AtomicUsize::new(0),
         });
         let state = shared.clone();
         let worker = thread::Builder::new()
@@ -204,7 +208,16 @@ impl Engine {
                     previous = Some(job.seq);
                     // Advance streaming state even through silence: with Q>0 this
                     // frame can supply a mask for earlier non-silent audio.
-                    let values = match model.infer(&job.x) {
+                    let started = Instant::now();
+                    let inference = model.infer(&job.x);
+                    let elapsed = started.elapsed().as_nanos().min(u64::MAX as u128) as u64;
+                    let count = state.inference_count.load(Ordering::Relaxed);
+                    state.inference_ns[count % state.inference_ns.len()]
+                        .store(elapsed, Ordering::Relaxed);
+                    state
+                        .inference_count
+                        .store(count.wrapping_add(1), Ordering::Release);
+                    let values = match inference {
                         Ok(m) if valid_mask(&m) => m,
                         _ => {
                             state
@@ -292,6 +305,17 @@ impl Engine {
     }
     pub fn latency_frames(&self) -> usize {
         LATENCY
+    }
+    /// Diagnostic snapshot; call after stop_worker for a stable sample set.
+    /// All clocks and writes occur on inference, never on the audio thread.
+    pub fn copy_inference_times(&self, output: &mut [u64]) -> usize {
+        let total = self.shared.inference_count.load(Ordering::Acquire);
+        let count = total.min(self.shared.inference_ns.len()).min(output.len());
+        for (i, value) in output[..count].iter_mut().enumerate() {
+            *value = self.shared.inference_ns[(total - count + i) % self.shared.inference_ns.len()]
+                .load(Ordering::Relaxed);
+        }
+        count
     }
     /// Diagnostic injection for the verification harness; no LADSPA control exposes this.
     pub fn pause_worker(&self, pause: bool) {

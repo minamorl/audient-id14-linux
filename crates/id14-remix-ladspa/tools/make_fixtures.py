@@ -1,5 +1,6 @@
 """Own synthetic fixtures only; no trained/third-party model is shipped here."""
 from pathlib import Path
+import sys
 import numpy as np
 import onnx
 from onnx import TensorProto, helper, numpy_helper
@@ -8,10 +9,12 @@ ROOT = Path(__file__).resolve().parents[1]
 DEST = ROOT / "fixtures"
 DEST.mkdir(exist_ok=True)
 
-def fixture(name, mask, q=0, contract="remix-v1", stateful=False, reverse=False, x_bins=513, state_nan=False):
+def fixture(name, mask, q=0, contract="remix-v1", stateful=False, reverse=False, x_bins=513, state_nan=False, state_size=3):
+    if len(sys.argv)>1 and name != sys.argv[1]:
+        return
     info = helper.make_tensor_value_info
-    inputs = [info("x", TensorProto.FLOAT, [1, 4, x_bins]), info("state", TensorProto.FLOAT, [1, 3])]
-    outputs = [info("mask", TensorProto.FLOAT, [1, 4, 513]), info("state_out", TensorProto.FLOAT, [1, 3])]
+    inputs = [info("x", TensorProto.FLOAT, [1, 4, x_bins]), info("state", TensorProto.FLOAT, [1, state_size])]
+    outputs = [info("mask", TensorProto.FLOAT, [1, 4, 513]), info("state_out", TensorProto.FLOAT, [1, state_size])]
     nodes = [helper.make_node("Constant", [], ["mask"], value=numpy_helper.from_array(mask.astype(np.float32).reshape(1, 4, 513)))]
     if state_nan:
         nodes.append(helper.make_node("Constant", [], ["state_out"], value=numpy_helper.from_array(np.full((1, 3), np.nan, np.float32))))
@@ -36,6 +39,7 @@ def fixture(name, mask, q=0, contract="remix-v1", stateful=False, reverse=False,
 voice = np.zeros((4, 513), np.float32)
 voice[0] = 1
 fixture("voice", voice)
+fixture("zero_state", voice, state_size=0)
 fixture("uniform", np.full((4, 513), 0.25, np.float32))
 bins = np.zeros((4, 513), np.float32)
 bins[3] = 1
@@ -53,4 +57,3 @@ fixture("bad_sum", voice*0.5)
 fixture("negative", voice-0.1)
 fixture("nan_mask", voice*np.nan)
 fixture("nan_state", voice, state_nan=True)
-

@@ -47,7 +47,46 @@ not a claim of allocation in the public LADSPA ID registry; identify by file/lab
 The audio thread owns STFT, synthesis, overlap-add, bass guard, delay, and peak
 protection. Two bounded SPSC queues transfer features and frame-tagged masks.
 All ONNX loading, optimization, allocation and inference happen on the worker.
-The selected CPU runtime is tract-onnx 0.22.1 with native kernels, no GPU/JIT backend.
+The inference runtime is ONNX Runtime 1.27.1 (Nix), via ort 2.0.0-rc.12.
+Only the CPU provider is selected: sequential execution, intra/inter thread count
+1, graph optimization level 3, no spinning, GPU, OpenVINO or JIT provider.
+The session and both input tensors persist across hops. ONNX state_out is copied
+into the next state input; reset zeros this state. Tract 0.22.1 remains for
+protobuf/contract validation and the explicit comparison benchmark, not inference.
+
+Native runtime discovery happens once per process, on the inference worker:
+
+1. The **runtime** environment variable `ID14_ORT_LIBRARY`, when present.
+2. `$HOME/.local/lib/id14-sr/onnxruntime/lib/libonnxruntime.so`, when HOME is present.
+3. `libonnxruntime.so` through the normal dynamic loader search.
+
+Missing or incompatible candidates fall through to the next entry. The first
+usable C API is retained for the process lifetime. If no candidate is usable,
+playback remains neutral and State/remix-state-v1 report ModelInvalid (5).
+No build-time environment value or native Nix store path is embedded. The
+installer in another lane owns the HOME symlink and its `nix build --out-link`
+GC root. `tools/with_cargo.sh` resolves nixpkgs#onnxruntime only to supply the
+runtime environment for local cargo test/run; it does not package a native library.
+Fallible loading checks the C API before calling any ORT Rust API.
+
+`tools/verify_library_discovery.py` launches fresh processes against the release
+plugin, checks precedence with distinct usable libraries and the HOME symlink,
+and verifies neutral audio, State, JSON publication and cleanup when all are absent.
+Build the release plugin with a distinctive `ID14_ORT_LIBRARY` sentinel and pass
+that exact value as `--build-library`; the tool rejects its presence in the binary.
+`bash tools/check_library_paths.sh /absolute/libonnxruntime.so /absolute/remix.onnx`
+runs the workspace/build, discovery, benchmark, audio/state and 30-second real-time
+checks sequentially. Its runtime/temp files stay inside `.build`; commands, raw
+outputs and exit codes are retained as `validation/library-*`.
+
+`examples/bench_worker.rs` times the exact model adapter on a worker thread, with
+separate startup and per-hop phases. `--tract-profile` additionally profiles the
+old runtime's operators, tests execution-state reuse and compares streaming mask
+values. `tools/verify_realtime_so.py` measures the actual plugin worker and drives
+256-frame blocks on absolute 5.333 ms deadlines. Its diagnostic C entrypoint
+`id14_remix_inference_times(handle, u64_buffer, capacity)` returns up to 8192 latest
+hop durations (nanoseconds); call outside run after `id14_remix_stop_worker` for a
+stable snapshot. Timing clocks and writes run only on the inference worker.
 Initialization may allocate; `run` does not allocate, load files, take a mutex,
 join a worker, or perform inference. The plugin does not advertise LADSPA's
 stronger HARD_RT_CAPABLE timing guarantee.
