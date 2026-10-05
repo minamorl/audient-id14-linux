@@ -4,6 +4,37 @@ use crate::engine::*;
 use std::f64::consts::PI;
 use std::time::{Duration, Instant};
 
+thread_local! {
+    static CALLBACK_ALLOCS: std::cell::Cell<(bool, usize)> = const { std::cell::Cell::new((false, 0)) };
+}
+struct TrackingAllocator;
+// Track only the current test's callback thread; worker inference is allowed to allocate.
+unsafe impl std::alloc::GlobalAlloc for TrackingAllocator {
+    unsafe fn alloc(&self, layout: std::alloc::Layout) -> *mut u8 {
+        let _ = CALLBACK_ALLOCS.try_with(|c| {
+            let (active, count) = c.get();
+            if active {
+                c.set((true, count + 1));
+            }
+        });
+        std::alloc::GlobalAlloc::alloc(&std::alloc::System, layout)
+    }
+    unsafe fn dealloc(&self, pointer: *mut u8, layout: std::alloc::Layout) {
+        std::alloc::GlobalAlloc::dealloc(&std::alloc::System, pointer, layout)
+    }
+    unsafe fn realloc(&self, pointer: *mut u8, layout: std::alloc::Layout, size: usize) -> *mut u8 {
+        let _ = CALLBACK_ALLOCS.try_with(|c| {
+            let (active, count) = c.get();
+            if active {
+                c.set((true, count + 1));
+            }
+        });
+        std::alloc::GlobalAlloc::realloc(&std::alloc::System, pointer, layout, size)
+    }
+}
+#[global_allocator]
+static CALLBACK_ALLOCATOR: TrackingAllocator = TrackingAllocator;
+
 struct VoiceMask;
 impl SeparationModel for VoiceMask {
     fn lookahead(&self) -> usize {
@@ -119,9 +150,11 @@ fn exact_dry_paths_and_measured_delay() {
 #[test]
 fn active_gain_stereo_and_callback_cost() {
     let mut e = engine();
-    let input = tone(RATE * 2, 3000.0, 0.05);
+    // A single source must return to its input loudness after the slow matcher
+    // settles. A permanent +3 dB expectation would contradict loudness fairness.
+    let input = tone(RATE * 10, 3000.0, 0.05);
     let (output, mut us) = process(&mut e, &input, true);
-    let from = LATENCY + RATE / 2;
+    let from = LATENCY + RATE * 8;
     let rms_error = output[from..]
         .iter()
         .map(|y| (y[1] as f64 - 0.5 * y[0] as f64).powi(2))
@@ -129,9 +162,9 @@ fn active_gain_stereo_and_callback_cost() {
         .sqrt();
     let measured_gain = projection(&output[from..from + RATE], 3000.0, 0) / 0.05;
     us.sort_by(f64::total_cmp);
-    println!("active gain_3000_hz={measured_gain:.9} target={:.9} stereo_ratio_error={rms_error:e} callback_256_us_p50={:.3} p99={:.3} max={:.3} final_status={:?}", 10_f64.powf(3.0/20.0), us[us.len()/2], us[us.len()*99/100], us[us.len()-1], e.status());
+    println!("active gain_3000_hz={measured_gain:.9} target=1 loudness_delta_db={:.6} stereo_ratio_error={rms_error:e} callback_256_us_p50={:.3} p99={:.3} max={:.3} final_status={:?}", 20.0*measured_gain.log10(), us[us.len()/2], us[us.len()*99/100], us[us.len()-1], e.status());
     assert!(rms_error < 1e-6);
-    assert!((measured_gain - 10_f64.powf(3.0 / 20.0)).abs() < 0.005);
+    assert!((20.0 * measured_gain.log10()).abs() <= 0.5);
     assert_eq!(e.status(), Status::Active);
 }
 
@@ -170,6 +203,29 @@ fn silence_adds_no_signal() {
     let nonzero = output.iter().flatten().filter(|x| x.to_bits() != 0).count();
     println!("silent_output_nonzero_samples={nonzero}");
     assert_eq!(nonzero, 0);
+}
+
+#[test]
+fn loudness_matching_callback_allocates_nothing() {
+    let mut e = engine();
+    let mut output = [[0.0; 2]; 256];
+    let input = std::array::from_fn::<_, 256, _>(|n| {
+        let value = (0.05 * (2.0 * PI * 3000.0 * n as f64 / RATE as f64).sin()) as f32;
+        [value, value * 0.7]
+    });
+    for _ in 0..400 {
+        CALLBACK_ALLOCS.with(|c| c.set((true, c.get().1)));
+        e.process(&input, &mut output);
+        CALLBACK_ALLOCS.with(|c| c.set((false, c.get().1)));
+        std::thread::sleep(Duration::from_micros(300));
+    }
+    let count = CALLBACK_ALLOCS.with(|c| c.get().1);
+    println!(
+        "callback_allocations={count} loudness_gain_db={}",
+        e.loudness_gain_db()
+    );
+    assert_eq!(count, 0);
+    assert!(e.loudness_gain_db() < -0.1, "exercise the active matcher");
 }
 
 #[test]

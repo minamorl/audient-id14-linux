@@ -1,4 +1,5 @@
 use crate::dsp::*;
+use crate::loudness::LoudnessMatch;
 use crate::queue::{channel, Consumer, Producer};
 use crate::state::Telemetry;
 use std::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
@@ -121,6 +122,7 @@ pub struct Engine {
     rx: Consumer<Mask, 16>,
     fourier: Fourier,
     guard: BassGuard,
+    loudness: LoudnessMatch,
     input: Vec<Stereo>,
     residual: Vec<Stereo>,
     tags: Vec<u64>,
@@ -263,13 +265,16 @@ impl Engine {
             }
             h
         });
+        let guard = BassGuard::default();
+        let loudness = LoudnessMatch::new(&guard);
         Self {
             shared,
             worker,
             tx,
             rx,
             fourier: Fourier::default(),
-            guard: BassGuard::default(),
+            guard,
+            loudness,
             input: vec![[0.0; 2]; RING],
             residual: vec![[0.0; 2]; RING],
             tags: vec![u64::MAX; RING],
@@ -305,6 +310,9 @@ impl Engine {
     }
     pub fn latency_frames(&self) -> usize {
         LATENCY
+    }
+    pub fn loudness_gain_db(&self) -> f32 {
+        self.loudness.db()
     }
     /// Diagnostic snapshot; call after stop_worker for a stable sample set.
     /// All clocks and writes occur on inference, never on the audio thread.
@@ -411,9 +419,15 @@ impl Engine {
         }
         // When a mask is missing, retain its spectral shape only during the dry fade.
         // This synthesizes current audio; old audio samples are never repeated.
-        let transformed = self
-            .fourier
-            .residual(&spectrum.data, &self.last_mask, self.controls.db);
+        let normalization =
+            self.loudness
+                .gain(&spectrum.data, &self.last_mask, self.controls.db, valid);
+        let transformed = self.fourier.normalized_residual(
+            &spectrum.data,
+            &self.last_mask,
+            self.controls.db,
+            normalization,
+        );
         let start = (target as i64 - 1) * HOP as i64 + LATENCY as i64 - FIR_DELAY as i64;
         for n in 0..HOP {
             let value = std::array::from_fn(|ch| transformed[n][ch] + self.overlap[n][ch]);

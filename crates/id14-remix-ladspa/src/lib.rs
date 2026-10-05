@@ -4,6 +4,7 @@ pub mod engine;
 #[cfg(not(feature = "comparison-legacy-guard"))]
 mod guard_coefficients;
 pub mod ladspa;
+mod loudness;
 pub mod model;
 pub mod queue;
 mod state;

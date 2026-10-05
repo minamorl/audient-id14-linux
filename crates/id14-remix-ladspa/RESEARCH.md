@@ -39,3 +39,6 @@
 
 Read during this implementation run. These are external primary API sources, explicitly
 authorized by the caller. No existing target code or tests were read.
+
+- https://www.itu.int/dms_pubrec/itu-r/rec/bs/R-REC-BS.1770-5-202311-I!!PDF-E.pdf — loudness follow-up: Annex 1 K-weighting coefficients at 48 kHz, stereo weights, 400 ms/75% overlap absolute and relative gating, 997 Hz meter reference.
+- https://tech.ebu.ch/loudness/ — EBU Mode distinguishes 400 ms momentary, 3 s short-term and programme-integrated loudness; the controller's 3 s exponential average is an implementation choice, not a claim to implement the EBU meter.

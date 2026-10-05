@@ -108,6 +108,35 @@ unsupported model. Masks must be finite, nonnegative, and sum to one per bin wit
 
 ## Low-band and peak protection
 
+Loudness matching uses a common gain for both channels and all remixed bins.
+For bins at/above 328.125 Hz (the first bin above 300 Hz), the synthesized
+correction is `(c * g[k] - 1) * X[k]`; lower bins remain zero. This correction
+still passes through the existing bass guard and peak protection. The original
+dry samples are never multiplied. OFF, all-zero controls, missing models and
+overload retain the existing dry bypass and fade. No delay or control port is added.
+
+`loudness.rs` evaluates the BS.1770 K-weighting response at the STFT bins and
+includes the bass guard's zero-phase response in a quadratic energy predictor.
+Its three energy moments use a 3-second exponential average. The common gain is
+bounded to +/-3 dB, follows with a 0.5-second time constant, and moves at most
+0.5 dB/second. It starts at 0 dB; startup is included in the verification results.
+It freezes through missing masks and approximately -70 LKFS quiet frames. A
+nonzero amount change discards stale energy moments but retains the smooth gain;
+all-zero amounts clear the matcher. While OFF it can estimate the same requested
+mixture without applying any correction, so ON does not reset the estimate.
+Initialization precomputes frequency/guard weights. Each audio hop uses fixed
+arrays and scalar arithmetic without allocating, locking, I/O or inference.
+
+The controller is a feed-forward spectral estimate, not a programme-integrated
+loudness meter. `tools/verify_loudness_so.py` independently measures actual output
+with time-domain K filters and BS.1770 400 ms blocks, absolute/relative gating.
+It includes the 997 Hz reference check, the caller's two WAVs, synthesized voiced
+syllables/instruments, and a stationary pumping probe, both remix alone and
+remix -> SR at 185. Diagnostic `id14_remix_loudness_gain_db` must be read between
+run calls by the owning host; it adds no LADSPA port. The reported 3-second
+ON/OFF loudness-difference variation includes source changes; the stationary
+probe separates settled gain modulation from the original signal envelope.
+
 Bins below 300 Hz have no correction. A symmetric 1025-tap high-pass additionally
 rejects synthesis-window leakage. `tools/design_guard.py` searches passband edges
 400/425/450 Hz and chooses 450 Hz with <=0.1 dB ripple and >=66 dB rejection margin.

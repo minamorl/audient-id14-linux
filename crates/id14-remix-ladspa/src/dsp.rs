@@ -109,6 +109,18 @@ impl Fourier {
         mask: &[f32; 4 * BINS],
         db: [f32; 4],
     ) -> [Stereo; FFT] {
+        self.normalized_residual(spectrum, mask, db, 1.0)
+    }
+    pub fn normalized_residual(
+        &self,
+        spectrum: &[[Complex; FFT]; 2],
+        mask: &[f32; 4 * BINS],
+        db: [f32; 4],
+        normalization: f64,
+    ) -> [Stereo; FFT] {
+        if db == [0.0; 4] {
+            return [[0.0; 2]; FFT];
+        }
         let gains = db.map(|x| 10_f64.powf(x.clamp(-6.0, 6.0) as f64 / 20.0) - 1.0);
         let mut out = [[0.0_f32; 2]; FFT];
         for ch in 0..2 {
@@ -117,6 +129,9 @@ impl Fourier {
                 let gain: f64 = (0..4)
                     .map(|part| gains[part] * mask[part * BINS + k] as f64)
                     .sum();
+                // Normalize only the remixed high band; synthesize its difference
+                // from the input. The unchanged dry signal is added later.
+                let gain = normalization * (1.0 + gain) - 1.0;
                 bins[k] = Complex {
                     re: spectrum[ch][k].re * gain,
                     im: spectrum[ch][k].im * gain,
@@ -195,6 +210,15 @@ impl Default for BassGuard {
     }
 }
 impl BassGuard {
+    /// Zero-phase response used by the loudness predictor, only during setup.
+    pub(crate) fn response_at_bin(&self, k: usize) -> f64 {
+        let omega = 2.0 * PI * k as f64 / FFT as f64;
+        self.taps
+            .iter()
+            .enumerate()
+            .map(|(i, h)| h * (omega * (i as f64 - FIR_DELAY as f64)).cos())
+            .sum()
+    }
     pub fn sample(&mut self, input: Stereo) -> Stereo {
         self.history[self.cursor] = input;
         let mut result = [0.0_f64; 2];

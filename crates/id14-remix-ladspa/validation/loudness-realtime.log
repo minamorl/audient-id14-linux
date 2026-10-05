@@ -1,0 +1,4 @@
+{"model": "/tmp/id14-remix-models/remix-20000.onnx", "bytes": 544901, "sha256": "b299f8ff621997c4412214755e1cd33c80d6fc889631fc6ec13a8e6a6a988e4d"}
+{"blocks": 5625, "callback_wall_us_max": 1228.0700029805303, "callback_wall_us_p99": 889.0630368841812, "check": "trained_model_realtime", "deadline_lateness_ms_max": 0.42768333514686674, "interval_ms_p50": 5.333319990313612, "interval_ms_p99": 5.582262196694502, "latency_frames": 3776, "overloaded_blocks": 0, "period_ms": 5.333333333333333, "seconds": 30.0, "states": {"1": 5625}, "warmup_blocks": 187, "warmup_states": {"1": 187}}
+{"check": "plugin_worker_infer", "samples": 2911, "p50_ms": 0.79305, "p99_ms": 1.006431, "max_ms": 1.06761}
+REALTIME_SO_VERIFICATION_OK

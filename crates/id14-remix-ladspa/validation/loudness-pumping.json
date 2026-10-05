@@ -1,0 +1,40 @@
+[
+  {
+    "material": "stationary_pumping",
+    "chain": "remix",
+    "seconds": 32.0,
+    "source_sha256": "synthetic",
+    "off_lufs": -22.433880899841885,
+    "on_lufs": -22.121798872720408,
+    "delta_lu": 0.3120820271214768,
+    "short_delta_p05_lu": -0.0007275318925437091,
+    "short_delta_p95_lu": 1.4684953992049117,
+    "short_delta_max_100ms_step_lu": 0.05032523833092739,
+    "input_difference_rms_db": -20.455780029296875,
+    "gain_min_db": -2.922699213027954,
+    "gain_max_db": 0.0,
+    "gain_max_slew_db_s": 0.5000084638595581,
+    "settled_gain_peak_to_peak_db": 0.00029277801513671875,
+    "settled_short_delta_peak_to_peak_lu": 0.006721300772536409,
+    "settled_momentary_delta_peak_to_peak_lu": 0.05082049772353159
+  },
+  {
+    "material": "stationary_pumping",
+    "chain": "remix_sr185",
+    "seconds": 32.0,
+    "source_sha256": "synthetic",
+    "off_lufs": -22.433880160194473,
+    "on_lufs": -22.12177610398318,
+    "delta_lu": 0.3121040562112931,
+    "short_delta_p05_lu": -0.0007057037354147866,
+    "short_delta_p95_lu": 1.4685180706059047,
+    "short_delta_max_100ms_step_lu": 0.050324894279142995,
+    "input_difference_rms_db": -20.4537353515625,
+    "gain_min_db": -2.922699213027954,
+    "gain_max_db": 0.0,
+    "gain_max_slew_db_s": 0.5000084638595581,
+    "settled_gain_peak_to_peak_db": 0.00029277801513671875,
+    "settled_short_delta_peak_to_peak_lu": 0.006721130441675882,
+    "settled_momentary_delta_peak_to_peak_lu": 0.05081742460557592
+  }
+]
