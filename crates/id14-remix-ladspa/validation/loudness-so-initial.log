@@ -1,0 +1,60 @@
+{"error":{"code":"ModelMissing","details":"file is missing or unreadable","message":"Remix model unavailable","trace_id":"01a10af5-dd0c-7679-9205-96dd43f3eff1"},"level":"warn","msg":"Remix model unavailable; continuing with neutral playback","trace_id":"01a10af5-dd0c-7679-9205-96dd43f3eff1","ts":1791185247.5003946}
+{"bit_mismatches": 0, "check": "transparency_and_delay", "measured_frames": 3776, "mode": "missing", "reported_frames": 3776, "sr_inclusive_ms": 100.0, "state": 4}
+{"bit_mismatches": 0, "check": "transparency_and_delay", "measured_frames": 3776, "mode": "off", "reported_frames": 3776, "sr_inclusive_ms": 100.0, "state": 2}
+{"bit_mismatches": 0, "check": "transparency_and_delay", "measured_frames": 3776, "mode": "zero", "reported_frames": 3776, "sr_inclusive_ms": 100.0, "state": 3}
+{"bit_mismatches": 0, "check": "transparency_and_delay", "measured_frames": 3776, "mode": "inplace", "reported_frames": 3776, "sr_inclusive_ms": 100.0, "state": 2}
+{"error":{"code":"ModelInvalid","details":"remix-v1 signature, metadata, operators or outputs are invalid","message":"Remix model unavailable","trace_id":"01a10af5-e14d-7265-9cf6-3ae333de9f11"},"level":"warn","msg":"Remix model unavailable; continuing with neutral playback","trace_id":"01a10af5-e14d-7265-9cf6-3ae333de9f11","ts":1791185248.589473}
+{"bit_mismatches": 0, "check": "invalid_model_neutral", "fixture": "bad_contract", "state": 5}
+{"error":{"code":"ModelInvalid","details":"remix-v1 signature, metadata, operators or outputs are invalid","message":"Remix model unavailable","trace_id":"01a10af5-e17a-757c-92c2-7751d12b1d69"},"level":"warn","msg":"Remix model unavailable; continuing with neutral playback","trace_id":"01a10af5-e17a-757c-92c2-7751d12b1d69","ts":1791185248.6344488}
+{"bit_mismatches": 0, "check": "invalid_model_neutral", "fixture": "bad_q", "state": 5}
+{"error":{"code":"ModelInvalid","details":"remix-v1 signature, metadata, operators or outputs are invalid","message":"Remix model unavailable","trace_id":"01a10af5-e1a7-7477-92c0-50e2f844a3fe"},"level":"warn","msg":"Remix model unavailable; continuing with neutral playback","trace_id":"01a10af5-e1a7-7477-92c0-50e2f844a3fe","ts":1791185248.6793966}
+{"bit_mismatches": 0, "check": "invalid_model_neutral", "fixture": "unsupported_q", "state": 5}
+{"error":{"code":"ModelInvalid","details":"remix-v1 signature, metadata, operators or outputs are invalid","message":"Remix model unavailable","trace_id":"01a10af5-e1d4-724b-89e3-1864f1a19a29"},"level":"warn","msg":"Remix model unavailable; continuing with neutral playback","trace_id":"01a10af5-e1d4-724b-89e3-1864f1a19a29","ts":1791185248.7243118}
+{"bit_mismatches": 0, "check": "invalid_model_neutral", "fixture": "bad_shape", "state": 5}
+{"error":{"code":"ModelInvalid","details":"remix-v1 signature, metadata, operators or outputs are invalid","message":"Remix model unavailable","trace_id":"01a10af5-e201-70e4-9c4b-fdca56fea8db"},"level":"warn","msg":"Remix model unavailable; continuing with neutral playback","trace_id":"01a10af5-e201-70e4-9c4b-fdca56fea8db","ts":1791185248.7699223}
+{"bit_mismatches": 0, "check": "invalid_model_neutral", "fixture": "bad_sum", "state": 5}
+{"error":{"code":"ModelInvalid","details":"remix-v1 signature, metadata, operators or outputs are invalid","message":"Remix model unavailable","trace_id":"01a10af5-e22e-7419-8db5-e7efdd6abe6e"},"level":"warn","msg":"Remix model unavailable; continuing with neutral playback","trace_id":"01a10af5-e22e-7419-8db5-e7efdd6abe6e","ts":1791185248.8146658}
+{"bit_mismatches": 0, "check": "invalid_model_neutral", "fixture": "negative", "state": 5}
+{"error":{"code":"ModelInvalid","details":"remix-v1 signature, metadata, operators or outputs are invalid","message":"Remix model unavailable","trace_id":"01a10af5-e25b-773a-8b50-c0a468ed13d9"},"level":"warn","msg":"Remix model unavailable; continuing with neutral playback","trace_id":"01a10af5-e25b-773a-8b50-c0a468ed13d9","ts":1791185248.8596158}
+{"bit_mismatches": 0, "check": "invalid_model_neutral", "fixture": "nan_mask", "state": 5}
+{"error":{"code":"ModelInvalid","details":"remix-v1 signature, metadata, operators or outputs are invalid","message":"Remix model unavailable","trace_id":"01a10af5-e288-743d-a2ee-9c6ed53e5efc"},"level":"warn","msg":"Remix model unavailable; continuing with neutral playback","trace_id":"01a10af5-e288-743d-a2ee-9c6ed53e5efc","ts":1791185248.9047742}
+{"bit_mismatches": 0, "check": "invalid_model_neutral", "fixture": "nan_state", "state": 5}
+{"bit_mismatches": 0, "check": "unsupported_rate", "state": 8}
+{"bit_mismatches": 0, "check": "reactivation", "history_reset": true}
+{"check": "continuity", "event": "stop_worker", "max_envelope_sample_step": 7.039642927889056e-05, "min_amplitude": 0.09999999852325936, "settle_ms": 64.64583333333333, "state": 6}
+{"check": "continuity", "event": "off", "max_envelope_sample_step": 7.133720962715362e-05, "min_amplitude": 0.09999999852325936, "settle_ms": 9.979166666666666, "state": 2}
+{"check": "continuity", "event": "zero", "max_envelope_sample_step": 7.133720962715362e-05, "min_amplitude": 0.09999999852325936, "settle_ms": 9.979166666666666, "state": 3}
+{"check": "continuity", "event": "on", "max_envelope_sample_step": 7.112093627076321e-05, "min_amplitude": 0.09999999852325936, "settle_ms": 9.625, "state": 1}
+{"check": "bass", "difference_relative_db": -160.13168010863586, "error_rms_dbfs": -100.14462513094551, "hz": 50}
+{"check": "bass", "difference_relative_db": -135.1315029056618, "error_rms_dbfs": -97.2356149312022, "hz": 100}
+{"check": "bass", "difference_relative_db": -126.51876514797985, "error_rms_dbfs": -89.93500519360586, "hz": 200}
+{"check": "bass", "difference_relative_db": -95.3573894640318, "error_rms_dbfs": -75.9755770376592, "hz": 299}
+{"check": "bass", "difference_relative_db": -92.09977794941244, "error_rms_dbfs": -77.6329359891483, "hz": 300}
+{"check": "stereo_multitone", "complex_lr_ratio_error": 1.060364171162394e-05, "fixture": "voice", "hz": 500}
+{"check": "stereo_multitone", "complex_lr_ratio_error": 3.1884394672269446e-06, "fixture": "voice", "hz": 1000}
+{"check": "stereo_multitone", "complex_lr_ratio_error": 2.8585773186814945e-06, "fixture": "voice", "hz": 3000}
+{"check": "callback_256", "fixture": "voice", "overload_callbacks": 0, "thread_cpu_us_max": 755.62, "thread_cpu_us_p50": 654.4, "thread_cpu_us_p99": 685.6936, "wall_us_max": 761.23, "wall_us_p99": 689.8507999999999}
+{"check": "stereo_multitone", "complex_lr_ratio_error": 1.7652496776185195e-06, "fixture": "uniform", "hz": 500}
+{"check": "stereo_multitone", "complex_lr_ratio_error": 5.629265295665129e-07, "fixture": "uniform", "hz": 1000}
+{"check": "stereo_multitone", "complex_lr_ratio_error": 4.555943650253145e-07, "fixture": "uniform", "hz": 3000}
+{"check": "callback_256", "fixture": "uniform", "overload_callbacks": 0, "thread_cpu_us_max": 1185.781, "thread_cpu_us_p50": 655.27, "thread_cpu_us_p99": 769.4863999999989, "wall_us_max": 1191.47, "wall_us_p99": 771.8653999999988}
+{"check": "stereo_multitone", "complex_lr_ratio_error": 1.2287580936832827e-05, "fixture": "voice_bins", "hz": 500}
+{"check": "stereo_multitone", "complex_lr_ratio_error": 1.9922467109187345e-05, "fixture": "voice_bins", "hz": 1000}
+{"check": "stereo_multitone", "complex_lr_ratio_error": 2.948122150538813e-06, "fixture": "voice_bins", "hz": 3000}
+{"check": "callback_256", "fixture": "voice_bins", "overload_callbacks": 0, "thread_cpu_us_max": 770.611, "thread_cpu_us_p50": 660.73, "thread_cpu_us_p99": 704.3929999999999, "wall_us_max": 778.46, "wall_us_p99": 708.9649999999999}
+{"check": "stereo_multitone", "complex_lr_ratio_error": 1.060364171162394e-05, "fixture": "q3", "hz": 500}
+{"check": "stereo_multitone", "complex_lr_ratio_error": 3.1884394672269446e-06, "fixture": "q3", "hz": 1000}
+{"check": "stereo_multitone", "complex_lr_ratio_error": 2.8585773186814945e-06, "fixture": "q3", "hz": 3000}
+{"check": "callback_256", "fixture": "q3", "overload_callbacks": 0, "thread_cpu_us_max": 898.451, "thread_cpu_us_p50": 656.621, "thread_cpu_us_p99": 772.0962599999993, "wall_us_max": 903.241, "wall_us_p99": 773.3802599999995}
+{"check": "stereo_bin", "complex_lr_ratio_error": 5.732081792574166e-06, "hz": 500}
+{"check": "stereo_bin", "complex_lr_ratio_error": 2.8687531306397106e-06, "hz": 1000}
+{"check": "stereo_bin", "complex_lr_ratio_error": 9.70803613477814e-07, "hz": 3000}
+{"check": "true_peak", "dc": 0, "excess_linear": 0, "hz": 6000, "input_dbtp": -1.4156527925060667, "output_dbtp": -1.1549995037918777}
+{"check": "true_peak", "dc": 0, "excess_linear": 0, "hz": 17000, "input_dbtp": -1.9384090832539362, "output_dbtp": -1.2517346871293291}
+{"check": "true_peak", "dc": 0, "excess_linear": 0, "hz": 19000, "input_dbtp": -1.9384771591029333, "output_dbtp": -1.2515708906106977}
+{"check": "true_peak", "dc": 0, "excess_linear": 0, "hz": 21000, "input_dbtp": -1.9684655780606175, "output_dbtp": -1.2216129277482852}
+{"check": "true_peak", "dc": 0, "excess_linear": 0, "hz": 23000, "input_dbtp": -1.9384771591029346, "output_dbtp": -1.0219759044523926}
+{"check": "true_peak", "dc": 0, "excess_linear": 0, "hz": 3000, "input_dbtp": -0.6303656851902566, "output_dbtp": -0.6303656851902566}
+{"check": "true_peak", "dc": 0.95, "excess_linear": 0, "hz": 6000, "input_dbtp": -0.2645840068909675, "output_dbtp": -0.2645840068909675}
+{"check": "silence", "nonzero_samples": 0}
+SO_VERIFICATION_OK

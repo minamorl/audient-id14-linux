@@ -1,0 +1,129 @@
+   Compiling id14-remix-ladspa v0.1.0 (/home/minamorl/repos/.worktrees/audient-id14-linux/remix-runtime/crates/id14-remix-ladspa)
+    Finished `test` profile [unoptimized] target(s) in 6.22s
+     Running unittests src/lib.rs (crates/id14-remix-ladspa/.build/target/debug/deps/id14_protocol-194b8cb0c917a2b5)
+
+running 40 tests
+test control_error::tests::dfu_missing_message_states_no_interface_0_fallback ... ok
+test db::tests::formatting ... ok
+test db::tests::unrepresentable_decibels_are_rejected ... ok
+test descriptor::tests::ambiguous_dfu_interfaces_are_refused ... ok
+test db::tests::whole_and_fractional_decibels ... ok
+test descriptor::tests::dfu_interface_is_found_from_descriptor ... ok
+test descriptor::tests::dfu_interface_numbered_0_to_2_is_refused ... ok
+test descriptor::tests::missing_dfu_interface_is_an_error_without_interface_0_fallback ... ok
+test descriptor::tests::extension_code_is_the_wire_field_not_the_unit_id ... ok
+test descriptor::tests::missing_mixer_output_volume_is_an_error ... ok
+test descriptor::tests::mk2_fixture_entities_parse ... ok
+test descriptor::tests::non_uac2_audio_control_is_refused ... ok
+test descriptor::tests::truncated_and_zero_length_descriptors_are_errors ... ok
+test evidence::tests::never_hardware_confirmed ... ok
+test evidence::tests::status_is_static_inferred_unverified ... ok
+test extension::tests::pinned_codes ... ok
+test extension::tests::round_trip ... ok
+test plan::tests::dump_plan_covers_the_four_targets_and_nothing_else ... ok
+test plan::tests::dump_plan_is_get_only_and_never_addresses_extension_units ... ok
+test plan::tests::mixer_nodes_use_uac2_mixer_control_numbers ... ok
+test plan::tests::mk2_declares_no_mute_control ... ok
+test plan::tests::values_render_by_kind ... ok
+test plan::tests::volume_on_undeclared_channel_is_refused ... ok
+test plan::tests::volume_targets_the_mixer_output_feature_unit ... ok
+test product::tests::lookup_by_vid_pid ... ok
+test product::tests::pinned_vid_pid ... ok
+test product::tests::table_covers_both_variants ... ok
+test request::tests::header_wire_bytes_le ... ok
+test request::tests::pinned_headers ... ok
+test request::tests::request_bytes_are_header_then_body ... ok
+test row_evidence::tests::get_direction_rows_are_mk2_observed ... ok
+test row_evidence::tests::set_header_stays_static_inferred ... ok
+test uac2::tests::cur_encoding_round_trips ... ok
+test uac2::tests::feature_controls_map_selectors_and_capabilities ... ok
+test uac2::tests::get_cur_setup_packet_bytes ... ok
+test uac2::tests::get_range_and_set_cur_headers ... ok
+test uac2::tests::header_evidence_follows_rows ... ok
+test uac2::tests::range_block_decoding_ignores_trailing_bytes ... ok
+test uac2::tests::range_block_rejects_short_and_empty ... ok
+test uac2::tests::setup_headers_match_the_pinned_request_headers ... ok
+
+test result: ok. 40 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/pinned_values.rs (crates/id14-remix-ladspa/.build/target/debug/deps/pinned_values-79d86291a0c2a0e0)
+
+running 4 tests
+test evidence_status_pins ... ok
+test extension_code_pins ... ok
+test product_table_pins ... ok
+test request_header_pins ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (crates/id14-remix-ladspa/.build/target/debug/deps/id14_remix_ladspa-9aa0eaed2d8d05a9)
+
+running 18 tests
+fft_max_error=7.771561172376096e-16 sqrt_hann_cola_error=4.440892098500626e-16
+test state::tests::model_failure_visible_without_audio_callback ... okonnx_rejected=bad_contract
+
+test dsp::tests::fft_roundtrip_and_weighted_overlap ... ok
+onnx_rejected=bad_q
+onnx_rejected=unsupported_q
+onnx_rejected=bad_shape
+bass_guard_0_300_hz_worst_db=-74.90667323991724
+test dsp::tests::bass_guard_stopband ... ok
+test queue::tests::concurrent_order_and_backpressure ... ok
+onnx_rejected=bad_sum
+onnx_valid=voice q=0 state_size=3
+onnx_rejected=negative
+onnx_valid=uniform q=0 state_size=3
+onnx_rejected=nan_mask
+onnx_valid=voice_bins q=0 state_size=3
+onnx_rejected=nan_state
+test model::tests::rejects_contract_and_runtime_value_errors ... ok
+onnx_valid=q3 q=3 state_size=3
+onnx_valid=stateful_reordered q=0 state_size=3
+onnx_valid=zero_state q=0 state_size=0
+test model::tests::accepts_valid_models_and_maps_reordered_names ... ok
+dry mode=missing bit_mismatches=0 reported=3776 cross_correlation_lag=3776 sr_inclusive_ms=100.000
+test state::tests::unavailable_runtime_preserves_audio_bits ... ok
+loudness part=0 settled_db=-3 max_hop_step_db=0.0053334236
+loudness part=3 settled_db=3 max_hop_step_db=0.0053334236
+test loudness::tests::both_gain_directions_converge_without_fast_modulation ... ok
+dry mode=off bit_mismatches=0 reported=3776 cross_correlation_lag=3776 sr_inclusive_ms=100.000
+dry mode=zero bit_mismatches=0 reported=3776 cross_correlation_lag=3776 sr_inclusive_ms=100.000
+test verification::exact_dry_paths_and_measured_delay ... ok
+silent_output_nonzero_samples=0
+test verification::silence_adds_no_signal ... ok
+hot_dc_protection_bit_mismatches=0 state=PeakProtected
+test verification::peak_protection_keeps_hot_dc_input_unchanged ... ok
+test state::tests::publication_updates_heartbeat_and_owned_cleanup ... ok
+transition event=worker_pause max_envelope_sample_step=7.056823446954796e-5 min_amplitude=0.099999999 settle_ms=59.312 final_bit_mismatches=0 state=Overloaded
+active gain_3000_hz=1.335771588 target=1.412537545 stereo_ratio_error=0e0 callback_256_us_p50=592.310 p99=14197.541 max=14302.840 final_status=Active
+
+thread 'verification::active_gain_stereo_and_callback_cost' (625) panicked at crates/id14-remix-ladspa/src/verification.rs:165:5:
+assertion failed: (measured_gain - 10_f64.powf(3.0 / 20.0)).abs() < 0.005
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test verification::active_gain_stereo_and_callback_cost ... FAILED
+lookahead_q0_vs_q3_max_sample_error=0e0
+test verification::lookahead_masks_align_with_their_original_spectra ... ok
+bass hz=50 difference_relative_db=-149.920814 error_rms_dbfs=-100.218311
+true_peak high_hz=6000 input_dbtp=-1.415640 output_dbtp=-1.154986 excess_linear=0.000000000
+callback_allocations=0 loudness_gain_db=-1.0453334
+test verification::loudness_matching_callback_allocates_nothing ... ok
+peak_protected_bass_150_hz_difference_relative_db=-86.147896
+transition event=off max_envelope_sample_step=7.14424937841851e-5 min_amplitude=0.099999999 settle_ms=9.979 final_bit_mismatches=0 state=Off
+bass hz=100 difference_relative_db=-133.735477 error_rms_dbfs=-97.219363
+true_peak high_hz=17000 input_dbtp=-1.938164 output_dbtp=-1.251493 excess_linear=0.000000000
+transition event=zero max_envelope_sample_step=7.14424937841851e-5 min_amplitude=0.099999999 settle_ms=9.979 final_bit_mismatches=0 state=ZeroAmounts
+test verification::stalled_worker_and_switches_fade_current_audio_to_dry ... ok
+bass hz=200 difference_relative_db=-125.930585 error_rms_dbfs=-89.920567
+true_peak high_hz=3000 input_dbtp=-0.630341 output_dbtp=-0.630341 excess_linear=0.000000000
+test verification::independent_true_peak_oracle ... ok
+bass hz=299 difference_relative_db=-94.807000 error_rms_dbfs=-75.958520
+test verification::low_band_retention ... ok
+
+failures:
+
+failures:
+    verification::active_gain_stereo_and_callback_cost
+
+test result: FAILED. 17 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.00s
+
+error: test failed, to rerun pass `-p id14-remix-ladspa --lib`

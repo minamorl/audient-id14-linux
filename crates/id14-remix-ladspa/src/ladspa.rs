@@ -226,6 +226,17 @@ pub unsafe extern "C" fn id14_remix_stop_worker(handle: Handle) {
     }
 }
 
+/// Diagnostic common high-band normalization gain, in dB.
+/// # Safety
+/// Call between run calls, with a live handle exclusively owned by the host.
+#[no_mangle]
+pub unsafe extern "C" fn id14_remix_loudness_gain_db(handle: Handle) -> f32 {
+    (handle as *mut Instance)
+        .as_ref()
+        .map(|instance| instance.engine.loudness_gain_db())
+        .unwrap_or(0.0)
+}
+
 /// Copy the latest (up to 8192) worker inference durations, in nanoseconds.
 /// # Safety
 /// Call outside run after id14_remix_stop_worker, with a live handle and a valid
