@@ -1,0 +1,30 @@
+   Compiling id14-remix-ladspa v0.1.0 (/home/minamorl/repos/.worktrees/audient-id14-linux/remix-runtime/crates/id14-remix-ladspa)
+    Finished `release` profile [optimized] target(s) in 2.61s
+     Running `crates/id14-remix-ladspa/.build/target/release/examples/bench_worker /tmp/id14-remix-models/remix-2000.onnx 300`
+{"load_stage":"actual_adapter_load_and_probe","ms":52.727098}
+{"max_ms":16.557479,"p50_ms":14.764382,"p99_ms":16.14095,"phase":"actual_worker_infer","samples":300}
+{"load_stage":"file_read","ms":0.27806000000000003}
+{"load_stage":"protobuf_decode","ms":0.70248}
+{"load_stage":"onnx_import","ms":0.2014}
+{"load_stage":"into_optimized","ms":28.792472}
+{"load_stage":"into_runnable","ms":0.05875}
+{"max_ms":0.00689,"p50_ms":0.001,"p99_ms":0.00689,"phase":"input_alloc_copy","samples":50}
+{"max_ms":0.02098,"p50_ms":0.00644,"p99_ms":0.02098,"phase":"execution_state_new","samples":50}
+{"max_ms":15.367471,"p50_ms":14.895871999999999,"p99_ms":15.367471,"phase":"profiled_execution","samples":50}
+{"max_ms":0.00536,"p50_ms":0.0027700000000000003,"p99_ms":0.00536,"phase":"output_copy_validate","samples":50}
+{"mean_ms":2.22786078,"node":"/dec0/Conv.im2col :: Im2col"}
+{"mean_ms":2.21606644,"node":"/dec1/Conv.im2col :: Im2col"}
+{"mean_ms":0.7593892799999999,"node":"/dec0_block/net/net.0/Conv.im2col :: Im2col"}
+{"mean_ms":0.7580459599999999,"node":"/enc0/net/net.2/Conv.im2col :: Im2col"}
+{"mean_ms":0.7579749800000002,"node":"/dec0_block/net/net.2/Conv.im2col :: Im2col"}
+{"mean_ms":0.7577084800000001,"node":"/enc0/net/net.0/Conv.im2col :: Im2col"}
+{"mean_ms":0.7479075200000004,"node":"/dec1_block/net/net.0/Conv.im2col :: Im2col"}
+{"mean_ms":0.7405508800000001,"node":"/enc1/net/net.0/Conv.im2col :: Im2col"}
+{"mean_ms":0.7400891799999999,"node":"/dec1_block/net/net.2/Conv.im2col :: Im2col"}
+{"mean_ms":0.73960086,"node":"/enc1/net/net.2/Conv.im2col :: Im2col"}
+{"mean_ms":0.73812904,"node":"/bottleneck/net/net.0/Conv.im2col :: Im2col"}
+{"mean_ms":0.7364583400000001,"node":"/bottleneck/net/net.2/Conv.im2col :: Im2col"}
+{"mean_ms":0.4858017999999999,"node":"/Resize :: Resize"}
+{"mean_ms":0.48003502,"node":"/Resize_1 :: Resize"}
+{"mean_ms":0.3795686999999999,"node":"/down1/Conv.im2col :: Im2col"}
+{"max_ms":16.24477,"p50_ms":14.774711,"p99_ms":16.07246,"phase":"reused_execution_state","samples":300}

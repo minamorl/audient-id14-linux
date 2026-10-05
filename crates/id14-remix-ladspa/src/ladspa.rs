@@ -225,3 +225,24 @@ pub unsafe extern "C" fn id14_remix_stop_worker(handle: Handle) {
         instance.engine.stop_worker();
     }
 }
+
+/// Copy the latest (up to 8192) worker inference durations, in nanoseconds.
+/// # Safety
+/// Call outside run after id14_remix_stop_worker, with a live handle and a valid
+/// writable buffer of `capacity` u64 elements. Returns the number copied.
+#[no_mangle]
+pub unsafe extern "C" fn id14_remix_inference_times(
+    handle: Handle,
+    output: *mut u64,
+    capacity: usize,
+) -> usize {
+    if output.is_null() || capacity == 0 {
+        return 0;
+    }
+    let Some(instance) = (handle as *mut Instance).as_ref() else {
+        return 0;
+    };
+    instance
+        .engine
+        .copy_inference_times(std::slice::from_raw_parts_mut(output, capacity.min(8192)))
+}

@@ -1,0 +1,4 @@
+{"model": "/home/minamorl/repos/.worktrees/audient-id14-linux/remix-runtime/crates/id14-remix-ladspa/.build/remix-2000.onnx", "bytes": 544901, "sha256": "d22d567981f3d895d36a99a74d934462f79f03555ef74ec94ded855d4a5dd760"}
+{"blocks": 5625, "callback_wall_us_max": 1559.108990477398, "callback_wall_us_p99": 1156.4287985675044, "check": "trained_model_realtime", "deadline_lateness_ms_max": 0.5833989998791367, "interval_ms_p50": 5.3333060059230775, "interval_ms_p99": 5.3545494080754, "latency_frames": 3776, "overloaded_blocks": 0, "period_ms": 5.333333333333333, "seconds": 30.0, "states": {"1": 5625}, "warmup_blocks": 187, "warmup_states": {"1": 187}}
+{"check": "plugin_worker_infer", "samples": 2911, "p50_ms": 0.864489, "p99_ms": 2.217378, "max_ms": 3.846888}
+REALTIME_SO_VERIFICATION_OK

@@ -31,7 +31,7 @@ Descriptor._fields_ = [
 ]
 
 class Host:
-    def __init__(self, so, fixture="voice", amounts=(3,0,0,-3), enabled=1, inplace=False, rate=RATE):
+    def __init__(self, so, fixture="voice", amounts=(3,0,0,-3), enabled=1, inplace=False, rate=RATE, model=None, expected_state=None):
         self.lib = C.CDLL(str(so))
         self.lib.ladspa_descriptor.argtypes = [C.c_ulong]
         self.lib.ladspa_descriptor.restype = C.POINTER(Descriptor)
@@ -43,7 +43,7 @@ class Host:
         assert [self.d.types[i] for i in range(11)] == [9,9,10,10,5,5,5,5,5,6,6]
         assert [self.d.hints[i].lower for i in range(4,8)] == [-6]*4
         assert [self.d.hints[i].upper for i in range(4,8)] == [6]*4
-        os.environ["ID14_REMIX_MODEL"] = str(ROOT/"fixtures"/(fixture+".onnx"))
+        os.environ["ID14_REMIX_MODEL"] = str(model if model is not None else ROOT/"fixtures"/(fixture+".onnx"))
         self.handle = self.d.instantiate(self.ptr, rate)
         assert self.handle
         self.inputs = [np.zeros(BLOCK,np.float32) for _ in range(2)]
@@ -58,6 +58,7 @@ class Host:
         self.closed = False
         deadline = time.monotonic()+10
         expected = 8 if rate != RATE else (4 if fixture=="missing" else 5 if fixture.startswith(("bad_","negative","nan_","unsupported_")) else 1)
+        if expected_state is not None: expected = expected_state
         while time.monotonic()<deadline:
             self.block(np.zeros((BLOCK,2),np.float32), measure=False)
             if self.state in (expected,2,3):

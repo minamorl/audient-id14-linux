@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/home/minamorl/repos/.worktrees/audient-id14-linux/remix-runtime/crates/id14-remix-ladspa/tools/verify_runtime_failure.py", line 13, in <module>
+    with Host(args.so,expected_state=5) as h:
+         ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/minamorl/repos/.worktrees/audient-id14-linux/remix-runtime/crates/id14-remix-ladspa/tools/verify_so.py", line 70, in __init__
+    raise AssertionError(("model startup", fixture, self.state, expected))
+AssertionError: ('model startup', 'voice', 0, 5)

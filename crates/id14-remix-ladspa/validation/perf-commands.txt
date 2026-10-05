@@ -1,0 +1,44 @@
+$ bash crates/id14-remix-ladspa/tools/with_cargo.sh run --release -p id14-remix-ladspa --example bench_worker -- /tmp/id14-remix-models/remix-2000.onnx 300 > crates/id14-remix-ladspa/validation/perf-before.txt 2>&1
+EXIT=0
+This baseline was executed before replacing the adapter; the current adapter uses ORT.
+
+$ bash crates/id14-remix-ladspa/tools/with_cargo.sh test --workspace > crates/id14-remix-ladspa/validation/perf-workspace-test.txt 2>&1
+EXIT=0
+
+$ bash crates/id14-remix-ladspa/tools/with_cargo.sh build --release -p id14-remix-ladspa > crates/id14-remix-ladspa/validation/perf-release-build.txt 2>&1
+EXIT=0
+
+$ ID14_BENCH_OUTPUT="$PWD/crates/id14-remix-ladspa/.build/parity-final.json" bash crates/id14-remix-ladspa/tools/with_cargo.sh run --release -p id14-remix-ladspa --example bench_worker -- crates/id14-remix-ladspa/.build/remix-2000.onnx 500 --tract-profile > crates/id14-remix-ladspa/validation/perf-comparison.txt 2>&1
+EXIT=0
+
+$ PYTHONDONTWRITEBYTECODE=1 bash crates/id14-remix-ladspa/tools/with_python.sh crates/id14-remix-ladspa/tools/verify_onnx_reference.py --model crates/id14-remix-ladspa/.build/remix-2000.onnx --vectors crates/id14-remix-ladspa/.build/parity.json > crates/id14-remix-ladspa/validation/perf-onnx-reference.txt 2>&1
+EXIT=0
+
+$ cmp crates/id14-remix-ladspa/.build/parity.json crates/id14-remix-ladspa/.build/parity-final.json
+EXIT=0
+
+$ XDG_RUNTIME_DIR="$PWD/crates/id14-remix-ladspa/.build/perf-runtime" PYTHONDONTWRITEBYTECODE=1 bash crates/id14-remix-ladspa/tools/with_python.sh crates/id14-remix-ladspa/tools/verify_so.py --so "$PWD/crates/id14-remix-ladspa/.build/target/release/libid14_remix_ladspa.so" --output "$PWD/crates/id14-remix-ladspa/validation/perf-so-results.json" > crates/id14-remix-ladspa/validation/perf-so-output.txt 2>&1
+EXIT=0
+
+$ systemd-run --user --wait --pipe --collect --property=MemoryDenyWriteExecute=yes --property="WorkingDirectory=$PWD" --setenv="XDG_RUNTIME_DIR=$PWD/crates/id14-remix-ladspa/.build/perf-mdwx-runtime" --setenv=PYTHONDONTWRITEBYTECODE=1 /run/current-system/sw/bin/bash crates/id14-remix-ladspa/tools/with_python.sh crates/id14-remix-ladspa/tools/verify_realtime_so.py --so "$PWD/crates/id14-remix-ladspa/.build/target/release/libid14_remix_ladspa.so" --model "$PWD/crates/id14-remix-ladspa/.build/remix-2000.onnx" --seconds 30 > crates/id14-remix-ladspa/validation/perf-mdwx-realtime.txt 2>&1
+EXIT=0
+
+$ PYTHONDONTWRITEBYTECODE=1 bash crates/id14-remix-ladspa/tools/with_python.sh crates/id14-remix-ladspa/tools/verify_state_so.py --so "$PWD/crates/id14-remix-ladspa/.build/target/release/libid14_remix_ladspa.so" > crates/id14-remix-ladspa/validation/perf-state-output.txt 2>&1
+EXIT=0
+
+$ XDG_RUNTIME_DIR="$PWD/crates/id14-remix-ladspa/.build/perf-runtime" PYTHONDONTWRITEBYTECODE=1 bash crates/id14-remix-ladspa/tools/with_python.sh crates/id14-remix-ladspa/tools/verify_runtime_failure.py --so "$PWD/crates/id14-remix-ladspa/.build/target/release/libid14_remix_ladspa.so" > crates/id14-remix-ladspa/validation/perf-runtime-failure.txt 2>&1
+EXIT=0
+
+$ XDG_RUNTIME_DIR="$PWD/crates/id14-remix-ladspa/.build/perf-runtime" PYTHONDONTWRITEBYTECODE=1 bash crates/id14-remix-ladspa/tools/with_python.sh crates/id14-remix-ladspa/tools/verify_runtime_failure.py --so "$PWD/crates/id14-remix-ladspa/.build/target/release/libid14_remix_ladspa.so" --library "$PWD/crates/id14-remix-ladspa/fixtures/voice.onnx" > crates/id14-remix-ladspa/validation/perf-invalid-library.txt 2>&1
+EXIT=0
+
+$ XDG_RUNTIME_DIR="$PWD/crates/id14-remix-ladspa/.build/perf-runtime" PYTHONDONTWRITEBYTECODE=1 bash crates/id14-remix-ladspa/tools/with_python.sh crates/id14-remix-ladspa/tools/verify_runtime_failure.py --so "$PWD/crates/id14-remix-ladspa/.build/target/release/libid14_remix_ladspa.so" --library "$PWD/crates/id14-remix-ladspa/.build/target/release/libid14_remix_ladspa.so" > crates/id14-remix-ladspa/validation/perf-missing-symbol.txt 2>&1
+EXIT=0
+
+Earlier diagnostic failures, preserved rather than rewritten:
+perf-comparison-initial.txt: EXIT=101, added tract/ORT equality assertion.
+perf-comparison-fresh-state.txt: EXIT=101, same assertion with fresh tract state.
+perf-parity-investigation.txt: EXIT=101, same assertion while exporting vectors.
+perf-runtime-failure-initial.txt: EXIT=1, missing-library startup stuck Loading.
+perf-missing-library-investigation.txt: EXIT=124, timeout 10s with absent runtime.
+Resolution and the independent reference check are described in perf-REPORT.md.

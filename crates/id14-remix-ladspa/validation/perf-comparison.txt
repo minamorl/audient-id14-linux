@@ -1,0 +1,62 @@
+   Compiling id14-remix-ladspa v0.1.0 (/home/minamorl/repos/.worktrees/audient-id14-linux/remix-runtime/crates/id14-remix-ladspa)
+    Finished `release` profile [optimized] target(s) in 3.29s
+     Running `crates/id14-remix-ladspa/.build/target/release/examples/bench_worker crates/id14-remix-ladspa/.build/remix-2000.onnx 500 --tract-profile`
+{"load_stage":"actual_adapter_load_and_probe","ms":30.078561999999998}
+{"adapter_load_stages_ms":{"decode_validate":0.94431,"probe":1.180789,"runtime_init":8.715784000000001,"session_optimize_build":18.719669}}
+{"max_ms":0.00493,"p50_ms":0.00023,"p99_ms":0.0007999999999999999,"phase":"adapter_input_copy","samples":500}
+{"max_ms":0.77984,"p50_ms":0.69383,"p99_ms":0.75008,"phase":"adapter_session_run","samples":500}
+{"max_ms":0.00807,"p50_ms":0.00279,"p99_ms":0.00379,"phase":"adapter_output_copy_validate","samples":500}
+{"max_ms":0.916229,"p50_ms":0.703789,"p99_ms":0.8606199999999999,"phase":"actual_worker_infer","samples":500}
+{"load_stage":"file_read","ms":0.31079}
+{"load_stage":"protobuf_decode","ms":0.64742}
+{"load_stage":"onnx_import","ms":0.33526900000000004}
+{"load_stage":"into_optimized","ms":29.631491999999998}
+{"load_stage":"into_runnable","ms":0.06501}
+{"max_ms":0.01195,"p50_ms":0.00327,"p99_ms":0.01195,"phase":"input_alloc_copy","samples":50}
+{"max_ms":0.07819,"p50_ms":0.01806,"p99_ms":0.07819,"phase":"execution_state_new","samples":50}
+{"max_ms":18.947509,"p50_ms":16.44614,"p99_ms":18.947509,"phase":"profiled_execution","samples":50}
+{"max_ms":0.008579999999999999,"p50_ms":0.00404,"p99_ms":0.008579999999999999,"phase":"output_copy_validate","samples":50}
+{"mean_ms":0.003838,"operator_group":"Add"}
+{"mean_ms":0.010412399999999999,"operator_group":"Concat"}
+{"mean_ms":0.04719756,"operator_group":"GRU"}
+{"mean_ms":0.011764400000000001,"operator_group":"Gather"}
+{"mean_ms":13.791381480000002,"operator_group":"Im2col"}
+{"mean_ms":0.025067000000000002,"operator_group":"IntoShape"}
+{"mean_ms":0.00849638,"operator_group":"Ln"}
+{"mean_ms":0.005987380000000001,"operator_group":"Mul"}
+{"mean_ms":0.020866179999999998,"operator_group":"OptAddByScalar"}
+{"mean_ms":0.014768779999999999,"operator_group":"OptAddUnicast"}
+{"mean_ms":0.6785919399999999,"operator_group":"OptMatMul"}
+{"mean_ms":0.01577358,"operator_group":"OptMatMulPack"}
+{"mean_ms":0.02365238,"operator_group":"OptMulByScalar"}
+{"mean_ms":0.027692179999999997,"operator_group":"OptMulUnicast"}
+{"mean_ms":0.0078472,"operator_group":"OptSubByScalar"}
+{"mean_ms":0.023259000000000002,"operator_group":"Reduce<MeanOfSquares>"}
+{"mean_ms":0.03271056,"operator_group":"Reduce<Sum>"}
+{"mean_ms":1.3634385800000002,"operator_group":"Resize"}
+{"mean_ms":0.0016138000000000003,"operator_group":"Rsqrt"}
+{"mean_ms":0.04104634,"operator_group":"Sigmoid"}
+{"mean_ms":0.30680479999999993,"operator_group":"Softmax"}
+{"mean_ms":0.00030460000000000003,"operator_group":"Source"}
+{"mean_ms":0.0011894,"operator_group":"Sqrt"}
+{"mean_ms":0.0014957999999999998,"operator_group":"Square"}
+{"mean_ms":2.4772555599999997,"node":"/dec1/Conv.im2col :: Im2col"}
+{"mean_ms":2.4455690800000003,"node":"/dec0/Conv.im2col :: Im2col"}
+{"mean_ms":0.80419448,"node":"/dec0_block/net/net.0/Conv.im2col :: Im2col"}
+{"mean_ms":0.8029944400000004,"node":"/dec0_block/net/net.2/Conv.im2col :: Im2col"}
+{"mean_ms":0.8025216200000002,"node":"/enc0/net/net.2/Conv.im2col :: Im2col"}
+{"mean_ms":0.7987009599999999,"node":"/enc0/net/net.0/Conv.im2col :: Im2col"}
+{"mean_ms":0.7863789,"node":"/dec1_block/net/net.0/Conv.im2col :: Im2col"}
+{"mean_ms":0.7862991199999999,"node":"/enc1/net/net.0/Conv.im2col :: Im2col"}
+{"mean_ms":0.78408086,"node":"/bottleneck/net/net.2/Conv.im2col :: Im2col"}
+{"mean_ms":0.7798109599999999,"node":"/enc1/net/net.2/Conv.im2col :: Im2col"}
+{"mean_ms":0.7777537800000002,"node":"/dec1_block/net/net.2/Conv.im2col :: Im2col"}
+{"mean_ms":0.7773188200000003,"node":"/bottleneck/net/net.0/Conv.im2col :: Im2col"}
+{"mean_ms":0.6852838,"node":"/Resize :: Resize"}
+{"mean_ms":0.67815478,"node":"/Resize_1 :: Resize"}
+{"mean_ms":0.41935781999999994,"node":"/down1/Conv.im2col :: Im2col"}
+{"max_ms":19.281198,"p50_ms":15.933831,"p99_ms":18.459309,"phase":"reused_execution_state","samples":500}
+{"max_absolute_error":0.06360892951488495,"parity_hop":0}
+{"max_absolute_error":0.06015893816947937,"parity_hop":1}
+{"max_absolute_error":0.05778840184211731,"parity_hop":2}
+{"check":"ort_tract_mask_parity","hops":32,"max_absolute_error":0.06360892951488495}

@@ -1,0 +1,2 @@
+{"check": "onnx_reference_mask", "max_absolute_error": {"ort": 2.980232238769531e-07, "tract": 0.06360894441604614}}
+ONNX_REFERENCE_VERIFICATION_OK

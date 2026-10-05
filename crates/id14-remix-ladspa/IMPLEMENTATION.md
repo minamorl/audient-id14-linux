@@ -47,7 +47,30 @@ not a claim of allocation in the public LADSPA ID registry; identify by file/lab
 The audio thread owns STFT, synthesis, overlap-add, bass guard, delay, and peak
 protection. Two bounded SPSC queues transfer features and frame-tagged masks.
 All ONNX loading, optimization, allocation and inference happen on the worker.
-The selected CPU runtime is tract-onnx 0.22.1 with native kernels, no GPU/JIT backend.
+The inference runtime is ONNX Runtime 1.27.1 (Nix), via ort 2.0.0-rc.12.
+Only the CPU provider is selected: sequential execution, intra/inter thread count
+1, graph optimization level 3, no spinning, GPU, OpenVINO or JIT provider.
+The session and both input tensors persist across hops. ONNX state_out is copied
+into the next state input; reset zeros this state. Tract 0.22.1 remains for
+protobuf/contract validation and the explicit comparison benchmark, not inference.
+
+`tools/with_cargo.sh` resolves nixpkgs#onnxruntime and embeds its absolute library
+path through the build environment variable `ID14_ORT_LIBRARY`. The same variable
+can override the path at process startup. Builds outside this wrapper should set
+it to the packaged `libonnxruntime.so`, or provide that library on the dynamic
+loader search path. The deployment must retain this native runtime in its Nix
+closure; copying the plugin alone to another machine does not provide ONNX Runtime.
+Missing/incompatible libraries produce ModelInvalid and neutral audio. Explicit
+fallible loading happens on the inference worker before calling any ORT API.
+
+`examples/bench_worker.rs` times the exact model adapter on a worker thread, with
+separate startup and per-hop phases. `--tract-profile` additionally profiles the
+old runtime's operators, tests execution-state reuse and compares streaming mask
+values. `tools/verify_realtime_so.py` measures the actual plugin worker and drives
+256-frame blocks on absolute 5.333 ms deadlines. Its diagnostic C entrypoint
+`id14_remix_inference_times(handle, u64_buffer, capacity)` returns up to 8192 latest
+hop durations (nanoseconds); call outside run after `id14_remix_stop_worker` for a
+stable snapshot. Timing clocks and writes run only on the inference worker.
 Initialization may allocate; `run` does not allocate, load files, take a mutex,
 join a worker, or perform inference. The plugin does not advertise LADSPA's
 stronger HARD_RT_CAPABLE timing guarantee.
