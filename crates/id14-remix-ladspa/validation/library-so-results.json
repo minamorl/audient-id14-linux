@@ -1,0 +1,345 @@
+[
+  {
+    "check": "transparency_and_delay",
+    "mode": "missing",
+    "bit_mismatches": 0,
+    "reported_frames": 3776,
+    "measured_frames": 3776,
+    "sr_inclusive_ms": 100.0,
+    "state": 4
+  },
+  {
+    "check": "transparency_and_delay",
+    "mode": "off",
+    "bit_mismatches": 0,
+    "reported_frames": 3776,
+    "measured_frames": 3776,
+    "sr_inclusive_ms": 100.0,
+    "state": 2
+  },
+  {
+    "check": "transparency_and_delay",
+    "mode": "zero",
+    "bit_mismatches": 0,
+    "reported_frames": 3776,
+    "measured_frames": 3776,
+    "sr_inclusive_ms": 100.0,
+    "state": 3
+  },
+  {
+    "check": "transparency_and_delay",
+    "mode": "inplace",
+    "bit_mismatches": 0,
+    "reported_frames": 3776,
+    "measured_frames": 3776,
+    "sr_inclusive_ms": 100.0,
+    "state": 2
+  },
+  {
+    "check": "invalid_model_neutral",
+    "fixture": "bad_contract",
+    "state": 5,
+    "bit_mismatches": 0
+  },
+  {
+    "check": "invalid_model_neutral",
+    "fixture": "bad_q",
+    "state": 5,
+    "bit_mismatches": 0
+  },
+  {
+    "check": "invalid_model_neutral",
+    "fixture": "unsupported_q",
+    "state": 5,
+    "bit_mismatches": 0
+  },
+  {
+    "check": "invalid_model_neutral",
+    "fixture": "bad_shape",
+    "state": 5,
+    "bit_mismatches": 0
+  },
+  {
+    "check": "invalid_model_neutral",
+    "fixture": "bad_sum",
+    "state": 5,
+    "bit_mismatches": 0
+  },
+  {
+    "check": "invalid_model_neutral",
+    "fixture": "negative",
+    "state": 5,
+    "bit_mismatches": 0
+  },
+  {
+    "check": "invalid_model_neutral",
+    "fixture": "nan_mask",
+    "state": 5,
+    "bit_mismatches": 0
+  },
+  {
+    "check": "invalid_model_neutral",
+    "fixture": "nan_state",
+    "state": 5,
+    "bit_mismatches": 0
+  },
+  {
+    "check": "unsupported_rate",
+    "state": 8,
+    "bit_mismatches": 0
+  },
+  {
+    "check": "reactivation",
+    "history_reset": true,
+    "bit_mismatches": 0
+  },
+  {
+    "check": "continuity",
+    "event": "stop_worker",
+    "max_envelope_sample_step": 8.685695671814542e-05,
+    "min_amplitude": 0.09999999852325936,
+    "settle_ms": 64.64583333333333,
+    "state": 6
+  },
+  {
+    "check": "continuity",
+    "event": "off",
+    "max_envelope_sample_step": 8.700021638405331e-05,
+    "min_amplitude": 0.09999999852325936,
+    "settle_ms": 9.979166666666666,
+    "state": 2
+  },
+  {
+    "check": "continuity",
+    "event": "zero",
+    "max_envelope_sample_step": 8.700021638405331e-05,
+    "min_amplitude": 0.09999999852325936,
+    "settle_ms": 9.979166666666666,
+    "state": 3
+  },
+  {
+    "check": "continuity",
+    "event": "on",
+    "max_envelope_sample_step": 8.678293259295478e-05,
+    "min_amplitude": 0.09999999852325936,
+    "settle_ms": 9.958333333333334,
+    "state": 1
+  },
+  {
+    "check": "bass",
+    "hz": 50,
+    "difference_relative_db": -154.4690008924507,
+    "error_rms_dbfs": -98.39755507447686
+  },
+  {
+    "check": "bass",
+    "hz": 100,
+    "difference_relative_db": -132.58393633944615,
+    "error_rms_dbfs": -95.37833409233285
+  },
+  {
+    "check": "bass",
+    "hz": 200,
+    "difference_relative_db": -124.48128599013788,
+    "error_rms_dbfs": -88.07848232759447
+  },
+  {
+    "check": "bass",
+    "hz": 299,
+    "difference_relative_db": -93.20405793571398,
+    "error_rms_dbfs": -74.11870225384304
+  },
+  {
+    "check": "bass",
+    "hz": 300,
+    "difference_relative_db": -90.05755353529824,
+    "error_rms_dbfs": -75.77656275602371
+  },
+  {
+    "check": "stereo_multitone",
+    "fixture": "voice",
+    "hz": 500,
+    "complex_lr_ratio_error": 6.68213993737612e-07
+  },
+  {
+    "check": "stereo_multitone",
+    "fixture": "voice",
+    "hz": 1000,
+    "complex_lr_ratio_error": 6.734923224282662e-07
+  },
+  {
+    "check": "stereo_multitone",
+    "fixture": "voice",
+    "hz": 3000,
+    "complex_lr_ratio_error": 8.365412954337746e-09
+  },
+  {
+    "check": "callback_256",
+    "fixture": "voice",
+    "thread_cpu_us_p50": 549.5,
+    "thread_cpu_us_p99": 700.6524000000001,
+    "thread_cpu_us_max": 847.451,
+    "wall_us_p99": 703.1507399999999,
+    "wall_us_max": 854.691,
+    "overload_callbacks": 0
+  },
+  {
+    "check": "stereo_multitone",
+    "fixture": "uniform",
+    "hz": 500,
+    "complex_lr_ratio_error": 6.760819863042626e-08
+  },
+  {
+    "check": "stereo_multitone",
+    "fixture": "uniform",
+    "hz": 1000,
+    "complex_lr_ratio_error": 6.733776471867578e-08
+  },
+  {
+    "check": "stereo_multitone",
+    "fixture": "uniform",
+    "hz": 3000,
+    "complex_lr_ratio_error": 1.017676313835119e-09
+  },
+  {
+    "check": "callback_256",
+    "fixture": "uniform",
+    "thread_cpu_us_p50": 547.281,
+    "thread_cpu_us_p99": 768.8237999999999,
+    "thread_cpu_us_max": 866.991,
+    "wall_us_p99": 776.2717999999998,
+    "wall_us_max": 873.551,
+    "overload_callbacks": 0
+  },
+  {
+    "check": "stereo_multitone",
+    "fixture": "voice_bins",
+    "hz": 500,
+    "complex_lr_ratio_error": 2.535994083899106e-05
+  },
+  {
+    "check": "stereo_multitone",
+    "fixture": "voice_bins",
+    "hz": 1000,
+    "complex_lr_ratio_error": 2.289903085634304e-05
+  },
+  {
+    "check": "stereo_multitone",
+    "fixture": "voice_bins",
+    "hz": 3000,
+    "complex_lr_ratio_error": 2.1938681407505174e-07
+  },
+  {
+    "check": "callback_256",
+    "fixture": "voice_bins",
+    "thread_cpu_us_p50": 547.52,
+    "thread_cpu_us_p99": 740.3583399999999,
+    "thread_cpu_us_max": 790.101,
+    "wall_us_p99": 743.8985999999998,
+    "wall_us_max": 795.211,
+    "overload_callbacks": 0
+  },
+  {
+    "check": "stereo_multitone",
+    "fixture": "q3",
+    "hz": 500,
+    "complex_lr_ratio_error": 6.68213993737612e-07
+  },
+  {
+    "check": "stereo_multitone",
+    "fixture": "q3",
+    "hz": 1000,
+    "complex_lr_ratio_error": 6.734923224282662e-07
+  },
+  {
+    "check": "stereo_multitone",
+    "fixture": "q3",
+    "hz": 3000,
+    "complex_lr_ratio_error": 8.365412954337746e-09
+  },
+  {
+    "check": "callback_256",
+    "fixture": "q3",
+    "thread_cpu_us_p50": 548.811,
+    "thread_cpu_us_p99": 797.30046,
+    "thread_cpu_us_max": 860.851,
+    "wall_us_p99": 802.261,
+    "wall_us_max": 868.421,
+    "overload_callbacks": 0
+  },
+  {
+    "check": "stereo_bin",
+    "hz": 500,
+    "complex_lr_ratio_error": 1.4713994710067667e-09
+  },
+  {
+    "check": "stereo_bin",
+    "hz": 1000,
+    "complex_lr_ratio_error": 1.2523686193050435e-09
+  },
+  {
+    "check": "stereo_bin",
+    "hz": 3000,
+    "complex_lr_ratio_error": 3.33290391502436e-08
+  },
+  {
+    "check": "true_peak",
+    "dc": 0,
+    "hz": 6000,
+    "input_dbtp": -1.4156527925060667,
+    "output_dbtp": -1.154999500057135,
+    "excess_linear": 0
+  },
+  {
+    "check": "true_peak",
+    "dc": 0,
+    "hz": 17000,
+    "input_dbtp": -1.9384090832539362,
+    "output_dbtp": -1.2517285889946792,
+    "excess_linear": 0
+  },
+  {
+    "check": "true_peak",
+    "dc": 0,
+    "hz": 19000,
+    "input_dbtp": -1.9384771591029333,
+    "output_dbtp": -1.2515607252842664,
+    "excess_linear": 0
+  },
+  {
+    "check": "true_peak",
+    "dc": 0,
+    "hz": 21000,
+    "input_dbtp": -1.9684655780606175,
+    "output_dbtp": -1.2216057337842732,
+    "excess_linear": 0
+  },
+  {
+    "check": "true_peak",
+    "dc": 0,
+    "hz": 23000,
+    "input_dbtp": -1.9384771591029346,
+    "output_dbtp": -1.0219706631973735,
+    "excess_linear": 0
+  },
+  {
+    "check": "true_peak",
+    "dc": 0,
+    "hz": 3000,
+    "input_dbtp": -0.6303656851902566,
+    "output_dbtp": -0.6303656851902566,
+    "excess_linear": 0
+  },
+  {
+    "check": "true_peak",
+    "dc": 0.95,
+    "hz": 6000,
+    "input_dbtp": -0.2645840068909675,
+    "output_dbtp": -0.2645840068909675,
+    "excess_linear": 0
+  },
+  {
+    "check": "silence",
+    "nonzero_samples": 0
+  }
+]

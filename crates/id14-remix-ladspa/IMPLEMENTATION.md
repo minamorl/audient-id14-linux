@@ -54,14 +54,30 @@ The session and both input tensors persist across hops. ONNX state_out is copied
 into the next state input; reset zeros this state. Tract 0.22.1 remains for
 protobuf/contract validation and the explicit comparison benchmark, not inference.
 
-`tools/with_cargo.sh` resolves nixpkgs#onnxruntime and embeds its absolute library
-path through the build environment variable `ID14_ORT_LIBRARY`. The same variable
-can override the path at process startup. Builds outside this wrapper should set
-it to the packaged `libonnxruntime.so`, or provide that library on the dynamic
-loader search path. The deployment must retain this native runtime in its Nix
-closure; copying the plugin alone to another machine does not provide ONNX Runtime.
-Missing/incompatible libraries produce ModelInvalid and neutral audio. Explicit
-fallible loading happens on the inference worker before calling any ORT API.
+Native runtime discovery happens once per process, on the inference worker:
+
+1. The **runtime** environment variable `ID14_ORT_LIBRARY`, when present.
+2. `$HOME/.local/lib/id14-sr/onnxruntime/lib/libonnxruntime.so`, when HOME is present.
+3. `libonnxruntime.so` through the normal dynamic loader search.
+
+Missing or incompatible candidates fall through to the next entry. The first
+usable C API is retained for the process lifetime. If no candidate is usable,
+playback remains neutral and State/remix-state-v1 report ModelInvalid (5).
+No build-time environment value or native Nix store path is embedded. The
+installer in another lane owns the HOME symlink and its `nix build --out-link`
+GC root. `tools/with_cargo.sh` resolves nixpkgs#onnxruntime only to supply the
+runtime environment for local cargo test/run; it does not package a native library.
+Fallible loading checks the C API before calling any ORT Rust API.
+
+`tools/verify_library_discovery.py` launches fresh processes against the release
+plugin, checks precedence with distinct usable libraries and the HOME symlink,
+and verifies neutral audio, State, JSON publication and cleanup when all are absent.
+Build the release plugin with a distinctive `ID14_ORT_LIBRARY` sentinel and pass
+that exact value as `--build-library`; the tool rejects its presence in the binary.
+`bash tools/check_library_paths.sh /absolute/libonnxruntime.so /absolute/remix.onnx`
+runs the workspace/build, discovery, benchmark, audio/state and 30-second real-time
+checks sequentially. Its runtime/temp files stay inside `.build`; commands, raw
+outputs and exit codes are retained as `validation/library-*`.
 
 `examples/bench_worker.rs` times the exact model adapter on a worker thread, with
 separate startup and per-hop phases. `--tract-profile` additionally profiles the

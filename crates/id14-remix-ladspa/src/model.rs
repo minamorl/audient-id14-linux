@@ -47,50 +47,67 @@ pub struct OnnxModel {
     pub load_ms: [f64; 4],
 }
 
+fn load_runtime(path: &Path) -> Result<(libloading::Library, ort::sys::OrtApi), Status> {
+    // Avoid ort rc.12's bootstrap error path: constructing ort::Error there
+    // itself calls the not-yet-loaded native API. No ort call before set_api.
+    // SAFETY: the runtime is selected by the host environment/installation. Its
+    // documented entrypoint and versioned C API are checked before use. The
+    // returned handle must outlive the copied function table.
+    let library = unsafe { libloading::Library::new(path) }.map_err(|_| Status::ModelInvalid)?;
+    let api = unsafe {
+        let get: libloading::Symbol<unsafe extern "system" fn() -> *const ort::sys::OrtApiBase> =
+            library
+                .get(b"OrtGetApiBase\0")
+                .map_err(|_| Status::ModelInvalid)?;
+        let base = get().as_ref().ok_or(Status::ModelInvalid)?;
+        let version_ptr = (base.GetVersionString)();
+        if version_ptr.is_null() {
+            return Err(Status::ModelInvalid);
+        }
+        let version = std::ffi::CStr::from_ptr(version_ptr)
+            .to_str()
+            .map_err(|_| Status::ModelInvalid)?;
+        let minor = version
+            .split('.')
+            .nth(1)
+            .and_then(|v| v.parse::<u32>().ok())
+            .ok_or(Status::ModelInvalid)?;
+        if minor < ort::sys::ORT_API_VERSION {
+            return Err(Status::ModelInvalid);
+        }
+        let api = (base.GetApi)(ort::sys::ORT_API_VERSION);
+        if api.is_null() {
+            return Err(Status::ModelInvalid);
+        }
+        std::ptr::read(api)
+    };
+    Ok((library, api))
+}
+
 fn runtime() -> Result<(), Status> {
     // The C API contains function pointers into this library. Keep the handle
     // alive for the process lifetime, including all sessions and error objects.
     static READY: OnceLock<Result<libloading::Library, Status>> = OnceLock::new();
     READY
         .get_or_init(|| {
-            let path = std::env::var_os("ID14_ORT_LIBRARY")
-                .map(PathBuf::from)
-                .unwrap_or_else(|| {
-                    PathBuf::from(option_env!("ID14_ORT_LIBRARY").unwrap_or("libonnxruntime.so"))
-                });
-            // Avoid ort rc.12's bootstrap error path: constructing ort::Error there
-            // itself calls the not-yet-loaded native API. No ort call before set_api.
-            // SAFETY: this is the explicitly selected native runtime. Its documented
-            // OrtGetApiBase entrypoint and versioned C function table are checked for
-            // null; the handle remains owned by READY for as long as pointers exist.
-            let library =
-                unsafe { libloading::Library::new(path) }.map_err(|_| Status::ModelInvalid)?;
-            unsafe {
-                let get: libloading::Symbol<
-                    unsafe extern "system" fn() -> *const ort::sys::OrtApiBase,
-                > = library
-                    .get(b"OrtGetApiBase\0")
-                    .map_err(|_| Status::ModelInvalid)?;
-                let base = get().as_ref().ok_or(Status::ModelInvalid)?;
-                let version_ptr = (base.GetVersionString)();
-                if version_ptr.is_null() {
-                    return Err(Status::ModelInvalid);
-                }
-                let version = std::ffi::CStr::from_ptr(version_ptr)
-                    .to_str()
-                    .map_err(|_| Status::ModelInvalid)?;
-                let minor = version
-                    .split('.')
-                    .nth(1)
-                    .and_then(|v| v.parse::<u32>().ok())
-                    .ok_or(Status::ModelInvalid)?;
-                if minor < ort::sys::ORT_API_VERSION {
-                    return Err(Status::ModelInvalid);
-                }
-                let api = (base.GetApi)(ort::sys::ORT_API_VERSION);
-                if api.is_null() || !ort::set_api(std::ptr::read(api)) {
-                    return Err(Status::ModelInvalid);
-                }
+            // Resolve only at runtime: the installer retains the HOME path with
+            // a Nix GC root. A build-machine store path must never be embedded.
+            let candidates = [
+                std::env::var_os("ID14_ORT_LIBRARY").map(PathBuf::from),
+                std::env::var_os("HOME").map(|home| {
+                    PathBuf::from(home).join(".local/lib/id14-sr/onnxruntime/lib/libonnxruntime.so")
+                }),
+                Some(PathBuf::from("libonnxruntime.so")),
+            ];
+            let (library, api) = candidates
+                .iter()
+                .flatten()
+                .find_map(|path| load_runtime(path).ok())
+                .ok_or(Status::ModelInvalid)?;
+            // Rejected candidates never install a global API. READY keeps this
+            // accepted library alive for all sessions and native error objects.
+            if !ort::set_api(api) {
+                return Err(Status::ModelInvalid);
             }
             ort::init()
                 .with_name("id14-remix")

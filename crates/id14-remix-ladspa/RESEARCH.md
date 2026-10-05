@@ -35,6 +35,7 @@
 - https://raw.githubusercontent.com/pykeio/ort/v2.0.0-rc.12/src/error.rs — bootstrap error construction calls the native API; explains the reproduced missing-library initialization hang.
 - https://docs.rs/libloading/latest/libloading/struct.Library.html — checked native-library/symbol loading and handle lifetime (0.9.0).
 - https://onnxruntime.ai/docs/api/c/struct_ort_api_base.html — versioned OrtGetApiBase/GetApi function-table contract.
+- https://raw.githubusercontent.com/nagisa/rust_libloading/0.9.0/src/os/unix/mod.rs — runtime-discovery follow-up: names containing a separator load that path; bare names use the platform loader search. Candidate failures remain fallible before ORT API installation.
 
 Read during this implementation run. These are external primary API sources, explicitly
 authorized by the caller. No existing target code or tests were read.

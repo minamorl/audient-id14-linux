@@ -1,0 +1,14 @@
+{"check": "file_created", "contract": "remix-state-v1", "instance": 1, "latency_frames": 3776, "model": "/home/minamorl/repos/.worktrees/audient-id14-linux/remix-runtime/crates/id14-remix-ladspa/fixtures/voice.onnx", "overloads": 0, "pid": 403, "state": 1, "state_name": "Active", "updated_unix_ms": 1791183068636}
+{"check": "state_change_and_heartbeat", "heartbeat_ms": 1006, "state": 2, "state_name": "Off"}
+{"check": "stopped_inference_visible", "contract": "remix-state-v1", "instance": 1, "latency_frames": 3776, "model": "/home/minamorl/repos/.worktrees/audient-id14-linux/remix-runtime/crates/id14-remix-ladspa/fixtures/voice.onnx", "overloads": 1, "pid": 403, "state": 6, "state_name": "Overloaded", "updated_unix_ms": 1791183069795}
+{"error":{"code":"ModelMissing","details":"file is missing or unreadable","message":"Remix model unavailable","trace_id":"01a10ad4-a264-74c4-8f5e-f5e8e39d7dde"},"level":"warn","msg":"Remix model unavailable; continuing with neutral playback","trace_id":"01a10ad4-a264-74c4-8f5e-f5e8e39d7dde","ts":1791183069.7965932}
+{"check": "owned_cleanup", "other_instance_preserved": true, "removed": true}
+{"bit_mismatches": 0, "check": "publication_failure_audio", "enabled": 0, "mode": "writable"}
+{"bit_mismatches": 0, "check": "publication_failure_audio", "enabled": 0, "mode": "unset"}
+{"bit_mismatches": 0, "check": "publication_failure_audio", "enabled": 0, "mode": "not_directory"}
+{"bit_mismatches": 0, "check": "publication_failure_audio", "enabled": 0, "mode": "permission_denied"}
+{"bit_mismatches": 0, "check": "publication_failure_audio", "enabled": 1, "mode": "writable"}
+{"bit_mismatches": 0, "check": "publication_failure_audio", "enabled": 1, "mode": "unset"}
+{"bit_mismatches": 0, "check": "publication_failure_audio", "enabled": 1, "mode": "not_directory"}
+{"bit_mismatches": 0, "check": "publication_failure_audio", "enabled": 1, "mode": "permission_denied"}
+STATE_SO_VERIFICATION_OK
