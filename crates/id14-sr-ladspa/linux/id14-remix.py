@@ -270,10 +270,14 @@ def probe_plugin(path):
             raise ValueError("remix LADSPA port names/order mismatch")
         if [value.flags[i] for i in range(11)] != [9, 9, 10, 10, 5, 5, 5, 5, 5, 6, 6]:
             raise ValueError("remix LADSPA port directions/types mismatch")
-        for i, bounds in [(4, (-6, 6)), (5, (-6, 6)), (6, (-6, 6)), (7, (-6, 6)), (8, (0, 1))]:
+        for i, bounds in [(4, (-6, 6)), (5, (-6, 6)), (6, (-6, 6)), (7, (-6, 6))]:
             hint = value.hints[i]
             if hint.descriptor & 3 != 3 or (hint.lower, hint.upper) != bounds:
                 raise ValueError("remix LADSPA control range mismatch")
+        # LADSPA TOGGLED permits only DEFAULT_0/DEFAULT_1 alongside it.
+        # Its boolean semantics do not use the bounded-range flags or fields.
+        if value.hints[8].descriptor != (0x4 | 0x240):
+            raise ValueError("remix LADSPA Enabled must be TOGGLED with DEFAULT_1")
         return
     raise ValueError("LADSPA label id14_remix_stereo missing")
 

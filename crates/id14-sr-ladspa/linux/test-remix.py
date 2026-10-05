@@ -226,7 +226,7 @@ apply_remix_to_output headphones
         self.assertNotIn("name = remix", result.stdout)
         self.assertIn("name = sr", result.stdout)
 
-    def build_plugin(self, label="id14_remix_stereo", count=11, flags=None):
+    def build_plugin(self, label="id14_remix_stereo", count=11, flags=None, enabled_hint=0x244):
         source = self.root / "fixture.c"
         library = self.root / "fixture.so"
         flags = flags or "9,9,10,10,5,5,5,5,5,6,6"
@@ -241,10 +241,10 @@ static const int flags[] = {FLAGS};
 static const char *const names[] = {"Input L","Input R","Output L","Output R",
  "Vocals","Drums","Bass","Other","Enabled","State","latency"};
 static const Hint hints[] = {{0,0,0},{0,0,0},{0,0,0},{0,0,0},
- {3,-6,6},{3,-6,6},{3,-6,6},{3,-6,6},{3,0,1},{3,0,8},{3,0,65536}};
+ {0x103,-6,6},{0x203,-6,6},{0x203,-6,6},{0x83,-6,6},{ENABLED_HINT,0,1},{3,0,8},{3,0,65536}};
 static const Descriptor descriptor = {1,"LABEL",0,"Fixture","Test","None",COUNT,flags,names,hints};
 const Descriptor *ladspa_descriptor(unsigned long i) { return i == 0 ? &descriptor : 0; }
-'''.replace("FLAGS", flags).replace("LABEL", label).replace("COUNT", str(count)))
+'''.replace("FLAGS", flags).replace("LABEL", label).replace("COUNT", str(count)).replace("ENABLED_HINT", str(enabled_hint)))
         self.run_command(["cc", "-shared", "-fPIC", str(source), "-o", str(library)])
         return library
 
@@ -257,6 +257,19 @@ const Descriptor *ladspa_descriptor(unsigned long i) { return i == 0 ? &descript
         ):
             library = self.build_plugin(label, count, flags)
             self.run_command([sys.executable, str(HELPER), "_probe", str(library)], expected)
+
+    def test_native_probe_rejects_enabled_without_toggle_or_default_one(self):
+        for hint in (0x3, 0x4, 0x204, 0x240, 0x247):
+            with self.subTest(enabled_hint=hex(hint)):
+                library = self.build_plugin(enabled_hint=hint)
+                result = self.run_command([sys.executable, str(HELPER), "_probe", str(library)], expected=1)
+                self.assertIn("TOGGLED with DEFAULT_1", json.loads(result.stderr)["message"])
+
+    def test_release_plugin_probe(self):
+        library = HERE.parents[2] / "target/release/libid14_remix_ladspa.so"
+        if not library.is_file():
+            self.skipTest("release plugin missing; run cargo build --release -p id14-remix-ladspa")
+        self.run_command([sys.executable, str(HELPER), "_probe", str(library)])
 
     def test_installer_destinations_and_model_opt_in(self):
         library = self.build_plugin()
