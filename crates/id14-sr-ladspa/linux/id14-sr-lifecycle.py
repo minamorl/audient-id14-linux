@@ -416,11 +416,14 @@ def restore(wait_seconds=20):
             present = {(node.get("info") or {}).get("props", {}).get("node.name") for node in nodes}
             if wanted.issubset(present):
                 active = systemctl("is-active", "--quiet", FILTER, check=False, timeout=remaining()).returncode == 0
-                if not active:
-                    result = systemctl("enable", "--now", FILTER, check=False, timeout=remaining())
+                # The transports carry node.dont-reconnect, so a running filter
+                # stays unlinked from the replugged hardware node; only a
+                # restart recreates them against it.
+                if active:
+                    result = systemctl("restart", FILTER, check=False, timeout=remaining())
                 else:
-                    result = None
-                if result is None or result.returncode == 0:
+                    result = systemctl("enable", "--now", FILTER, check=False, timeout=remaining())
+                if result.returncode == 0:
                     if run([home / ".local/bin/id14-sr", "reconcile"], check=False, timeout=remaining()).returncode == 0:
                         return
             if attempt < 5:

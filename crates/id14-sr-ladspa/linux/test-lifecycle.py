@@ -521,8 +521,13 @@ const void *ladspa_descriptor(unsigned long i) { return i ? 0 : &descriptor; }
                         self.assertEqual(unplugged, self.snapshot())
                         data['nodes'] = {NAMES['line']: 81, NAMES['headphones']: 92}
                         self.save_db(data)
+                        replug = len(self.events.read_text().splitlines())
                         result = self.device_event(True)
                         self.assertEqual(result.returncode, 0, result.stderr)
+                        # A running filter's transports do not follow the new
+                        # hardware node, so the replug must restart it.
+                        calls = [json.loads(line) for line in self.events.read_text().splitlines()[replug:]]
+                        self.assertEqual(['systemctl', ['--user', 'restart', FILTER]] in calls, active)
                         data = self.load_db()
                         wanted = ('line', 'headphones') if selection == 'all' else (selection,)
                         self.assertEqual(data['metadata'], {str(data['nodes'][NAMES[x]]): 'filter:' + x for x in wanted})
