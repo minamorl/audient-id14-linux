@@ -1,3 +1,0 @@
-[Service]
-Type=simple
-ExecStart=/fixture/pipewire -c filter-chain.conf
