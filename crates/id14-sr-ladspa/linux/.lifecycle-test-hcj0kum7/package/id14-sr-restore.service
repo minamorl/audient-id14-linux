@@ -1,0 +1,17 @@
+[Unit]
+Description=Restore iD14 processing on USB connection
+BindsTo=dev-snd-by\x2did-usb\x2dAudient_Audient_iD14\x2d00.device
+After=dev-snd-by\x2did-usb\x2dAudient_Audient_iD14\x2d00.device pipewire.service wireplumber.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/env python3 "%h/.local/lib/id14-sr/lifecycle.py" restore
+Environment="PATH=%h/.local/bin:%h/.nix-profile/bin:/run/current-system/sw/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="XDG_STATE_HOME=@STATE_HOME@"
+UMask=0077
+NoNewPrivileges=yes
+TimeoutStartSec=180
+
+[Install]
+WantedBy=dev-snd-by\x2did-usb\x2dAudient_Audient_iD14\x2d00.device
